@@ -23,7 +23,7 @@ export default function Home() {
             description="A valid product description"
             offers={1}
             time="7d"
-            to="/"
+            to="/1/1"
           />
           <ItemCard
             name="Product Test"

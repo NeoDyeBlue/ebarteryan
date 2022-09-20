@@ -4,12 +4,12 @@ import LocationBarterButtons from "../LocationBarterButtons";
 
 export default function CategoryNavbar() {
   return (
-    <div className="w-full shadow-md z-40 sticky top-[61px] lg:top-[75px] bg-white">
-      <div className="container mx-auto lg:gap-4 flex flex-col lg:flex-row">
+    <div className="sticky top-[61px] z-50 w-full bg-white shadow-md lg:top-[75px]">
+      <div className="container mx-auto flex flex-col lg:flex-row lg:gap-4">
         <div
-          className="relative flex before:block before:absolute before:w-4 before:left-0 before:h-full before:bg-gradient-to-r
-         before:from-white before:to-transparent before:z-50 after:block after:absolute after:w-4 after:right-0 after:h-full 
-         after:bg-gradient-to-l after:from-white after:to-transparent overflow-hidden w-full"
+          className="relative flex w-full overflow-hidden before:absolute before:left-0 before:z-50 before:block
+         before:h-full before:w-4 before:bg-gradient-to-r before:from-white before:to-transparent after:absolute after:right-0 after:block 
+         after:h-full after:w-4 after:bg-gradient-to-l after:from-white after:to-transparent"
         >
           <CategoryList>
             <CategoryListItem to="/" name="All Items" />
@@ -23,7 +23,7 @@ export default function CategoryNavbar() {
             <CategoryListItem to="/" name="Others" />
           </CategoryList>
         </div>
-        <LocationBarterButtons className="hidden lg:flex gap-4 py-4 flex-row-reverse w-full lg:max-w-[380px]" />
+        <LocationBarterButtons className="hidden w-full flex-row-reverse gap-4 py-4 lg:flex lg:max-w-[380px]" />
       </div>
     </div>
   );

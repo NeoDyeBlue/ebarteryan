@@ -13,7 +13,7 @@ export default function LocationBarterButtons({ className }) {
       <Button>
         <Pen size={20} /> Make a Barter
       </Button>
-      <Button secondary="true" underlined="true">
+      <Button underlined="true">
         <Location size={20} /> Pandi, Bulacan
       </Button>
     </div>

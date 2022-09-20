@@ -3,13 +3,17 @@ export default function Button({ secondary, underlined, children }) {
     <button
       className={`
       ${
-        secondary
-          ? "bg-white border border-gray-100 text-black-light"
-          : "bg-green text-white"
+        secondary && !underlined
+          ? "bg-white border border-black-light text-black-light"
+          : ""
       } ${
-        underlined ? "underline" : "no-underline"
+        underlined && !secondary
+          ? "underline bg-white border border-gray-100 text-black-light"
+          : "no-underline"
+      } ${
+        !underlined && !secondary ? "bg-green text-white" : ""
       } font-display text-[15px] font-medium text-center rounded-[10px] 
-        px-4 py-3 flex items-center justify-center gap-2 w-full text-ellipsis whitespace-nowrap
+        px-4 py-3 flex items-center justify-center gap-1 w-full text-ellipsis whitespace-nowrap
     `}
     >
       {children}

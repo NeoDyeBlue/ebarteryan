@@ -6,7 +6,7 @@
 
 @layer base {
   html {
-    @apply text-black-light font-body;
+    @apply font-body text-black-light;
   }
   h1,
   h2,
@@ -15,6 +15,21 @@
   h5,
   h6 {
     @apply font-display;
+  }
+  svg {
+    @apply inline;
+  }
+}
+
+@layer components {
+  .tab {
+    @apply relative flex h-[70px] cursor-pointer items-center justify-center gap-2 whitespace-nowrap text-center 
+    font-display font-medium capitalize text-gray-300 outline-none before:absolute before:bottom-0 
+    before:block before:h-[3px] before:w-full before:rounded-full hover:text-black-light hover:before:bg-gray-300;
+  }
+
+  .tab-active {
+    @apply text-black-light before:bg-green hover:before:bg-green;
   }
 }
 

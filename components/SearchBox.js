@@ -14,7 +14,7 @@ export default function SearchBox({ className }) {
             placeholder="Search in eBarterYan"
           ></input>
           <button className="bg-green rounded-full text-white p-1 lg:p-2">
-            <Search size={16} />
+            <Search size={16} className="block" />
           </button>
         </div>
       </div>
