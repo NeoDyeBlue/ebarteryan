@@ -1,4 +1,4 @@
-import { Timer, Need, ArrowsHorizontal } from "@carbon/icons-react";
+import { Timer, Need } from "@carbon/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -12,9 +12,9 @@ export default function ItemCard({
 }) {
   return (
     <Link href={to}>
-      <a className="flex flex-col gap-2 max-h-[400px]">
-        <div className="relative w-full min-h-[150px] overflow-hidden rounded-[10px] aspect-square">
-          <div className="bg-cyan rounded-[10px] flex items-center justify-centers px-2 py-1 absolute m-2 top-0 right-0 z-10 gap-1">
+      <a className="flex max-h-[400px] flex-col gap-2">
+        <div className="relative aspect-square min-h-[150px] w-full overflow-hidden rounded-[10px]">
+          <div className="justify-centers absolute top-0 right-0 z-10 m-2 flex items-center gap-1 rounded-[10px] bg-cyan px-2 py-1">
             <Timer size={16} />
             <p className="text-sm">{time}</p>
           </div>
@@ -25,17 +25,17 @@ export default function ItemCard({
           />
         </div>
         <div className="flex flex-col gap-1 text-gray-400">
-          <p className="font-display font-semibold whitespace-nowrap text-ellipsis text-black-light">
+          <p className="text-ellipsis whitespace-nowrap font-display font-semibold text-black-light">
             {name}
           </p>
           <p className="text-[15px] font-medium">Exchange for:</p>
-          <p className="text-ellipsis text-[15px] overflow-hidden whitespace-nowrap">
+          <p className="overflow-hidden text-ellipsis whitespace-nowrap text-[15px]">
             {description}
           </p>
         </div>
-        <div className="flex gap-1 items-center text-black-light self-end">
+        <div className="flex items-center gap-1 self-end text-black-light">
           <Need />
-          <p className="font-display font-semibold text-sm">{offers}</p>
+          <p className="font-display text-sm font-semibold">{offers}</p>
         </div>
       </a>
     </Link>

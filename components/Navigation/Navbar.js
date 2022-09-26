@@ -20,7 +20,7 @@ export default function Navbar() {
           </a>
         </Link>
         <SearchBox className="container absolute top-0 left-0 z-10 mx-auto hidden h-full w-full max-w-[500px] px-4 lg:relative lg:block" />
-        <div className="flex items-center gap-4 md:gap-10">
+        <div className="flex items-center gap-4 md:gap-7">
           <ul className="hidden items-center gap-7 md:flex">
             <li>
               <Link href="/">
@@ -53,13 +53,15 @@ export default function Navbar() {
           <button className="flex cursor-pointer items-center justify-center md:hidden">
             <Search size={24} />
           </button>
-          <div className="relative h-6 w-6 overflow-hidden rounded-full">
-            <Image
-              src="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-              layout="fill"
-              // objectFit="cover"
-            />
-          </div>
+          <Link href="/profile">
+            <a className="relative h-6 w-6 overflow-hidden rounded-full">
+              <Image
+                src="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
+                layout="fill"
+                // objectFit="cover"
+              />
+            </a>
+          </Link>
         </div>
       </div>
     </nav>

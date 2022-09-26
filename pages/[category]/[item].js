@@ -32,7 +32,7 @@ export default function Item() {
             showThumbs={false}
             showStatus={false}
             infiniteLoop
-            className="-mx-4 -mt-4 w-auto md:col-start-1 md:row-start-2 md:m-0 md:overflow-hidden md:rounded-[10px]
+            className="-mx-6 -mt-4 w-auto md:col-start-1 md:row-start-2 md:m-0 md:overflow-hidden md:rounded-[10px]
             "
           >
             <div className="relative aspect-square min-h-[200px] w-full">
@@ -209,6 +209,9 @@ export default function Item() {
           <div className="container mx-auto">
             <TabPanel>
               <OfferList>
+                <OfferListItem />
+                <OfferListItem />
+                <OfferListItem />
                 <OfferListItem />
                 <OfferListItem />
               </OfferList>
