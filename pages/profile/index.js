@@ -1,6 +1,7 @@
 import NavLayout from "../../components/Layouts/NavLayout";
 import Image from "next/image";
 import Head from "next/head";
+import Link from "next/link";
 import { Rating } from "react-simple-star-rating";
 import { ArrowsHorizontal, Need, StarFilled } from "@carbon/icons-react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
@@ -45,9 +46,9 @@ export default function Profile() {
                 <p>•</p>
                 <p className="text-[15px]">10</p>
               </div>
-              <a href="#reviews" className="font-medium underline">
-                See Reviews
-              </a>
+              <Link href="#reviews">
+                <a className="font-medium underline">See Reviews</a>
+              </Link>
             </div>
           </div>
           <div className="flex w-full gap-4 md:w-auto md:gap-8">
@@ -169,7 +170,10 @@ export default function Profile() {
           </Tabs>
         </div>
         {/* reviews */}
-        <div id="reviews" className="flex flex-col gap-6 md:flex-row">
+        <div
+          id="reviews"
+          className="flex scroll-mt-24 flex-col gap-6 md:flex-row"
+        >
           <div className="flex flex-col gap-4 md:w-[35%]">
             <div className="flex items-center gap-4">
               <p className="flex items-center gap-2 font-display text-2xl font-semibold">
