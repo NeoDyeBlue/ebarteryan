@@ -13,14 +13,14 @@ export default function CategoryNavbar() {
         >
           <CategoryList>
             <CategoryListItem to="/" name="All Items" />
-            <CategoryListItem to="/" name="Appliances" />
-            <CategoryListItem to="/" name="Automotive" />
-            <CategoryListItem to="/" name="Clothings" />
-            <CategoryListItem to="/" name="Electronics" />
-            <CategoryListItem to="/" name="Furnitures" />
-            <CategoryListItem to="/" name="Groceries" />
-            <CategoryListItem to="/" name="Plants" />
-            <CategoryListItem to="/" name="Others" />
+            <CategoryListItem to="/appliances" name="Appliances" />
+            <CategoryListItem to="/automotive" name="Automotive" />
+            <CategoryListItem to="/clothings" name="Clothings" />
+            <CategoryListItem to="/electronics" name="Electronics" />
+            <CategoryListItem to="/furnitures" name="Furnitures" />
+            <CategoryListItem to="/groceries" name="Groceries" />
+            <CategoryListItem to="/plants" name="Plants" />
+            <CategoryListItem to="/others" name="Others" />
           </CategoryList>
         </div>
         <LocationBarterButtons className="hidden w-full flex-row-reverse gap-4 py-4 lg:flex lg:max-w-[380px]" />

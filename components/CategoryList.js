@@ -3,7 +3,7 @@ import ScrollContainer from "react-indiana-drag-scroll";
 export default function CategoryList({ children }) {
   return (
     <ScrollContainer>
-      <ul className="flex gap-9 px-4 h-[60px] lg:h-[80px] w-min">{children}</ul>
+      <ul className="flex h-[60px] w-min gap-9 px-4 lg:h-full">{children}</ul>
     </ScrollContainer>
   );
 }

@@ -19,6 +19,10 @@
   svg {
     @apply inline;
   }
+
+  [contenteditable="true"]:empty:before {
+    @apply pointer-events-none block text-gray-300 content-[attr(placeholder)];
+  }
 }
 
 @layer components {
@@ -29,8 +33,14 @@
   }
 
   .tab-active {
-    @apply text-black-light before:bg-green hover:before:bg-green;
+    @apply text-black-light before:bg-green-500 hover:before:bg-green-500;
   }
+}
+
+[contenteditable="true"]:empty:before {
+  content: attr(placeholder);
+  pointer-events: none;
+  display: block; /* For Firefox */
 }
 
 html,

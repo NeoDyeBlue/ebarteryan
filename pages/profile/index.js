@@ -61,7 +61,7 @@ export default function Profile() {
                 Bartered Items
               </p>
             </div>
-            <div className="w-[1px] bg-green"></div>
+            <div className="w-[1px] bg-green-500"></div>
             <div className="flex w-full flex-col items-center justify-center gap-2">
               <div className="flex items-center gap-2">
                 <Need size={32} />
@@ -95,7 +95,7 @@ export default function Profile() {
             <div>
               <TabPanel>
                 <div
-                  className="grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
+                  className="grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 py-4 
            lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:py-6"
                 >
                   <ItemCard

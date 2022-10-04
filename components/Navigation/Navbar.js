@@ -13,8 +13,8 @@ export default function Navbar() {
       <div className="container relative mx-auto flex items-center justify-between py-4 lg:py-3">
         <Link href="/">
           <a className="flex items-center gap-2">
-            <Logo />
-            <p className="font-display text-xl font-semibold text-green md:text-2xl">
+            <Logo responsive={true} />
+            <p className="font-display text-xl font-semibold text-green-500 md:text-2xl">
               eBarterYan
             </p>
           </a>

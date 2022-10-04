@@ -14,7 +14,7 @@ export default function ItemCard({
     <Link href={to}>
       <a className="flex max-h-[400px] flex-col gap-2">
         <div className="relative aspect-square min-h-[150px] w-full overflow-hidden rounded-[10px]">
-          <div className="justify-centers absolute top-0 right-0 z-10 m-2 flex items-center gap-1 rounded-[10px] bg-cyan px-2 py-1">
+          <div className="justify-centers absolute top-0 right-0 z-10 m-2 flex items-center gap-1 rounded-[10px] bg-gray-400 px-2 py-1 text-white shadow-md">
             <Timer size={16} />
             <p className="text-sm">{time}</p>
           </div>

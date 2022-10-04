@@ -1,8 +1,13 @@
 import Image from "next/image";
 
-export default function Logo() {
+export default function Logo({ responsive, size }) {
   return (
-    <span className="relative w-[24px] h-[24px] md:w-[36px] md:h-[36px]">
+    <span
+      style={!responsive ? { width: `${size}px`, height: `${size}px` } : {}}
+      className={`relative ${
+        responsive || !size ? "h-[24px] w-[24px] md:h-[36px] md:w-[36px]" : ""
+      }`}
+    >
       <Image src="/ebarteryan.svg" alt="ebarteryan logo" layout="fill" />
     </span>
   );

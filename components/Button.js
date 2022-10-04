@@ -4,16 +4,16 @@ export default function Button({ secondary, underlined, children }) {
       className={`
       ${
         secondary && !underlined
-          ? "bg-white border border-black-light text-black-light"
+          ? "border border-black-light bg-white text-black-light"
           : ""
       } ${
         underlined && !secondary
-          ? "underline bg-white border border-gray-100 text-black-light"
+          ? "border border-gray-100 bg-white text-black-light underline"
           : "no-underline"
       } ${
-        !underlined && !secondary ? "bg-green text-white" : ""
-      } font-display text-[15px] font-medium text-center rounded-[10px] 
-        px-4 py-3 flex items-center justify-center gap-1 w-full text-ellipsis whitespace-nowrap
+        !underlined && !secondary ? "bg-green-500 text-white" : ""
+      } flex w-full items-center justify-center gap-1 
+        text-ellipsis whitespace-nowrap rounded-[10px] px-4 py-3 text-center font-display text-[15px] font-medium
     `}
     >
       {children}
