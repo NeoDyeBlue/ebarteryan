@@ -1,9 +1,9 @@
 import { useRef } from "react";
 
-export default function Textarea({ label, placeholder }) {
+export default function Textarea({ label, placeholder, infoMessage }) {
   const textBoxRef = useRef(null);
   return (
-    <div className="flex flex-col gap-1">
+    <div className="flex flex-col gap-2">
       {label && <p className="font-display font-medium">{label}</p>}
       <div
         className="min-h-[100px] w-full rounded-[10px] border border-gray-100 bg-white
@@ -15,6 +15,14 @@ export default function Textarea({ label, placeholder }) {
         role="textbox"
         placeholder={placeholder}
       ></div>
+      {infoMessage && (
+        <p className="flex gap-1 text-sm text-gray-200">
+          <span>
+            <Information size={16} />
+          </span>
+          {infoMessage}
+        </p>
+      )}
     </div>
   );
 }

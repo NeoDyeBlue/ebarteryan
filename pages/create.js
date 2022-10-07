@@ -2,8 +2,13 @@ import Head from "next/head";
 import CreationLayout from "../components/Layouts/CreationLayout";
 import InputField from "../components/Inputs/InputField";
 import Textarea from "../components/Inputs/Textarea";
+import ImageSelector from "../components/Inputs/ImageSelector";
+import DropdownSelect from "../components/Inputs/DropdownSelect";
+import { useState } from "react";
 
 export default function Create() {
+  const [formData, setFormData] = useState({ category: "" });
+  // function handleSelectedCategoryChange
   return (
     <div className="w-full">
       <Head>
@@ -17,6 +22,10 @@ export default function Create() {
           <p className="text-gray-300">Step 1 of 3: Details</p>
         </div>
         <form className="flex flex-col gap-4">
+          <ImageSelector
+            label="Upload Photos"
+            infoMessage="You can upload up to 10 photos only."
+          />
           <InputField
             label="Item Name"
             name="name"
@@ -27,6 +36,15 @@ export default function Create() {
             placeholder="What do you want in exchange..."
           />
           <Textarea label="Description" placeholder="Item description..." />
+          <DropdownSelect
+            items={[1, 2, 3]}
+            placeholder="Select a category"
+            label="Category"
+            selectedItem={formData.category}
+            handleSelectedItemChange={({ selectedItem }) =>
+              setFormData((prev) => ({ ...prev, category: selectedItem }))
+            }
+          />
         </form>
       </div>
     </div>
