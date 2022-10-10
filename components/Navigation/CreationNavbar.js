@@ -15,8 +15,17 @@ export default function CreationNavbar() {
         <Link href="/">
           <a className="flex items-center gap-2">
             <Logo size={36} />
+            <p className="hidden font-display text-xl font-semibold text-green-500 md:block md:text-2xl">
+              eBarterYan
+            </p>
           </a>
         </Link>
+        <button
+          type="button"
+          className="ml-auto font-display font-medium text-green-500"
+        >
+          Save as Draft
+        </button>
       </div>
     </nav>
   );

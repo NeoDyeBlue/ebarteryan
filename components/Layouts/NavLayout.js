@@ -3,20 +3,20 @@ import Footer from "../Navigation/Footer";
 import MobileNavbar from "../Navigation/MobileNavbar";
 import MessagesModal from "../Modals/MessagesModal";
 
-export default function NavLayout({ children }) {
+export default function NavLayout({ noFooter, children }) {
   return (
     <>
       <Navbar />
       {children}
       <MobileNavbar
-        className="fixed container flex items-center w-full z-20
-      bg-white mx-auto bottom-0 py-4 h-[70px] border-t border-gray-200 lg:hidden"
+        className="container fixed bottom-0 z-20 mx-auto flex
+      h-[70px] w-full items-center border-t border-gray-200 bg-white py-4 lg:hidden"
       />
       <MessagesModal
         hasBadge={true}
-        className="fixed bottom-0 w-full pointer-events-none hidden lg:block z-10"
+        className="pointer-events-none fixed bottom-0 z-10 hidden w-full lg:block"
       />
-      <Footer />
+      {!noFooter && <Footer />}
     </>
   );
 }

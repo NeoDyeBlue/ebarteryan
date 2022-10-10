@@ -8,6 +8,7 @@ export default function DropdownSelect({
   handleSelectedItemChange,
   placeholder,
   label,
+  id,
 }) {
   const {
     isOpen,
@@ -22,7 +23,7 @@ export default function DropdownSelect({
     onSelectedItemChange: handleSelectedItemChange,
   });
   return (
-    <div className="relative">
+    <div className="relative" id={id}>
       <div className="flex flex-col gap-2">
         {label && (
           <label {...getLabelProps()} className="font-display font-medium">
@@ -46,8 +47,8 @@ export default function DropdownSelect({
       </div>
       <ul
         {...getMenuProps()}
-        className="absolute mt-1 max-h-80 w-full overflow-x-auto rounded-[10px]
-        bg-white shadow-[0_0_8px_0_rgba(0,0,0,0.2)]"
+        className="absolute z-10 mt-1 max-h-80 w-full overflow-x-auto
+        rounded-[10px] bg-white shadow-[0_0_8px_0_rgba(0,0,0,0.2)]"
       >
         {isOpen &&
           items.map((item, index) => (

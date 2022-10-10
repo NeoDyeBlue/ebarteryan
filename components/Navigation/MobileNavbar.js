@@ -11,7 +11,7 @@ import {
 export default function MobileNavbar({ className }) {
   return (
     <nav className={className}>
-      <ul className="flex items-center justify-between w-full">
+      <ul className="flex w-full items-center justify-between">
         <li>
           <Link href="/">
             <a>
@@ -49,7 +49,7 @@ export default function MobileNavbar({ className }) {
           </Link>
         </li>
         <li>
-          <Link href="/">
+          <Link href="/messages">
             <a>
               <BadgedIcon hasBadge={true}>
                 <Chat size={24} />

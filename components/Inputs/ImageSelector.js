@@ -46,7 +46,7 @@ export default function ImageSelector({ label, infoMessage }) {
             type="button"
             onClick={() => openFileSelector()}
             className="flex aspect-square flex-col items-center justify-center overflow-hidden 
-        rounded-[10px] bg-gray-100 p-1 font-body text-sm text-gray-300"
+        rounded-[10px] bg-gray-100 p-2 font-body text-sm text-gray-300"
           >
             <Image size={32} /> Add Photo
           </button>
