@@ -6,7 +6,7 @@ export default function Textarea({ label, placeholder, infoMessage }) {
     <div className="flex flex-col gap-2">
       {label && <p className="font-display font-medium">{label}</p>}
       <div
-        className="min-h-[100px] w-full rounded-[10px] border border-gray-100 bg-white
+        className="min-h-[100px] w-full break-all rounded-[10px] border border-gray-100 bg-white
             p-4 font-body placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-green-500"
         ref={textBoxRef}
         contentEditable="true"
