@@ -14,7 +14,7 @@ export default function NavLayout({ noFooter, children }) {
       />
       <MessagesModal
         hasBadge={true}
-        className="pointer-events-none fixed bottom-0 z-10 hidden w-full lg:block"
+        className="pointer-events-none fixed bottom-0 z-50 hidden w-full lg:block"
       />
       {!noFooter && <Footer />}
     </>

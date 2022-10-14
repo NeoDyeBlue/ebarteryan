@@ -35,6 +35,18 @@
   .tab-active {
     @apply text-black-light before:bg-green-500 hover:before:bg-green-500;
   }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    @apply h-[8px] w-[8px];
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    @apply rounded-[10px];
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply rounded-[10px] bg-gray-100;
+  }
 }
 
 [contenteditable="true"]:empty:before {
