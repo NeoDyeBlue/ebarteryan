@@ -6,7 +6,7 @@
 
 @layer base {
   html {
-    @apply font-body text-black-light;
+    @apply font-body text-[15px] text-black-light;
   }
   h1,
   h2,
