@@ -11,7 +11,8 @@ import MessageSearchBox from "../Messages/MessageSearchBox";
 import { OverflowMenuVertical } from "@carbon/icons-react";
 import CircleButton from "../CircleButton";
 
-export default function MessagesModal({ className, hasBadge }) {
+export default function MessagesPopup
+({ className, hasBadge }) {
   const userId = 1;
   const chats = [
     {

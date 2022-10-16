@@ -27,7 +27,7 @@
 
 @layer components {
   .tab {
-    @apply relative flex h-[70px] cursor-pointer items-center justify-center gap-2 whitespace-nowrap text-center 
+    @apply relative flex h-[60px] cursor-pointer items-center justify-center gap-2 whitespace-nowrap text-center 
     font-display font-medium capitalize text-gray-300 outline-none before:absolute before:bottom-0 
     before:block before:h-[3px] before:w-full before:rounded-full hover:text-black-light hover:before:bg-gray-300;
   }

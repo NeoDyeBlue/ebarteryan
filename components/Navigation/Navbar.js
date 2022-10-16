@@ -4,10 +4,29 @@ import Image from "next/image";
 import { Notification, Bookmark, ArrowsHorizontal } from "@carbon/icons-react";
 import BadgedIcon from "../Icons/BadgedIcon";
 import SearchBox from "../SearchBox";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Search } from "@carbon/icons-react";
+import { useRouter } from "next/router";
+import NotificationPopup from "../Popups/NotificationsPopup";
+import useOnClickOutside from "../../hooks/useOnClickOutside";
 
 export default function Navbar() {
+  const [showNotifications, setShowNotifications] = useState(false);
+  const popupRef = useRef(null);
+  const router = useRouter();
+  const currentRoute = router.asPath;
+  useOnClickOutside(popupRef, hideNotificationsPopup);
+
+  function showNotificationsPopup() {
+    if (currentRoute != "/notifications") {
+      setShowNotifications((prev) => !prev);
+    }
+  }
+
+  function hideNotificationsPopup() {
+    setShowNotifications(false);
+  }
+
   return (
     <nav className="sticky top-0 z-50 w-full border-b border-b-gray-100 bg-white">
       <div className="container relative mx-auto flex items-center justify-between py-4 lg:py-3">
@@ -20,10 +39,10 @@ export default function Navbar() {
           </a>
         </Link>
         <SearchBox className="container absolute top-0 left-0 z-10 mx-auto hidden h-full w-full max-w-[500px] px-4 lg:relative lg:block" />
-        <div className="flex items-center gap-4 md:gap-7">
+        <div className="relative flex items-center gap-4 md:gap-7">
           <ul className="hidden items-center gap-7 md:flex">
             <li>
-              <Link href="/">
+              <Link href="/offers">
                 <a>
                   <BadgedIcon hasBadge={true}>
                     <ArrowsHorizontal size={24} />
@@ -31,17 +50,26 @@ export default function Navbar() {
                 </a>
               </Link>
             </li>
-            <li>
-              <Link href="/">
-                <a>
-                  <BadgedIcon hasBadge={true}>
-                    <Notification size={24} />
-                  </BadgedIcon>
-                </a>
-              </Link>
+            <li
+              className="relative"
+              ref={popupRef}
+              onClick={showNotificationsPopup}
+            >
+              <button
+                className={`${
+                  showNotifications || currentRoute == "/notifications"
+                    ? "text-green-500"
+                    : ""
+                }`}
+              >
+                <BadgedIcon hasBadge={true}>
+                  <Notification size={24} />
+                </BadgedIcon>
+              </button>
+              {showNotifications && <NotificationPopup />}
             </li>
             <li>
-              <Link href="/">
+              <Link href="/saved">
                 <a>
                   <BadgedIcon hasBadge={true}>
                     <Bookmark size={24} />
