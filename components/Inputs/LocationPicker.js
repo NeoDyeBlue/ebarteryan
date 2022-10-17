@@ -1,42 +1,25 @@
-import { useState, useCallback, useMemo } from "react";
-import { GoogleMap, useJsApiLoader, MarkerF } from "@react-google-maps/api";
+import { MapContainer, TileLayer, useMap, Marker, Popup } from "react-leaflet";
+import "leaflet/dist/leaflet.css";
+import { useMemo } from "react";
 
 export default function LocationPicker() {
-  const { isLoaded } = useJsApiLoader({
-    id: "google-map-script",
-    googleMapsApiKey: process.env.GOOGLE_API_KEY,
-  });
-
-  console.log(process.env.GOOGLE_API_KEY);
-
-  const center = {
-    lat: -3.745,
-    lng: -38.523,
-  };
-
-  const onLoad = useCallback((map) => {
-    const bounds = new window.google.maps.LatLngBounds(center);
-    map.fitBounds(bounds);
-    setMap(map);
-  }, []);
-
-  const onUnmount = useCallback((map) => setMap(null), []);
-
-  const [map, setMap] = useState(null);
-
-  return isLoaded ? (
-    <GoogleMap
-      //   mapContainerStyle={containerStyle}
-      mapContainerClassName="w-full h-full min-h-[400px]"
+  const center = useMemo(() => [51.505, -0.09], []);
+  return (
+    <MapContainer
       center={center}
-      zoom={10}
-      onLoad={onLoad}
-      onUnmount={onUnmount}
+      zoom={13}
+      scrollWheelZoom={false}
+      className="h-[400px] max-w-full"
     >
-      {/* Child components, such as markers, info windows, etc. */}
-      <></>
-    </GoogleMap>
-  ) : (
-    <div className="h-full min-h-[60vh] w-full animate-pulse rounded-[10px] bg-gray-100"></div>
+      <TileLayer
+        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+      />
+      <Marker position={center}>
+        <Popup>
+          A pretty CSS3 popup. <br /> Easily customizable.
+        </Popup>
+      </Marker>
+    </MapContainer>
   );
 }
