@@ -98,7 +98,18 @@ module.exports = {
         "2xl": "3rem",
       },
     },
-    extend: {},
+    extend: {
+      keyframes: {
+        "color-fade": {
+          "0%": { backgroundColor: "transparent" },
+          "100%": { backgroundColor: "rgba(0,0,0,0.2)" },
+        },
+        "slide-up": {
+          "0%": { transform: "translateY(-100%)" },
+          "100%": { transform: "translateY(0)" },
+        },
+      },
+    },
   },
   plugins: [require("tailwind-scrollbar-hide")],
 };

@@ -12,11 +12,11 @@ export default function CategoryListItem({ to, name }) {
           ${
             currentRoute == to
               ? "text-black-light before:bg-green-500"
-              : "before:scale-x-0 hover:text-black-light hover:before:scale-x-100 hover:before:bg-gray-300 "
+              : "hover:text-black-light hover:before:bg-gray-300"
           }
             relative flex h-full w-full items-center justify-center whitespace-nowrap 
             text-center font-display text-sm font-medium capitalize text-gray-300
-            before:absolute before:bottom-0 before:block before:h-[3px] before:w-full before:rounded-full before:transition-transform`}
+            before:absolute before:bottom-0 before:block before:h-[3px] before:w-full before:rounded-full before:transition-colors`}
         >
           {name}
         </a>

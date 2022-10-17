@@ -4,6 +4,21 @@ import StatusBadge from "./StatusBadge";
 import ItemMiniCard from "./Cards/ItemMiniCard";
 
 export default function UserOfferListItem({ status }) {
+  let colors = "";
+  switch (status) {
+    case "info":
+      colors = "bg-info-500 text-white";
+      break;
+    case "waiting":
+      colors = "bg-warning-500 text-black-light";
+      break;
+    case "success":
+      colors = "bg-success-500 text-white";
+      break;
+    case "failed":
+      colors = "bg-danger-500 text-white";
+      break;
+  }
   return (
     <li className="flex cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 p-3 hover:bg-gray-100/30">
       <div className="flex items-center justify-between">
@@ -17,14 +32,14 @@ export default function UserOfferListItem({ status }) {
           </div>
           <p className="font-display font-medium">Another User</p>
         </div>
-        <StatusBadge type={status} statusText={status} />
+        <StatusBadge status={status} statusText={status} />
       </div>
       {/* items */}
       <div className="relative flex flex-col items-center gap-2">
         <ItemMiniCard from="You" itemName="Item Name" />
         <div
-          className="absolute top-[50%] right-0 z-30 flex h-[36px] w-[36px] translate-y-[-50%]
-         items-center justify-center rounded-full border border-gray-100 bg-white shadow-lg"
+          className={`absolute top-[50%] right-0 z-20 flex h-[36px] w-[36px] translate-y-[-50%] items-center
+         justify-center rounded-full ${colors} shadow-lg`}
         >
           <ArrowsHorizontal
             size={24}

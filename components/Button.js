@@ -1,6 +1,7 @@
-export default function Button({ secondary, underlined, children }) {
+export default function Button({ secondary, underlined, children, onClick }) {
   return (
     <button
+      onClick={onClick}
       className={`
       ${
         secondary && !underlined

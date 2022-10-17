@@ -43,7 +43,11 @@ export default function Navbar() {
           <ul className="hidden items-center gap-7 md:flex">
             <li>
               <Link href="/offers">
-                <a>
+                <a
+                  className={`${
+                    currentRoute == "/offers" ? "bg-black text-green-500" : ""
+                  }`}
+                >
                   <BadgedIcon hasBadge={true}>
                     <ArrowsHorizontal size={24} />
                   </BadgedIcon>

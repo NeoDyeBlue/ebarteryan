@@ -16,7 +16,6 @@ export default function ImageSelector({ label, infoMessage }) {
   const [images, setImages] = useState([]);
 
   useEffect(() => {
-    console.log("re");
     setImages((prev) => [
       ...prev,
       ...filesContent.slice(0, 10 - images.length),

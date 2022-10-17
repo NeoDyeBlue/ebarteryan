@@ -28,8 +28,8 @@
 @layer components {
   .tab {
     @apply relative flex h-[60px] cursor-pointer items-center justify-center gap-2 whitespace-nowrap text-center 
-    font-display font-medium capitalize text-gray-300 outline-none before:absolute before:bottom-0 
-    before:block before:h-[3px] before:w-full before:rounded-full hover:text-black-light hover:before:bg-gray-300;
+    font-display font-medium capitalize text-gray-300 outline-none before:absolute before:bottom-0 before:block
+    before:h-[3px] before:w-full before:rounded-full before:transition-colors hover:text-black-light hover:before:bg-gray-300;
   }
 
   .tab-active {
@@ -46,6 +46,10 @@
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
     @apply rounded-[10px] bg-gray-100;
+  }
+
+  .modal-open-body {
+    @apply h-full overflow-hidden;
   }
 }
 
