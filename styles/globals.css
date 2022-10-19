@@ -23,6 +23,33 @@
   [contenteditable="true"]:empty:before {
     @apply pointer-events-none block text-gray-300 content-[attr(placeholder)];
   }
+
+  input[type="range"] {
+    @apply cursor-pointer appearance-none bg-transparent;
+  }
+
+  input[type="range"]::-webkit-slider-runnable-track,
+  input[type="range"]::-moz-range-track {
+    @apply h-[4px] rounded-full bg-gray-100;
+  }
+
+  input[type="range"]::webkit-progress-value {
+    @apply bg-green-500;
+  }
+
+  input[type="range"]::-webkit-slider-thumb,
+  input[type="range"]::-moz-range-thumb {
+    @apply -mt-[4px] h-[12px] w-[12px] appearance-none rounded-full bg-green-500 transition-all;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover,
+  input[type="range"]::-moz-range-thumb:hover {
+    @apply scale-105 ring-4 ring-green-500/30;
+  }
+
+  /* input[type="range"]::-moz-range-track {
+    @apply h-[4px] rounded-full bg-gray-100;
+  } */
 }
 
 @layer components {
@@ -51,12 +78,6 @@
   .modal-open-body {
     @apply h-full overflow-hidden;
   }
-}
-
-[contenteditable="true"]:empty:before {
-  content: attr(placeholder);
-  pointer-events: none;
-  display: block; /* For Firefox */
 }
 
 html,

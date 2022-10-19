@@ -27,12 +27,12 @@ export default function LocationBarterButtons({ className }) {
         onRequestClose={closeLocationModal}
         bodyOpenClassName="modal-open-body"
         className={`relative h-[90vh] w-full overflow-hidden rounded-t-[10px] bg-white
-         py-6 shadow-lg md:m-auto md:max-w-[480px] md:rounded-[10px]`}
+         py-6 shadow-lg md:m-auto md:max-w-[580px] md:rounded-[10px]`}
       >
         <div
-          className={`custom-scrollbar container max-h-full min-h-full overflow-y-auto md:px-6`}
+          className={`custom-scrollbar container flex max-h-full min-h-full overflow-y-auto md:px-6`}
         >
-          <LocationModal />
+          <LocationModal onClose={closeLocationModal} />
           {/* <OfferModal onClose={closeOfferModal} /> */}
         </div>
       </ReactModal>
