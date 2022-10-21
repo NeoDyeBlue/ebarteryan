@@ -11,10 +11,6 @@ module.exports = {
     },
     colors: {
       transparent: "transparent",
-      // green: {
-      //   DEFAULT: "#85CB33",
-      //   light: "#E7F6D1",
-      // },
       green: {
         100: "#F2FCD6",
         200: "#E1F9AE",

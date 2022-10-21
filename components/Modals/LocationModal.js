@@ -4,8 +4,11 @@ const Map = dynamic(() => import("../Map/Map"), {
 });
 import { Add } from "@carbon/icons-react";
 import CircleButton from "../CircleButton";
+import Button from "../Button";
+import useMapStore from "../../store/useMapStore";
 
 export default function LocationModal({ onClose }) {
+  const { setListingLocation, region } = useMapStore();
   return (
     <div
       className="flex max-h-full min-h-full w-full flex-shrink-0 flex-col
@@ -20,6 +23,15 @@ export default function LocationModal({ onClose }) {
       </div>
       <hr className="border-gray-100" />
       <Map withRadiusPicker={true} />
+      <Button
+        disabled={!region}
+        onClick={() => {
+          setListingLocation();
+          onClose();
+        }}
+      >
+        Apply
+      </Button>
     </div>
   );
 }

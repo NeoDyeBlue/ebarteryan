@@ -3,8 +3,10 @@ import LocationBarterButtons from "../components/LocationBarterButtons";
 import ItemCard from "../components/Cards/ItemCard";
 import NavLayout from "../components/Layouts/NavLayout";
 import CategoryLayout from "../components/Layouts/CategoryLayout";
+import useMapStore from "../store/useMapStore";
 
 export default function Home() {
+  const { listingRegion, radius } = useMapStore();
   return (
     <div className="w-full">
       <Head>
@@ -13,10 +15,18 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <LocationBarterButtons />
-      <div className="container mx-auto relative">
+      <div className="container relative mx-auto">
+        {listingRegion && (
+          <p className="align-right py-3 text-gray-300 md:pt-8">
+            Listing items from{" "}
+            <span className="font-medium text-black-light">
+              {listingRegion} - {radius}km
+            </span>
+          </p>
+        )}
         <div
           className="grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
-           lg:gap-6 lg:py-6 lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))]"
+           lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:py-6"
         >
           <ItemCard
             name="Product Test"

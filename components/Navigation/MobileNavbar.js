@@ -11,7 +11,7 @@ import {
 export default function MobileNavbar({ className }) {
   return (
     <nav className={className}>
-      <ul className="flex w-full items-center justify-between">
+      <ul className="container mx-auto flex w-full items-center justify-between">
         <li>
           <Link href="/">
             <a>

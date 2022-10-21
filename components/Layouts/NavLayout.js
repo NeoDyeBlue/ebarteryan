@@ -9,8 +9,8 @@ export default function NavLayout({ noFooter, children }) {
       <Navbar />
       {children}
       <MobileNavbar
-        className="container fixed bottom-0 z-20 mx-auto flex
-      h-[70px] w-full items-center border-t border-gray-200 bg-white py-4 lg:hidden"
+        className="fixed bottom-0 z-20 flex h-[70px]
+      w-full w-full items-center border-t border-gray-200 bg-white py-4 lg:hidden"
       />
       <MessagesPopup
         hasBadge={true}

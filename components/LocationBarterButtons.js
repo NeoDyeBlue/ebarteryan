@@ -9,7 +9,7 @@ export default function LocationBarterButtons({ className }) {
   ReactModal.setAppElement("#__next");
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   function openLocationModal() {
-    console.log("t");
+    console.log("map open");
     setLocationModalOpen(true);
   }
 
@@ -52,7 +52,8 @@ export default function LocationBarterButtons({ className }) {
           </a>
         </Link>
         <Button underlined="true" onClick={openLocationModal}>
-          <Location size={20} /> Pandi, Bulacan
+          <Location size={20} />
+          Choose Location
         </Button>
       </div>
     </>
