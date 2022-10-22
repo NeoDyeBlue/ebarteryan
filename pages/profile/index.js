@@ -3,7 +3,12 @@ import Image from "next/image";
 import Head from "next/head";
 import Link from "next/link";
 import { Rating } from "react-simple-star-rating";
-import { ArrowsHorizontal, Need, StarFilled } from "@carbon/icons-react";
+import {
+  ArrowsHorizontal,
+  Need,
+  StarFilled,
+  Settings,
+} from "@carbon/icons-react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import ItemCard from "../../components/Cards/ItemCard";
 import ProgressBar from "@ramonak/react-progress-bar";
@@ -30,7 +35,7 @@ export default function Profile() {
           </div>
           <div className="flex flex-col items-center gap-2 md:w-full md:items-start">
             <h1 className="text-3xl font-semibold">Current User</h1>
-            <div className="flex flex-col items-center gap-2 md:flex-row md:gap-4 md:whitespace-nowrap">
+            <div className="flex flex-col items-center gap-2 md:items-start md:gap-2">
               <p className="text-gray-300">Joined in 2022</p>
               <div className="flex w-full items-end justify-center gap-2">
                 <Rating
@@ -51,25 +56,36 @@ export default function Profile() {
               </Link>
             </div>
           </div>
-          <div className="flex w-full gap-4 md:w-auto md:gap-8">
-            <div className="flex w-full flex-col items-center gap-2 md:justify-center">
-              <div className="flex items-center gap-2">
-                <ArrowsHorizontal size={32} />
-                <p className="text-2xl">8</p>
+          <div className="flex h-full w-full flex-col items-center justify-between gap-8 md:w-auto md:items-end">
+            <Link href="/profile/edit">
+              <a
+                className="flex items-center justify-center gap-1 overflow-hidden text-ellipsis whitespace-nowrap rounded-[10px]
+        bg-green-500 px-4 py-3 text-center font-display text-[15px] font-medium text-white disabled:opacity-50"
+              >
+                <Settings size={20} />
+                Profile & Account
+              </a>
+            </Link>
+            <div className="flex w-full gap-4 md:w-auto md:gap-8">
+              <div className="flex w-full flex-col items-center gap-2 md:justify-center">
+                <div className="flex items-center gap-2">
+                  <ArrowsHorizontal size={32} />
+                  <p className="text-2xl">8</p>
+                </div>
+                <p className="text-center font-display text-sm font-medium md:whitespace-nowrap">
+                  Bartered Items
+                </p>
               </div>
-              <p className="text-center font-display text-sm font-medium md:whitespace-nowrap">
-                Bartered Items
-              </p>
-            </div>
-            <div className="w-[1px] bg-green-500"></div>
-            <div className="flex w-full flex-col items-center justify-center gap-2">
-              <div className="flex items-center gap-2">
-                <Need size={32} />
-                <p className="text-2xl">10</p>
+              <div className="w-[1px] bg-green-500"></div>
+              <div className="flex w-full flex-col items-center justify-center gap-2">
+                <div className="flex items-center gap-2">
+                  <Need size={32} />
+                  <p className="text-2xl">10</p>
+                </div>
+                <p className="text-center font-display text-sm font-medium md:whitespace-nowrap">
+                  Offered Items
+                </p>
               </div>
-              <p className="text-center font-display text-sm font-medium md:whitespace-nowrap">
-                Offered Items
-              </p>
             </div>
           </div>
         </div>

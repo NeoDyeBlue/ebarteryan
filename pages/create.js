@@ -4,7 +4,6 @@ import CreationLayout from "../components/Layouts/CreationLayout";
 import InputField from "../components/Inputs/InputField";
 import Textarea from "../components/Inputs/Textarea";
 import ImageSelector from "../components/Inputs/ImageSelector";
-// import DropdownSelect from "../components/Inputs/DropdownSelect";
 const DropdownSelect = dynamic(
   () => import("../components/Inputs/DropdownSelect"),
   { ssr: false }

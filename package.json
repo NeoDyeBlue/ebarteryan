@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@carbon/icons-react": "^11.7.0",
+    "@iconify/react": "^4.0.0",
     "@ramonak/react-progress-bar": "^5.0.2",
     "downshift": "^6.1.12",
     "framer-motion": "^7.4.0",

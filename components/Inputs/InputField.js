@@ -1,3 +1,6 @@
+import { Information, View, ViewOff } from "@carbon/icons-react";
+import { useState } from "react";
+
 export default function InputField({
   type,
   name,
@@ -8,15 +11,28 @@ export default function InputField({
   label,
   infoMessage,
 }) {
+  const [showPass, setShowPass] = useState(false);
   return (
     <div className="flex flex-col gap-2">
-      {label && (
-        <label htmlFor={name} className="font-display font-medium">
-          {label}
-        </label>
-      )}
+      <div className="flex items-center">
+        {label && (
+          <label htmlFor={name} className="font-display font-medium">
+            {label}
+          </label>
+        )}
+        {type == "password" ? (
+          <button
+            type="button"
+            className="ml-auto"
+            onClick={() => setShowPass((prev) => !prev)}
+          >
+            {!showPass && <View size={20} />}
+            {showPass && <ViewOff size={20} />}
+          </button>
+        ) : null}
+      </div>
       <input
-        type={type}
+        type={type == "password" ? (showPass ? "text" : "password") : type}
         name={name}
         value={value}
         required={required}

@@ -9,10 +9,9 @@ import useSWR from "swr";
 export default function MapPinDrop({ initialMode, switchToInitialMode }) {
   const { position, setPosition, setMap, setRegion, region, listingPosition } =
     useMapStore();
-  const { data: revGeoCoding, error } = useSWR(() =>
-    Object.keys(position).length
-      ? `https://api.tomtom.com/search/2/reverseGeocode/${position.lat},${position.lng}.json?key=awbTtEIZufAop7NYalmH11BPHSzr0QYv`
-      : null
+  const { data: revGeoCoding, error } = useSWR(
+    () =>
+      `https://api.tomtom.com/search/2/reverseGeocode/${position.lat},${position.lng}.json?key=awbTtEIZufAop7NYalmH11BPHSzr0QYv`
   );
   const iconMarkup = renderToStaticMarkup(
     <div className="text-danger-500">
@@ -21,8 +20,8 @@ export default function MapPinDrop({ initialMode, switchToInitialMode }) {
   );
 
   useEffect(() => {
-    if (revGeoCoding?.addresses) {
-      console.log(revGeoCoding.addresses);
+    if (revGeoCoding?.addresses?.length) {
+      console.log(revGeoCoding);
       const city = revGeoCoding.addresses[0].address.municipality;
       const state =
         revGeoCoding.addresses[0].address.countrySecondarySubdivision;
@@ -36,9 +35,8 @@ export default function MapPinDrop({ initialMode, switchToInitialMode }) {
   }, [revGeoCoding]);
 
   const map = useMapEvent("click", (location) => {
-    switchToInitialMode(true);
+    switchToInitialMode(false);
     setPosition(location.latlng);
-    console.log(location.latlng);
   });
 
   const customMarkerIcon = divIcon({
@@ -53,7 +51,7 @@ export default function MapPinDrop({ initialMode, switchToInitialMode }) {
       dragend() {
         const marker = markerRef.current;
         if (marker != null) {
-          switchToInitialMode(true);
+          switchToInitialMode(false);
           setPosition(marker.getLatLng());
         }
       },
@@ -63,8 +61,7 @@ export default function MapPinDrop({ initialMode, switchToInitialMode }) {
 
   useEffect(() => setMap(map), [map]);
 
-  return !Object.keys(position).length ||
-    !Object.keys(listingPosition).length ? null : (
+  return Object.keys(position).length || Object.keys(listingPosition).length ? (
     <Marker
       position={initialMode ? listingPosition : position}
       icon={customMarkerIcon}
@@ -74,5 +71,5 @@ export default function MapPinDrop({ initialMode, switchToInitialMode }) {
     >
       <Popup>{!revGeoCoding ? "Loading..." : region}</Popup>
     </Marker>
-  );
+  ) : null;
 }
