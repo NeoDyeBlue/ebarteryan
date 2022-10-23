@@ -4,16 +4,19 @@ import Link from "next/link";
 import LocationModal from "./Modals/LocationModal";
 import ReactModal from "react-modal";
 import { useState } from "react";
+import useMapStore from "../store/useMapStore";
+import Marquee from "react-fast-marquee";
 
 export default function LocationBarterButtons({ className }) {
   ReactModal.setAppElement("#__next");
+  const { clearPositionRegion, listingRegion, listingRadius } = useMapStore();
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   function openLocationModal() {
-    console.log("map open");
     setLocationModalOpen(true);
   }
 
   function closeLocationModal() {
+    clearPositionRegion();
     setLocationModalOpen(false);
   }
   return (
@@ -32,7 +35,7 @@ export default function LocationBarterButtons({ className }) {
         <div
           className={`custom-scrollbar container flex max-h-full min-h-full overflow-y-auto md:px-6`}
         >
-          <LocationModal onClose={closeLocationModal} />
+          <LocationModal onClose={closeLocationModal} applyInListing={true} />
           {/* <OfferModal onClose={closeOfferModal} /> */}
         </div>
       </ReactModal>
@@ -40,7 +43,7 @@ export default function LocationBarterButtons({ className }) {
         className={
           className
             ? className
-            : "container mx-auto flex w-full flex-col gap-4 p-4 lg:hidden"
+            : "container mx-auto flex w-full flex-col gap-4 p-[1.5rem] lg:hidden"
         }
       >
         <Link href="/create">
@@ -53,7 +56,15 @@ export default function LocationBarterButtons({ className }) {
         </Link>
         <Button underlined="true" onClick={openLocationModal}>
           <Location size={20} />
-          Choose Location
+          {listingRegion ? (
+            <Marquee gradientWidth={8}>
+              <p className="px-2">
+                {listingRegion} - {listingRadius}km
+              </p>
+            </Marquee>
+          ) : (
+            "Choose Location"
+          )}
         </Button>
       </div>
     </>

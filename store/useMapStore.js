@@ -2,11 +2,15 @@ import create from "zustand";
 
 const useMapStore = create((set) => ({
   map: null,
-  listingPosition: {},
   position: {},
+  listingPosition: {},
+  creationPosition: {},
   radius: 1,
+  listingRadius: 1,
   listingRegion: "",
   region: "",
+  creationRegion: "",
+
   setPosition: (payload) =>
     set((state) => ({ position: { ...state.position, ...payload } })),
   setRadius: (payload) => set(() => ({ radius: payload })),
@@ -14,8 +18,21 @@ const useMapStore = create((set) => ({
   setRegion: (payload) => set(() => ({ region: payload })),
   setListingLocation: () =>
     set((state) => ({
-      listingPosition: state.position,
-      listingRegion: state.region,
+      listingPosition: Object.keys(state.position).length
+        ? state.position
+        : state.listingPosition,
+      listingRegion: state.region ? state.region : state.listingRadius,
+      listingRadius: state.radius,
+    })),
+  setCreationLocation: () =>
+    set((state) => ({
+      creationPosition: state.position,
+      creationRegion: state.region,
+    })),
+  clearPositionRegion: () =>
+    set(() => ({
+      position: {},
+      region: "",
     })),
 }));
 

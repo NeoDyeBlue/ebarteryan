@@ -26,16 +26,24 @@ export default function Login() {
             <div className="flex flex-col gap-2">
               <InputField type="password" label="Password" />
               <Link href="/forgotpassword">
-                <a className="self-end text-sm text-green-500 hover:underline">
+                <a className="self-end font-display text-sm font-medium text-green-500 hover:underline">
                   Forgot Password?
                 </a>
               </Link>
             </div>
+            <p className="text-center">
+              Don't have an account?{" "}
+              <Link href="/signup">
+                <a className="font-display font-medium text-green-500 hover:underline">
+                  Sign Up
+                </a>
+              </Link>
+            </p>
             <Button>Login</Button>
           </form>
           <div className="overflow-hidden">
             <p
-              class="flex w-full flex-row bg-white before:right-2 before:m-auto 
+              className="flex w-full flex-row bg-white before:right-2 before:m-auto 
           before:-ml-[50%] before:h-[1px] before:w-1/2 before:flex-1 
           before:bg-gray-100 before:align-middle after:left-2 after:m-auto after:-mr-[50%] 
           after:h-[1px] after:w-1/2 after:flex-1 after:bg-gray-100 after:align-middle"

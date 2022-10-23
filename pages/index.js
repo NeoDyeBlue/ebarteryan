@@ -7,7 +7,7 @@ import useMapStore from "../store/useMapStore";
 import { Location } from "@carbon/icons-react";
 
 export default function Home() {
-  const { listingRegion, radius } = useMapStore();
+  const { listingRegion, listingRadius } = useMapStore();
   return (
     <div className="flex w-full flex-col gap-4">
       <Head>
@@ -16,17 +16,27 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <LocationBarterButtons />
-      {listingRegion && (
-        <div className="container mx-auto flex items-start justify-end gap-1 pb-4 lg:pb-0 lg:pt-10">
-          <Location size={16} className="mt-[2px] text-gray-300" />
-          <p className="text-gray-300">
-            Listing items from{" "}
-            <span className="font-medium text-black-light">
-              {listingRegion} - {radius}km
-            </span>
-          </p>
+      {/* {listingRegion && (
+        <div className="container mx-auto flex items-center justify-center gap-1 pb-4 lg:pb-0 lg:pt-10">
+          <div
+            className="flex gap-1 rounded-[10px] border border-gray-100 bg-white p-4 text-center
+          shadow-md"
+          >
+            <p className="text-gray-300">
+              <span>
+                <Location
+                  size={16}
+                  className="-mt-[2px] flex-shrink-0 text-gray-300 "
+                />
+              </span>
+              Listing items from{" "}
+              <span className="font-medium text-black-light">
+                {listingRegion} - {listingRadius}km
+              </span>
+            </p>
+          </div>
         </div>
-      )}
+      )} */}
       <div className="container relative mx-auto">
         <div
           className="grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 

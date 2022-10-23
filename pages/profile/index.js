@@ -8,6 +8,8 @@ import {
   Need,
   StarFilled,
   Settings,
+  Thumbnail_2,
+  LicenseDraft,
 } from "@carbon/icons-react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import ItemCard from "../../components/Cards/ItemCard";
@@ -93,15 +95,17 @@ export default function Profile() {
         <div className="w-full border-b border-gray-100">
           <Tabs className="flex flex-col">
             <div className="border-t border-t-gray-100">
-              <TabList className="flex gap-4 md:gap-8">
+              <TabList className="flex gap-4 py-2 md:gap-8">
                 <Tab className="tab" selectedClassName="tab-active">
+                  {/* <Thumbnail_2 size={24} /> */}
                   <p>Listings</p>
                   <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
                     0
                   </span>
                 </Tab>
                 <Tab className="tab" selectedClassName="tab-active">
-                  <p>Offered Items</p>
+                  {/* <LicenseDraft size={24} /> */}
+                  <p>Drafts</p>
                   <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
                     0
                   </span>

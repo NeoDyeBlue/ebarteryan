@@ -19,6 +19,7 @@ import OfferList from "../../components/OfferList";
 import OfferListItem from "../../components/OfferListItem";
 import OfferModal from "../../components/Modals/OfferModal";
 import { useState } from "react";
+import Textarea from "../../components/Inputs/Textarea";
 
 export default function Item() {
   const [offerModalOpen, setOfferModalOpen] = useState(false);
@@ -222,7 +223,10 @@ export default function Item() {
       <div className="w-full pb-6">
         <Tabs className="flex flex-col gap-6">
           <div className="border-y border-y-gray-100">
-            <TabList className="container mx-auto flex max-w-[1000px] gap-4 md:gap-8">
+            <TabList
+              className="container sticky top-[57.25px] mx-auto flex max-w-[1000px]
+            gap-4 md:top-[71.5px] md:gap-8"
+            >
               <Tab className="tab" selectedClassName="tab-active">
                 <p>Offers</p>
                 <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
@@ -248,7 +252,17 @@ export default function Item() {
               </OfferList>
             </TabPanel>
             <TabPanel>
-              <h2>Any content 2</h2>
+              <div>
+                <form className="flex flex-col gap-4">
+                  <p className="font-display text-2xl font-semibold">
+                    Ask a question
+                  </p>
+                  <div className="flex items-end gap-4">
+                    <Textarea placeholder="Type here..." />
+                    <Button autoWidth={true}>Ask</Button>
+                  </div>
+                </form>
+              </div>
             </TabPanel>
           </div>
         </Tabs>

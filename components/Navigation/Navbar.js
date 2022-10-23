@@ -1,7 +1,12 @@
 import Link from "next/link";
 import Logo from "../Icons/Logo";
 import Image from "next/image";
-import { Notification, Bookmark, ArrowsHorizontal } from "@carbon/icons-react";
+import {
+  Notification,
+  Bookmark,
+  ArrowsHorizontal,
+  Home,
+} from "@carbon/icons-react";
 import BadgedIcon from "../Icons/BadgedIcon";
 import SearchBox from "../SearchBox";
 import { useState, useRef } from "react";
@@ -41,6 +46,15 @@ export default function Navbar() {
         <SearchBox className="container absolute top-0 left-0 z-10 mx-auto hidden h-full w-full max-w-[500px] px-4 lg:relative lg:block" />
         <div className="relative flex items-center gap-4 md:gap-7">
           <ul className="hidden items-center gap-7 md:flex">
+            <li>
+              <Link href="/">
+                <a>
+                  <BadgedIcon>
+                    <Home size={24} />
+                  </BadgedIcon>
+                </a>
+              </Link>
+            </li>
             <li>
               <Link href="/offers">
                 <a

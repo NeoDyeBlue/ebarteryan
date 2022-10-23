@@ -6,9 +6,34 @@ import { Add } from "@carbon/icons-react";
 import CircleButton from "../CircleButton";
 import Button from "../Button";
 import useMapStore from "../../store/useMapStore";
+import { useMemo } from "react";
 
-export default function LocationModal({ onClose }) {
-  const { setListingLocation, region } = useMapStore();
+export default function LocationModal({ onClose, applyInListing }) {
+  const {
+    region,
+    listingPosition,
+    setListingLocation,
+    setCreationLocation,
+    creationPosition,
+  } = useMapStore();
+
+  // check if there is a position set
+  const initialPosition = useMemo(() => {
+    const hasListingPosition = Boolean(Object.keys(listingPosition).length);
+    const hasCreationPosition = Boolean(Object.keys(creationPosition).length);
+    if (applyInListing) {
+      return hasListingPosition ? listingPosition : null;
+    } else if (!applyInListing) {
+      if (hasCreationPosition) {
+        return creationPosition;
+      } else if (!hasCreationPosition && hasListingPosition) {
+        return listingPosition;
+      } else {
+        return null;
+      }
+    }
+  }, [listingPosition, creationPosition]);
+
   return (
     <div
       className="flex max-h-full min-h-full w-full flex-shrink-0 flex-col
@@ -22,11 +47,19 @@ export default function LocationModal({ onClose }) {
         />
       </div>
       <hr className="border-gray-100" />
-      <Map withRadiusPicker={true} />
+      <Map
+        withRadiusPicker={applyInListing ? true : false}
+        center={initialPosition}
+        pinPosition={initialPosition}
+      />
       <Button
         disabled={!region}
         onClick={() => {
-          setListingLocation();
+          if (applyInListing) {
+            setListingLocation();
+          } else {
+            setCreationLocation();
+          }
           onClose();
         }}
       >

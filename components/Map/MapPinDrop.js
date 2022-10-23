@@ -6,12 +6,17 @@ import useMapStore from "../../store/useMapStore";
 import { useRef, useMemo, useEffect } from "react";
 import useSWR from "swr";
 
-export default function MapPinDrop({ initialMode, switchToInitialMode }) {
-  const { position, setPosition, setMap, setRegion, region, listingPosition } =
-    useMapStore();
-  const { data: revGeoCoding, error } = useSWR(
-    () =>
-      `https://api.tomtom.com/search/2/reverseGeocode/${position.lat},${position.lng}.json?key=awbTtEIZufAop7NYalmH11BPHSzr0QYv`
+export default function MapPinDrop({ pinPosition, onPositionChange }) {
+  // console.log(pinPosition);
+  const { setPosition, setMap, setRegion, region, position } = useMapStore();
+  const {
+    data: revGeoCoding,
+    mutate,
+    error,
+  } = useSWR(
+    pinPosition && Object.keys(pinPosition).length
+      ? `https://api.tomtom.com/search/2/reverseGeocode/${pinPosition.lat},${pinPosition.lng}.json?key=awbTtEIZufAop7NYalmH11BPHSzr0QYv`
+      : null
   );
   const iconMarkup = renderToStaticMarkup(
     <div className="text-danger-500">
@@ -34,9 +39,12 @@ export default function MapPinDrop({ initialMode, switchToInitialMode }) {
     }
   }, [revGeoCoding]);
 
+  // console.log("rerender", pinPosition);
+
   const map = useMapEvent("click", (location) => {
-    switchToInitialMode(false);
+    onPositionChange();
     setPosition(location.latlng);
+    mutate();
   });
 
   const customMarkerIcon = divIcon({
@@ -51,8 +59,9 @@ export default function MapPinDrop({ initialMode, switchToInitialMode }) {
       dragend() {
         const marker = markerRef.current;
         if (marker != null) {
-          switchToInitialMode(false);
+          onPositionChange();
           setPosition(marker.getLatLng());
+          mutate();
         }
       },
     }),
@@ -60,10 +69,10 @@ export default function MapPinDrop({ initialMode, switchToInitialMode }) {
   );
 
   useEffect(() => setMap(map), [map]);
-
-  return Object.keys(position).length || Object.keys(listingPosition).length ? (
+  // console.log(pinPosition);
+  return pinPosition ? (
     <Marker
-      position={initialMode ? listingPosition : position}
+      position={pinPosition}
       icon={customMarkerIcon}
       draggable={true}
       ref={markerRef}

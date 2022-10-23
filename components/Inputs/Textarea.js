@@ -3,7 +3,7 @@ import { useRef } from "react";
 export default function Textarea({ label, placeholder, infoMessage }) {
   const textBoxRef = useRef(null);
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex w-full flex-col gap-2">
       {label && <p className="font-display font-medium">{label}</p>}
       <div
         className="min-h-[100px] w-full break-all rounded-[10px] border border-gray-100 bg-white
