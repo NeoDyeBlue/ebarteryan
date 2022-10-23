@@ -6,18 +6,28 @@ import useMapStore from "../../store/useMapStore";
 import { useRef, useMemo, useEffect } from "react";
 import useSWR from "swr";
 
-export default function MapPinDrop({ pinPosition, onPositionChange }) {
-  // console.log(pinPosition);
-  const { setPosition, setMap, setRegion, region, position } = useMapStore();
-  const {
-    data: revGeoCoding,
-    mutate,
-    error,
-  } = useSWR(
-    pinPosition && Object.keys(pinPosition).length
-      ? `https://api.tomtom.com/search/2/reverseGeocode/${pinPosition.lat},${pinPosition.lng}.json?key=awbTtEIZufAop7NYalmH11BPHSzr0QYv`
-      : null
+const tomtomFetcher = (url, args) =>
+  fetch(`${url}/${args.lat},${args.lng}.json?key=${args.token}`).then((r) =>
+    r.json()
   );
+
+export default function MapPinDrop({ pinPosition, onPositionChange }) {
+  console.log("rerender");
+  const { setPosition, setMap, setRegion, region } = useMapStore();
+  const { data: revGeoCoding, error } = useSWR(
+    [
+      "https://api.tomtom.com/search/2/reverseGeocode",
+      {
+        lat: pinPosition?.lat,
+        lng: pinPosition?.lng,
+        token: "awbTtEIZufAop7NYalmH11BPHSzr0QYv",
+      },
+    ],
+    tomtomFetcher
+  );
+  // pinPosition && Object.keys(pinPosition).length
+  //   ? `https://api.tomtom.com/search/2/reverseGeocode/${pinPosition?.lat},${pinPosition?.lng}.json?key=awbTtEIZufAop7NYalmH11BPHSzr0QYv`
+  //   : null
   const iconMarkup = renderToStaticMarkup(
     <div className="text-danger-500">
       <LocationFilled size={32} />
@@ -44,7 +54,7 @@ export default function MapPinDrop({ pinPosition, onPositionChange }) {
   const map = useMapEvent("click", (location) => {
     onPositionChange();
     setPosition(location.latlng);
-    mutate();
+    // mutate();
   });
 
   const customMarkerIcon = divIcon({
@@ -61,7 +71,7 @@ export default function MapPinDrop({ pinPosition, onPositionChange }) {
         if (marker != null) {
           onPositionChange();
           setPosition(marker.getLatLng());
-          mutate();
+          // mutate();
         }
       },
     }),
@@ -78,7 +88,9 @@ export default function MapPinDrop({ pinPosition, onPositionChange }) {
       ref={markerRef}
       eventHandlers={eventHandlers}
     >
-      <Popup>{!revGeoCoding ? "Loading..." : region}</Popup>
+      <Popup>
+        {!revGeoCoding ? "Loading..." : region ? region : "Unrecognized"}
+      </Popup>
     </Marker>
   ) : null;
 }
