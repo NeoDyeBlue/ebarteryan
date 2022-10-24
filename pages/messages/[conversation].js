@@ -1,8 +1,10 @@
 import Head from "next/head";
-import ChatHeader from "../../components/Messages/ChatHeader";
-import ChatContainer from "../../components/Messages/ChatContainer";
-import ChatBubble from "../../components/Messages/ChatBubble";
-import ChatInput from "../../components/Messages/ChatInput";
+import {
+  ChatBubble,
+  ChatContainer,
+  ChatHeader,
+  ChatInput,
+} from "../../components/Messages";
 
 export default function Conversation() {
   const userId = 1;

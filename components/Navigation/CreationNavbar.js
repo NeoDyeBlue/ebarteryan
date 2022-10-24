@@ -1,4 +1,4 @@
-import Logo from "../Icons/Logo";
+import { Logo } from "../Icons";
 import { Add } from "@carbon/icons-react";
 import Link from "next/link";
 

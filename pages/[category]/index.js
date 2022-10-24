@@ -1,9 +1,8 @@
-import NavLayout from "../../components/Layouts/NavLayout";
-import CategoryLayout from "../../components/Layouts/CategoryLayout";
+import { NavLayout, CategoryLayout } from "../../components/Layouts";
 
 export default function Category() {
   return (
-    <div className="container mx-auto flex items-center justify-center h-screen">
+    <div className="container mx-auto flex h-screen items-center justify-center">
       content
     </div>
   );

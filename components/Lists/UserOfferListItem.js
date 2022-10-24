@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { ArrowsHorizontal } from "@carbon/icons-react";
-import StatusBadge from "./StatusBadge";
-import ItemMiniCard from "./Cards/ItemMiniCard";
+import { StatusBadge } from "../Misc";
+import { ItemMiniCard } from "../Cards";
 
 export default function UserOfferListItem({ status }) {
   let colors = "";

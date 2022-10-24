@@ -1,7 +1,6 @@
 import Head from "next/head";
-import NavLayout from "../components/Layouts/NavLayout";
-import UserOfferList from "../components/UserOfferList";
-import UserOfferListItem from "../components/UserOfferListItem";
+import { NavLayout } from "../components/Layouts";
+import { UserOfferList, UserOfferListItem } from "../components/Lists";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 
 export default function Offers() {

@@ -8,14 +8,11 @@ import {
   Need,
   StarFilled,
   Settings,
-  Thumbnail_2,
-  LicenseDraft,
 } from "@carbon/icons-react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import ItemCard from "../../components/Cards/ItemCard";
+import { ItemCard } from "../../components/Cards";
 import ProgressBar from "@ramonak/react-progress-bar";
-import ReviewList from "../../components/ReviewList";
-import ReviewListItem from "../../components/ReviewListItem";
+import { ReviewList, ReviewListItem } from "../../components/Lists";
 
 export default function Profile() {
   return (

@@ -3,8 +3,7 @@ const Map = dynamic(() => import("../Map/Map"), {
   ssr: false,
 });
 import { Add } from "@carbon/icons-react";
-import CircleButton from "../CircleButton";
-import Button from "../Button";
+import { Button, CircleButton } from "../Buttons";
 import useMapStore from "../../store/useMapStore";
 import { useMemo } from "react";
 

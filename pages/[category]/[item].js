@@ -11,15 +11,19 @@ import {
   ArrowsHorizontal,
   Bookmark,
 } from "@carbon/icons-react";
-import Button from "../../components/Button";
-import IconLabel from "../../components/IconLabel";
+import { Button } from "../../components/Buttons";
+import { IconLabel } from "../../components/Icons";
 import { Rating } from "react-simple-star-rating";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import OfferList from "../../components/OfferList";
-import OfferListItem from "../../components/OfferListItem";
-import OfferModal from "../../components/Modals/OfferModal";
+import {
+  OfferList,
+  OfferListItem,
+  QuestionAnswerList,
+  QuestionAnswerListItem,
+} from "../../components/Lists";
+import { OfferModal } from "../../components/Modals";
 import { useState } from "react";
-import Textarea from "../../components/Inputs/Textarea";
+import { Textarea } from "../../components/Inputs";
 
 export default function Item() {
   const [offerModalOpen, setOfferModalOpen] = useState(false);
@@ -57,7 +61,7 @@ export default function Item() {
           <OfferModal onClose={closeOfferModal} />
         </div>
       </ReactModal>
-      <div className="container mx-auto flex max-w-[1000px] flex-col gap-4 md:gap-6">
+      <div className="container mx-auto flex max-w-[1100px] flex-col gap-4 md:gap-6">
         {/* Carousel and other info */}
         <div className="flex flex-col gap-6 border-b border-b-gray-100 pt-4 pb-6 md:grid md:grid-cols-2 md:gap-8 md:pt-8">
           <Carousel
@@ -106,7 +110,7 @@ export default function Item() {
           </div>
           <div className="flex flex-col gap-4 md:col-start-2 md:row-start-2">
             <div className="flex flex-col gap-1 border-b border-b-gray-100 pb-6">
-              <h1 className="text-2xl font-semibold md:text-3xl">Item Name</h1>
+              <h1 className="text-3xl font-semibold md:text-3xl">Item Name</h1>
               <div className="break-words text-sm">
                 <span className="mr-1 inline-block align-middle">
                   <Location size={16} />
@@ -114,8 +118,8 @@ export default function Item() {
                 <p className="inline">Pandi, Bulacan • September 17, 2022</p>
               </div>
             </div>
-            <div className="flex flex-col gap-2 pb-4">
-              <h2 className="text-lg font-medium">Exchange for</h2>
+            <div className="flex flex-col gap-3 pb-4">
+              <h2 className="text-xl font-medium">Exchange for</h2>
               <p>
                 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
                 eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -154,17 +158,20 @@ export default function Item() {
         </div>
         {/* Description and Barterer*/}
         <div className="flex flex-col gap-4 md:flex-row md:gap-6">
-          <div className="flex flex-col gap-2 border-b border-b-gray-100 pb-6 md:w-full md:border-0">
-            <h2 className="text-lg font-medium">Description</h2>
+          <div className="flex flex-col gap-3 border-b border-b-gray-100 pb-6 md:w-full md:border-0">
+            <h2 className="text-xl font-medium">Description</h2>
             <p>
               Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
               eiusmod tempor incididunt ut labore et dolore magna aliqua.
               Pellentesque eu tincidunt tortor aliquam nulla.
             </p>
           </div>
-          <div className="hidden w-[1px] bg-gray-100 md:block"></div>
-          <div className="flex flex-col gap-4 md:w-3/5">
-            <p className="font-display text-lg font-medium">Listed By</p>
+          {/* <div className="hidden w-[1px] bg-gray-100 md:block"></div> */}
+          <div
+            className="flex flex-col gap-4 rounded-[10px] border border-gray-100 bg-white p-6
+          shadow-lg md:w-3/5"
+          >
+            <p className="font-display text-xl font-medium">Listed By</p>
             <div className="flex items-center justify-center gap-4">
               <div className="relative h-16 w-16 overflow-hidden rounded-full">
                 <Image
@@ -224,7 +231,7 @@ export default function Item() {
         <Tabs className="flex flex-col gap-6">
           <div className="border-y border-y-gray-100">
             <TabList
-              className="container sticky top-[57.25px] mx-auto flex max-w-[1000px]
+              className="container sticky top-[57.25px] mx-auto flex max-w-[1100px]
             gap-4 md:top-[71.5px] md:gap-8"
             >
               <Tab className="tab" selectedClassName="tab-active">
@@ -241,7 +248,7 @@ export default function Item() {
               </Tab>
             </TabList>
           </div>
-          <div className="container mx-auto max-w-[1000px]">
+          <div className="container mx-auto max-w-[1100px]">
             <TabPanel>
               <OfferList>
                 <OfferListItem />
@@ -252,16 +259,20 @@ export default function Item() {
               </OfferList>
             </TabPanel>
             <TabPanel>
-              <div>
+              <div className="flex flex-col gap-8">
                 <form className="flex flex-col gap-4">
                   <p className="font-display text-2xl font-semibold">
                     Ask a question
                   </p>
-                  <div className="flex items-end gap-4">
+                  <div className="flex flex-col items-end gap-4 md:flex-row">
                     <Textarea placeholder="Type here..." />
                     <Button autoWidth={true}>Ask</Button>
                   </div>
                 </form>
+                <QuestionAnswerList>
+                  <QuestionAnswerListItem />
+                  <QuestionAnswerListItem />
+                </QuestionAnswerList>
               </div>
             </TabPanel>
           </div>

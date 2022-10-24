@@ -1,9 +1,8 @@
 import InputField from "../Inputs/InputField";
 import Textarea from "../Inputs/Textarea";
 import ImageSelector from "../Inputs/ImageSelector";
-import Button from "../Button";
 import { Add, Location } from "@carbon/icons-react";
-import CircleButton from "../CircleButton";
+import { Button, CircleButton } from "../Buttons";
 
 export default function OfferModal({ onClose }) {
   return (

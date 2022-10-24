@@ -1,5 +1,5 @@
 import Link from "next/link";
-import Logo from "../Icons/Logo";
+import { Logo, BadgedIcon } from "../Icons";
 import Image from "next/image";
 import {
   Notification,
@@ -7,20 +7,32 @@ import {
   ArrowsHorizontal,
   Home,
 } from "@carbon/icons-react";
-import BadgedIcon from "../Icons/BadgedIcon";
-import SearchBox from "../SearchBox";
-import { useState, useRef } from "react";
+import { SearchBox } from "../Inputs";
+import { useState, useRef, useEffect } from "react";
 import { Search } from "@carbon/icons-react";
 import { useRouter } from "next/router";
-import NotificationPopup from "../Popups/NotificationsPopup";
+import { NotificationsPopup } from "../Popups";
 import useOnClickOutside from "../../hooks/useOnClickOutside";
+import useUiSizesStore from "../../store/useUiSizesStore";
 
-export default function Navbar() {
+export default function Navbar({ sticky }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const popupRef = useRef(null);
+  const navbarRef = useRef(null);
   const router = useRouter();
   const currentRoute = router.asPath;
+  const { setNavbarHeight } = useUiSizesStore();
+
   useOnClickOutside(popupRef, hideNotificationsPopup);
+
+  useEffect(() => {
+    function handleResize() {
+      setNavbarHeight(navbarRef.current?.getBoundingClientRect().height);
+    }
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   function showNotificationsPopup() {
     if (currentRoute != "/notifications") {
@@ -33,7 +45,12 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 w-full border-b border-b-gray-100 bg-white">
+    <nav
+      ref={navbarRef}
+      className={`${
+        sticky ? "sticky" : "relative"
+      } top-0 z-50 w-full border-b border-b-gray-100 bg-white`}
+    >
       <div className="container relative mx-auto flex items-center justify-between py-4 lg:py-3">
         <Link href="/">
           <a className="flex items-center gap-2">
@@ -48,7 +65,7 @@ export default function Navbar() {
           <ul className="hidden items-center gap-7 md:flex">
             <li>
               <Link href="/">
-                <a>
+                <a className={`${currentRoute == "/" ? "text-green-500" : ""}`}>
                   <BadgedIcon>
                     <Home size={24} />
                   </BadgedIcon>
@@ -59,7 +76,7 @@ export default function Navbar() {
               <Link href="/offers">
                 <a
                   className={`${
-                    currentRoute == "/offers" ? "bg-black text-green-500" : ""
+                    currentRoute == "/offers" ? "text-green-500" : ""
                   }`}
                 >
                   <BadgedIcon hasBadge={true}>
@@ -84,11 +101,15 @@ export default function Navbar() {
                   <Notification size={24} />
                 </BadgedIcon>
               </button>
-              {showNotifications && <NotificationPopup />}
+              {showNotifications && <NotificationsPopup />}
             </li>
             <li>
               <Link href="/saved">
-                <a>
+                <a
+                  className={`${
+                    currentRoute == "/saved" ? "text-green-500" : ""
+                  }`}
+                >
                   <BadgedIcon hasBadge={true}>
                     <Bookmark size={24} />
                   </BadgedIcon>

@@ -37,7 +37,7 @@ export default function InputField({
         value={value}
         required={required}
         placeholder={placeholder}
-        className="w-full rounded-[10px] border border-gray-100 bg-white 
+        className="w-full rounded-[10px] border border-gray-200 bg-white 
         p-4 font-body placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-green-500"
         onChange={onChange}
       ></input>

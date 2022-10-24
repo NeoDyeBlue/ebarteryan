@@ -1,13 +1,12 @@
-import FooterLinkList from "../FooterLinkList";
-import FooterLinkListItem from "../FooterLinkListItem";
+import { FooterLinkList, FooterLinkListItem } from "../Lists";
 import { LogoFacebook, LogoTwitter } from "@carbon/icons-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-white-dark border-t border-t-gray-100">
-      <div className="container mx-auto flex flex-col py-10 gap-9">
-        <div className="flex flex-col gap-9 md:items-start md:flex-row md:justify-between">
-          <span className="font-display font-semibold text-2xl md:text-4xl">
+    <footer className="border-t border-t-gray-100 bg-white-dark">
+      <div className="container mx-auto flex flex-col gap-9 py-10">
+        <div className="flex flex-col gap-9 md:flex-row md:items-start md:justify-between">
+          <span className="font-display text-2xl font-semibold md:text-4xl">
             eBarterYan
           </span>
           <FooterLinkList title="Listings">
@@ -31,7 +30,7 @@ export default function Footer() {
             </a>
           </div>
         </div>
-        <p className="mx-auto text-gray-400 text-xs">
+        <p className="mx-auto text-xs text-gray-400">
           © 2022 EBarterYan. All Rights Reserved
         </p>
       </div>

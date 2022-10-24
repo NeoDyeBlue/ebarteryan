@@ -1,10 +1,15 @@
-import CategoryList from "../CategoryList";
-import CategoryListItem from "../CategoryListItem";
-import LocationBarterButtons from "../LocationBarterButtons";
+import { CategoryList, CategoryListItem } from "../Lists";
+import { LocationBarterButtons } from "../Buttons";
+import useUiSizesStore from "../../store/useUiSizesStore";
 
 export default function CategoryNavbar() {
+  const { navbarHeight } = useUiSizesStore();
+
   return (
-    <div className="sticky top-[57.25px] z-40 w-full bg-white shadow-md lg:top-[71.5px]">
+    <div
+      style={{ top: navbarHeight }}
+      className="sticky z-40 w-full bg-white shadow-md"
+    >
       <div className="container mx-auto flex flex-col lg:flex-row lg:gap-4">
         <div
           className="relative flex w-full overflow-hidden before:absolute before:left-0 before:z-50 before:block

@@ -1,7 +1,7 @@
-import NotificationTabs from "../Notifications/NotificationTabs";
+import { NotificationTabs } from "../Notifications";
 import Link from "next/link";
 
-export default function NotificationPopup() {
+export default function NotificationsPopup() {
   return (
     <div
       className="custom-scrollbar absolute top-[calc(100%+1rem)] right-[-415%] z-50 h-[80vh] w-[360px]

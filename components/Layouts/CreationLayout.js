@@ -1,4 +1,4 @@
-import CreationNavbar from "../Navigation/CreationNavbar";
+import { CreationNavbar } from "../Navigation";
 
 export default function CreationLayout({ children }) {
   return (

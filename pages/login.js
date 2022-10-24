@@ -1,9 +1,8 @@
-import NavLayout from "../components/Layouts/NavLayout";
+import { NavLayout } from "../components/Layouts";
 import Head from "next/head";
-import InputField from "../components/Inputs/InputField";
-import Button from "../components/Button";
+import { InputField } from "../components/Inputs";
+import { Button, ThirdPartyButton } from "../components/Buttons";
 import { Icon } from "@iconify/react";
-import ThirdPartyButton from "../components/ThirdPartyButton";
 import Link from "next/link";
 
 export default function Login() {

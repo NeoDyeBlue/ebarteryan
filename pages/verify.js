@@ -1,4 +1,4 @@
-import NavLayout from "../components/Layouts/NavLayout";
+import { NavLayout } from "../components/Layouts";
 import Head from "next/head";
 import { Email } from "@carbon/icons-react";
 

@@ -1,18 +1,20 @@
-import BadgedIcon from "../Icons/BadgedIcon";
+import { BadgedIcon } from "../Icons";
 import { Chat } from "@carbon/icons-react";
 import { useState } from "react";
-import ChatHeader from "../Messages/ChatHeader";
-import ChatContainer from "../Messages/ChatContainer";
-import ChatInput from "../Messages/ChatInput";
-import ChatBubble from "../Messages/ChatBubble";
-import MessageList from "../Messages/MessageList";
-import MessageListItem from "../Messages/MessageListItem";
-import MessageSearchBox from "../Messages/MessageSearchBox";
-import { OverflowMenuVertical } from "@carbon/icons-react";
-import CircleButton from "../CircleButton";
+import {
+  ChatHeader,
+  ChatContainer,
+  ChatInput,
+  ChatBubble,
+  MessageList,
+  MessageListItem,
+  MessageSearchBox,
+} from "../Messages";
 
-export default function MessagesPopup
-({ className, hasBadge }) {
+import { OverflowMenuVertical } from "@carbon/icons-react";
+import { CircleButton } from "../Buttons/";
+
+export default function MessagesPopup({ className, hasBadge }) {
   const userId = 1;
   const chats = [
     {
@@ -102,8 +104,8 @@ export default function MessagesPopup
           isOpen ? "translate-y-0" : "translate-y-[calc(70vh-0.75rem*-1)]"
         }`}
       >
-        <div className="pointer-events-auto flex flex-col items-end">
-          <div style={{ perspective: "100px" }}>
+        <div className="pointer-events-none flex flex-col items-end">
+          <div style={{ perspective: "100px" }} className="pointer-events-auto">
             <button
               style={{
                 ...(isOpen
@@ -115,7 +117,7 @@ export default function MessagesPopup
                   : {}),
               }}
               onClick={() => setIsOpen(true)}
-              className="pointer-events-auto relative flex origin-bottom cursor-pointer 
+              className="relative flex origin-bottom cursor-pointer 
         items-center gap-3 rounded-t-[10px] border border-b-0 border-gray-100 bg-white px-4 py-3
         font-display font-medium text-black-light shadow-lg transition-all delay-300 duration-300
         "
@@ -127,8 +129,8 @@ export default function MessagesPopup
             </button>
           </div>
           <div
-            className="z-10 mb-3 flex h-[70vh] w-[50vw] overflow-hidden
-        rounded-[10px] border border-gray-100 bg-white shadow-lg"
+            className="pointer-events-auto z-10 mb-3 flex h-[70vh] w-[50vw]
+        overflow-hidden rounded-[10px] border border-gray-100 bg-white shadow-lg"
           >
             <div className="flex w-full max-w-[280px] flex-col gap-4 border-r border-gray-100">
               <div className="flex items-center justify-between gap-4 px-4 pt-4">

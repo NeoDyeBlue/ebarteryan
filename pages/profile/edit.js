@@ -1,8 +1,8 @@
 import NavLayout from "../../components/Layouts/NavLayout";
 import Head from "next/head";
 import Image from "next/image";
-import InputField from "../../components/Inputs/InputField";
-import Button from "../../components/Button";
+import { InputField } from "../../components/Inputs";
+import { Button } from "../../components/Buttons";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import { useFilePicker } from "use-file-picker";
 import { UserProfile, Account, Pen } from "@carbon/icons-react";

@@ -1,4 +1,4 @@
-import NavLayout from "../components/Layouts/NavLayout";
+import { NavLayout } from "../components/Layouts";
 import Head from "next/head";
 
 export default function ForgotPassword() {

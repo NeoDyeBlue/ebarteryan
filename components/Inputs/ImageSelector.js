@@ -1,7 +1,7 @@
 import { useFilePicker } from "use-file-picker";
 import { Image } from "@carbon/icons-react";
 import ImageSelectorItem from "./ImageSelectorItem";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import { Information } from "@carbon/icons-react";
 
 export default function ImageSelector({ label, infoMessage }) {

@@ -1,6 +1,6 @@
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import NotificationList from "./NotificationList";
-import NotificationListItem from "./NotificationListtem";
+import NotificationListItem from "./NotificationListItem";
 import Link from "next/link";
 
 export default function NotificationTabs() {

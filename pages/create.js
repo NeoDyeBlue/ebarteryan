@@ -1,23 +1,25 @@
 import Head from "next/head";
 import dynamic from "next/dynamic";
-import CreationLayout from "../components/Layouts/CreationLayout";
-import InputField from "../components/Inputs/InputField";
-import Textarea from "../components/Inputs/Textarea";
-import ImageSelector from "../components/Inputs/ImageSelector";
-import RadioSelect from "../components/Inputs/RadioSelect";
-import RadioSelectItem from "../components/Inputs/RadioSelectItem";
+import { IconDescription } from "../components/Icons";
+import { CreationLayout } from "../components/Layouts";
+import { LocationModal } from "../components/Modals";
+import {
+  InputField,
+  Textarea,
+  ImageSelector,
+  RadioSelect,
+  RadioSelectItem,
+  MultiSelect,
+  MultiSelectItem,
+} from "../components/Inputs";
 const DropdownSelect = dynamic(
   () => import("../components/Inputs/DropdownSelect"),
   { ssr: false }
 );
 import { useState } from "react";
 import { Location } from "@carbon/icons-react";
-import MultiSelect from "../components/Inputs/MultiSelect";
-import MultiSelectItem from "../components/Inputs/MultiSelectItem";
 import { Collaborate, Delivery, Chat } from "@carbon/icons-react";
-import IconDescription from "../components/IconDescription";
-import Button from "../components/Button";
-import LocationModal from "../components/Modals/LocationModal";
+import { Button } from "../components/Buttons";
 import ReactModal from "react-modal";
 import useMapStore from "../store/useMapStore";
 

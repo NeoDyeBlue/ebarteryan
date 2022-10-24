@@ -1,8 +1,7 @@
 import Head from "next/head";
-import LocationBarterButtons from "../components/LocationBarterButtons";
-import ItemCard from "../components/Cards/ItemCard";
-import NavLayout from "../components/Layouts/NavLayout";
-import CategoryLayout from "../components/Layouts/CategoryLayout";
+import { LocationBarterButtons } from "../components/Buttons";
+import { ItemCard } from "../components/Cards";
+import { NavLayout, CategoryLayout } from "../components/Layouts";
 import useMapStore from "../store/useMapStore";
 import { Location } from "@carbon/icons-react";
 

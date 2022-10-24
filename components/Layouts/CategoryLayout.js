@@ -1,4 +1,4 @@
-import CategoryNavbar from "../Navigation/CategoryNavbar";
+import { CategoryNavbar } from "../Navigation";
 
 export default function CategoryLayout({ children }) {
   return (

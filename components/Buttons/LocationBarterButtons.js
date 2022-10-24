@@ -1,10 +1,11 @@
 import Button from "./Button";
+import LinkButton from "./LinkButton";
 import { Pen, Location } from "@carbon/icons-react";
 import Link from "next/link";
-import LocationModal from "./Modals/LocationModal";
+import LocationModal from "../Modals/LocationModal";
 import ReactModal from "react-modal";
 import { useState } from "react";
-import useMapStore from "../store/useMapStore";
+import useMapStore from "../../store/useMapStore";
 import Marquee from "react-fast-marquee";
 
 export default function LocationBarterButtons({ className }) {
@@ -46,14 +47,9 @@ export default function LocationBarterButtons({ className }) {
             : "container mx-auto flex w-full flex-col gap-4 p-[1.5rem] lg:hidden"
         }
       >
-        <Link href="/create">
-          <a
-            className="flex w-full items-center justify-center gap-1 text-ellipsis whitespace-nowrap 
-        rounded-[10px] bg-green-500 px-4 py-3 text-center font-display text-[15px] font-medium text-white"
-          >
-            <Pen size={20} /> Make a Barter
-          </a>
-        </Link>
+        <LinkButton link="/create">
+          <Pen size={20} /> Make a Barter
+        </LinkButton>
         <Button underlined="true" onClick={openLocationModal}>
           <Location size={20} />
           {listingRegion ? (

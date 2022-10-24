@@ -1,5 +1,5 @@
 import { ArrowLeft, Add } from "@carbon/icons-react";
-import CircleButton from "../CircleButton";
+import { CircleButton } from "../Buttons";
 import Image from "next/image";
 
 export default function ChatHeader({ showClose, onClose }) {
