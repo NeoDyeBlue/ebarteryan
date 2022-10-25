@@ -4,7 +4,7 @@ import { useField } from "formik";
 
 export default function InputField({ label, infoMessage, ...props }) {
   const [showPass, setShowPass] = useState(false);
-  const [field, meta] = useField(props.name);
+  const [field, meta] = useField(props);
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center">

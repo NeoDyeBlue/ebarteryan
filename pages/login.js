@@ -1,6 +1,6 @@
 import { NavLayout } from "../components/Layouts";
 import Head from "next/head";
-import LoginForm from "../components/Forms";
+import { LoginForm } from "../components/Forms";
 
 export default function Login() {
   return (

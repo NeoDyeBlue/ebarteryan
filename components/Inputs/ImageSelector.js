@@ -1,33 +1,45 @@
 import { useFilePicker } from "use-file-picker";
 import { Image } from "@carbon/icons-react";
 import ImageSelectorItem from "./ImageSelectorItem";
-import { useState, useEffect } from "react";
-import { Information } from "@carbon/icons-react";
+import { useEffect, useMemo } from "react";
+import { Information, Error } from "@carbon/icons-react";
+import React from "react";
+import { useField } from "formik";
 
-export default function ImageSelector({ label, infoMessage }) {
+export default function ImageSelector({
+  label,
+  infoMessage,
+  values,
+  max,
+  onChange,
+  ...props
+}) {
+  const [field, meta] = useField(props);
   const [openFileSelector, { filesContent, errors }] = useFilePicker({
     readAs: "DataURL",
-    accept: "image/*",
+    accept: ["image/jpeg", "image/png", "image/gif"],
     multiple: true,
     // limitFilesConfig: { max: 10 },
-    maxFileSize: 50,
+    maxFileSize: 10,
   });
 
-  const [images, setImages] = useState([]);
-
-  useEffect(() => {
-    setImages((prev) => [
-      ...prev,
-      ...filesContent.slice(0, 10 - images.length),
-    ]);
-  }, [filesContent]);
+  console.log(meta.error && meta.touched ? meta.error : "no");
 
   const removeImage = (image) => {
-    const newSelected = images.filter((img) => img !== image);
-    setImages(newSelected);
+    const newSelected = values.filter((img) => img !== image);
+    onChange(newSelected);
   };
 
-  const selectedImages = images.map((file, index) => (
+  const images = useMemo(
+    () => [...values, ...filesContent.slice(0, max - values.length)],
+    [filesContent]
+  );
+
+  useEffect(() => {
+    onChange(images);
+  }, [filesContent]);
+
+  const selectedImages = values.map((file, index) => (
     <ImageSelectorItem
       key={index}
       src={file.content}
@@ -40,8 +52,10 @@ export default function ImageSelector({ label, infoMessage }) {
       {label && <p className="font-display font-medium">{label}</p>}
       <div className="grid grid-cols-3 gap-2">
         {selectedImages}
-        {images.length < 10 && (
+        {values.length < max && (
           <button
+            onBlur={field.onBlur}
+            id={props.name}
             type="button"
             onClick={() => openFileSelector()}
             className="flex aspect-square flex-col items-center justify-center overflow-hidden 
@@ -51,7 +65,7 @@ export default function ImageSelector({ label, infoMessage }) {
           </button>
         )}
       </div>
-      {infoMessage && (
+      {infoMessage && !meta.error && (
         <p className="flex gap-1 text-sm text-gray-200">
           <span>
             <Information size={16} />
@@ -59,6 +73,16 @@ export default function ImageSelector({ label, infoMessage }) {
           {infoMessage}
         </p>
       )}
+      {meta.error && (
+        <p className="flex gap-1 text-sm text-danger-500">
+          <span>
+            <Error size={16} className="-mt-[2px]" />
+          </span>
+          {JSON.stringify(meta.error)}
+        </p>
+      )}
     </div>
   );
 }
+
+export const MemoizedImageSelector = React.memo(ImageSelector);

@@ -1,42 +1,45 @@
 import { Button, ThirdPartyButton } from "../Buttons";
 import { Icon } from "@iconify/react";
 import Link from "next/link";
-import { loginSchema } from "../../lib/validators/user-validator";
+import { signupSchema } from "../../lib/validators/user-validator";
 import { Formik, Form } from "formik";
 import { InputField } from "../Inputs";
 
-export default function LoginForm() {
+export default function SignUpForm() {
   function handleSubmit() {
     console.log("submitted");
   }
 
   return (
     <div className="flex w-full flex-col gap-6 md:m-auto md:max-w-[480px]">
-      <h1 className="mx-auto text-4xl font-semibold">Login</h1>
+      <h1 className="mx-auto text-4xl font-semibold">Sign Up</h1>
       <Formik
         initialValues={{
+          firstName: "",
+          lastName: "",
           email: "",
           password: "",
+          confirmPassword: "",
         }}
-        validationSchema={loginSchema}
+        validationSchema={signupSchema}
         onSubmit={handleSubmit}
       >
         {(props) => (
           <Form className="flex flex-col gap-4">
+            <InputField type="text" label="First Name" name="firstName" />
+            <InputField type="text" label="Last Name" name="lastName" />
             <InputField type="email" label="Email" name="email" />
-            <div className="flex flex-col gap-2">
-              <InputField type="password" label="Password" name="password" />
-              <Link href="/forgotpassword">
-                <a className="self-end font-display text-sm font-medium text-green-500 hover:underline">
-                  Forgot Password?
-                </a>
-              </Link>
-            </div>
+            <InputField type="password" label="Password" name="password" />
+            <InputField
+              type="password"
+              label="Confirm Password"
+              name="confirmPassword"
+            />
             <p className="text-center">
-              Don't have an account?{" "}
-              <Link href="/signup">
+              Already have an account?{" "}
+              <Link href="/login">
                 <a className="font-display font-medium text-green-500 hover:underline">
-                  Sign Up
+                  Login
                 </a>
               </Link>
             </p>
@@ -62,11 +65,11 @@ export default function LoginForm() {
               className="h-[24px] w-[24px]"
             />
           }
-          text="Login with Google"
+          text="Sign Up with Google"
         />
         <ThirdPartyButton
           icon={<Icon icon="logos:facebook" className="h-[24px] w-[24px]" />}
-          text="Login with Facebook"
+          text="Sign Up with Facebook"
         />
       </div>
     </div>
