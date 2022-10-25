@@ -5,9 +5,11 @@ export default function Button({
   onClick,
   disabled,
   autoWidth,
+  type,
 }) {
   return (
     <button
+      type={type ? type : "button"}
       onClick={onClick}
       disabled={disabled}
       className={`${autoWidth ? "w-auto" : "w-full"} ${

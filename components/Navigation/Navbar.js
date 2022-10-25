@@ -12,7 +12,7 @@ import { useState, useRef, useEffect } from "react";
 import { Search } from "@carbon/icons-react";
 import { useRouter } from "next/router";
 import { NotificationsPopup } from "../Popups";
-import useOnClickOutside from "../../hooks/useOnClickOutside";
+import useOnClickOutside from "../../lib/hooks/useOnClickOutside";
 import useUiSizesStore from "../../store/useUiSizesStore";
 
 export default function Navbar({ sticky }) {

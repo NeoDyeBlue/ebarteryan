@@ -1,15 +1,29 @@
 import { Information, View, ViewOff, Error } from "@carbon/icons-react";
 import { useState } from "react";
-import { useField } from "formik";
 
-export default function InputField({ label, infoMessage, ...props }) {
+export default function InputField({
+  type,
+  name,
+  value,
+  required,
+  placeholder,
+  onChange,
+  onBlur,
+  label,
+  infoMessage,
+  error,
+  errorMessage,
+}) {
   const [showPass, setShowPass] = useState(false);
-  const [field, meta] = useField(props.name);
   return (
     <div className="flex flex-col gap-2">
       <div className="flex items-center">
-        {label && <label className="font-display font-medium">{label}</label>}
-        {props.type == "password" ? (
+        {label && (
+          <label htmlFor={name} className="font-display font-medium">
+            {label}
+          </label>
+        )}
+        {type == "password" ? (
           <button
             type="button"
             className="ml-auto"
@@ -21,24 +35,22 @@ export default function InputField({ label, infoMessage, ...props }) {
         ) : null}
       </div>
       <input
-        {...field}
-        {...props}
-        type={
-          props.type == "password"
-            ? showPass
-              ? "text"
-              : "password"
-            : props.type
-        }
+        type={type == "password" ? (showPass ? "text" : "password") : type}
+        name={name}
+        value={value}
+        required={required}
+        placeholder={placeholder}
         className={`w-full rounded-[10px] border bg-white 
-    p-4 font-body placeholder-gray-300 focus:outline-none focus:ring-1
-    ${
-      meta.error && meta.touched
-        ? "border-danger-500 focus:ring-danger-500"
-        : "border-gray-200 focus:ring-green-500"
-    }`}
-      />
-      {infoMessage && !meta.error && (
+        p-4 font-body placeholder-gray-300 focus:outline-none focus:ring-1
+        ${
+          error
+            ? "border-danger-500 focus:ring-danger-500"
+            : "border-gray-200 focus:ring-green-500"
+        }`}
+        onChange={onChange}
+        onBlur={onBlur}
+      ></input>
+      {infoMessage && !error && (
         <p className="flex gap-1 text-sm text-gray-200">
           <span>
             <Information size={16} className="-mt-[2px]" />
@@ -46,12 +58,12 @@ export default function InputField({ label, infoMessage, ...props }) {
           {infoMessage}
         </p>
       )}
-      {meta.error && meta.touched && (
+      {error && (
         <p className="flex gap-1 text-sm text-danger-500">
           <span>
             <Error size={16} className="-mt-[2px]" />
           </span>
-          {meta.error}
+          {errorMessage}
         </p>
       )}
     </div>
