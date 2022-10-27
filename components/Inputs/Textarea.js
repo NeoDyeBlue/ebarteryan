@@ -40,9 +40,9 @@ export default function Textarea({ label, infoMessage, ...props }) {
       )}
       {meta.error && meta.touched && (
         <p className="flex gap-1 text-sm text-danger-500">
-          <span>
+          {/* <span>
             <Error size={16} className="-mt-[2px]" />
-          </span>
+          </span> */}
           {meta.error}
         </p>
       )}

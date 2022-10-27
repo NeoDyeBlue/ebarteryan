@@ -1,6 +1,6 @@
 import { Information } from "@carbon/icons-react";
 
-export default function RadioSelect({ label, children, infoMessage }) {
+export default function RadioSelect({ label, children, infoMessage, error }) {
   return (
     <fieldset className="flex flex-col gap-2">
       {label && (
@@ -13,6 +13,14 @@ export default function RadioSelect({ label, children, infoMessage }) {
             <Information size={16} />
           </span>
           {infoMessage}
+        </p>
+      )}
+      {error && (
+        <p className="flex gap-1 text-sm text-danger-500">
+          {/* <span>
+            <Error size={16} className="-mt-[2px]" />
+          </span> */}
+          {error}
         </p>
       )}
     </fieldset>

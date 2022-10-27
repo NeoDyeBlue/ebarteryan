@@ -1,7 +1,6 @@
 export { default as InputField } from "./InputField";
 export { default as DropdownSelect } from "./DropdownSelect";
 export { default as ImageSelector } from "./ImageSelector";
-export { MemoizedImageSelector } from "./ImageSelector";
 export { default as MultiSelect } from "./MultiSelect";
 export { default as MultiSelectItem } from "./MultiSelectItem";
 export { default as RadioSelect } from "./RadioSelect";

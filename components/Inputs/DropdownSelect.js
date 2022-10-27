@@ -1,15 +1,18 @@
 import { useSelect } from "downshift";
 import { CaretDown, CaretUp } from "@carbon/icons-react";
 // import "react-dropdown/style.css";
+import { useField } from "formik";
+import { useState, useEffect } from "react";
 
 export default function DropdownSelect({
   items,
-  selectedItem,
-  handleSelectedItemChange,
   placeholder,
   label,
-  id,
+  infoMessage,
+  name,
 }) {
+  const [field, meta, helpers] = useField(name);
+  const [selectedItem, setSelectedItem] = useState(meta.value);
   const {
     isOpen,
     getToggleButtonProps,
@@ -20,11 +23,20 @@ export default function DropdownSelect({
   } = useSelect({
     items,
     selectedItem,
-    onSelectedItemChange: handleSelectedItemChange,
+    onSelectedItemChange: ({ selectedItem: newSelectedItem }) => {
+      setSelectedItem(newSelectedItem);
+    },
   });
 
+  useEffect(() => {
+    helpers.setValue(selectedItem);
+  }, [selectedItem]);
+
+  console.log(selectedItem);
+  console.log(meta.value);
+
   return (
-    <div className="relative" id={id}>
+    <div className="relative" id={name}>
       <div className="flex flex-col gap-2">
         {label && (
           <label {...getLabelProps()} className="font-display font-medium">
@@ -32,19 +44,42 @@ export default function DropdownSelect({
           </label>
         )}
         <button
+          name={name}
+          onBlur={() => helpers.setTouched(!isOpen)}
           aria-label="toggle menu"
-          className="flex w-full items-center justify-between rounded-[10px] border border-gray-100
-            bg-white p-4 font-body focus:outline-none focus:ring-1 focus:ring-green-500"
+          className={`flex w-full items-center justify-between rounded-[10px] border bg-white
+          p-4 font-body placeholder-gray-300 focus:outline-none focus:ring-1
+          ${
+            meta.error && meta.touched
+              ? "border-danger-500 focus:ring-danger-500"
+              : "border-gray-200 focus:ring-green-500"
+          }`}
           type="button"
           {...getToggleButtonProps()}
         >
           <span className="font-body text-gray-300">
             {selectedItem ? selectedItem : placeholder}
           </span>
-          <span className="px-2 text-black-light">
+          <span className="text-black-light">
             {isOpen ? <CaretUp size={16} /> : <CaretDown size={16} />}
           </span>
         </button>
+        {infoMessage && (!meta.error || !meta.touched) && (
+          <p className="flex gap-1 text-sm text-gray-200">
+            <span>
+              <Information size={16} className="-mt-[2px]" />
+            </span>
+            {infoMessage}
+          </p>
+        )}
+        {meta.error && meta.touched && (
+          <p className="flex gap-1 text-sm text-danger-500">
+            {/* <span>
+            <Error size={16} className="-mt-[2px]" />
+          </span> */}
+            {meta.error}
+          </p>
+        )}
       </div>
       <ul
         {...getMenuProps()}
@@ -60,6 +95,7 @@ export default function DropdownSelect({
                 flex cursor-pointer flex-col p-4 font-body shadow-sm
               `}
               key={index}
+              // onClick={selectItem}
               {...getItemProps({ item, index })}
             >
               <span>{item}</span>

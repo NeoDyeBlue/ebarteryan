@@ -1,22 +1,16 @@
 import { RadioButton, RadioButtonChecked } from "@carbon/icons-react";
+import { useField } from "formik";
 
-export default function RadioSelectItem({
-  children,
-  name,
-  checked,
-  onChange,
-  long,
-  value,
-}) {
+export default function RadioSelectItem({ children, long, checked, ...props }) {
+  const [field, meta] = useField(props);
   return (
     <label className={`flex gap-4 ${long ? "items-start" : ""} cursor-pointer`}>
       <input
         type="radio"
         className="hidden"
-        onChange={onChange}
-        name={name}
+        {...field}
+        {...props}
         checked={checked}
-        value={value}
       />
       <div className={`relative ${long ? "mt-1" : ""}`}>
         <span
