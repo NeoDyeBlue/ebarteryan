@@ -21,13 +21,15 @@ const useMapStore = create((set) => ({
       listingPosition: Object.keys(state.position).length
         ? state.position
         : state.listingPosition,
-      listingRegion: state.region ? state.region : state.listingRadius,
+      listingRegion: state.region ? state.region : state.listingRegion,
       listingRadius: state.radius,
     })),
   setCreationLocation: () =>
     set((state) => ({
-      creationPosition: state.position,
-      creationRegion: state.region,
+      creationPosition: Object.keys(state.position).length
+        ? state.position
+        : state.creationPosition,
+      creationRegion: state.region ? state.region : state.listingRegion,
     })),
   clearPositionRegion: () =>
     set(() => ({

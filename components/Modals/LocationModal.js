@@ -7,14 +7,8 @@ import { Button, CircleButton } from "../Buttons";
 import useMapStore from "../../store/useMapStore";
 import { useMemo } from "react";
 
-export default function LocationModal({ onClose, applyInListing }) {
-  const {
-    region,
-    listingPosition,
-    setListingLocation,
-    setCreationLocation,
-    creationPosition,
-  } = useMapStore();
+export default function LocationModal({ onClose, applyInListing, onApply }) {
+  const { region, listingPosition, creationPosition } = useMapStore();
 
   // check if there is a position set
   const initialPosition = useMemo(() => {
@@ -51,17 +45,7 @@ export default function LocationModal({ onClose, applyInListing }) {
         center={initialPosition}
         pinPosition={initialPosition}
       />
-      <Button
-        disabled={!region}
-        onClick={() => {
-          if (applyInListing) {
-            setListingLocation();
-          } else {
-            setCreationLocation();
-          }
-          onClose();
-        }}
-      >
+      <Button disabled={!region} onClick={onApply}>
         Apply
       </Button>
     </div>

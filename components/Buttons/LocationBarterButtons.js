@@ -10,7 +10,12 @@ import Marquee from "react-fast-marquee";
 
 export default function LocationBarterButtons({ className }) {
   ReactModal.setAppElement("#__next");
-  const { clearPositionRegion, listingRegion, listingRadius } = useMapStore();
+  const {
+    clearPositionRegion,
+    listingRegion,
+    listingRadius,
+    setListingLocation,
+  } = useMapStore();
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   function openLocationModal() {
     setLocationModalOpen(true);
@@ -36,7 +41,13 @@ export default function LocationBarterButtons({ className }) {
         <div
           className={`custom-scrollbar container flex max-h-full min-h-full overflow-y-auto md:px-6`}
         >
-          <LocationModal onClose={closeLocationModal} applyInListing={true} />
+          <LocationModal
+            onClose={closeLocationModal}
+            onApply={() => {
+              setListingLocation();
+              closeLocationModal();
+            }}
+          />
           {/* <OfferModal onClose={closeOfferModal} /> */}
         </div>
       </ReactModal>

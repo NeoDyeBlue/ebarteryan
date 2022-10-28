@@ -12,7 +12,6 @@ const tomtomFetcher = (url, args) =>
   );
 
 export default function MapPinDrop({ pinPosition, onPositionChange }) {
-  console.log("rerender");
   const { setPosition, setMap, setRegion, region } = useMapStore();
   const { data: revGeoCoding, error } = useSWR(
     [

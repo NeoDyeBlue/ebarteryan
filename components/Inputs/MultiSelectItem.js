@@ -1,20 +1,17 @@
 import { Checkbox, CheckboxCheckedFilled } from "@carbon/icons-react";
+import { useField } from "formik";
 
-export default function MultiSelectItem({
-  children,
-  name,
-  checked,
-  onChange,
-  long,
-}) {
+export default function MultiSelectItem({ children, checked, long, ...props }) {
+  const [field, meta, helpers] = useField(props);
   return (
     <label className={`flex gap-4 ${long ? "items-start" : ""} cursor-pointer`}>
       <input
         type="checkbox"
         className="hidden"
-        onChange={onChange}
-        name={name}
+        name={props.name}
         checked={checked}
+        {...field}
+        {...props}
       />
       <div className={`relative ${long ? "mt-1" : ""}`}>
         <span

@@ -15,14 +15,7 @@ export default function RadioSelect({ label, children, infoMessage, error }) {
           {infoMessage}
         </p>
       )}
-      {error && (
-        <p className="flex gap-1 text-sm text-danger-500">
-          {/* <span>
-            <Error size={16} className="-mt-[2px]" />
-          </span> */}
-          {error}
-        </p>
-      )}
+      {error && <p className="flex gap-1 text-sm text-danger-500">{error}</p>}
     </fieldset>
   );
 }

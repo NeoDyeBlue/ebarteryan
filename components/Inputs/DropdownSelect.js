@@ -32,11 +32,16 @@ export default function DropdownSelect({
     helpers.setValue(selectedItem);
   }, [selectedItem]);
 
-  console.log(selectedItem);
-  console.log(meta.value);
+  // console.log(meta.touched);
 
   return (
-    <div className="relative" id={name}>
+    <div
+      className="relative"
+      id={name}
+      onBlur={field.onBlur}
+      // onClick={() => helpers.setTouched(!isOpen ? true : false)}
+      // onBlur={(event) => helpers.setTouched(!isOpen ? true : false)}
+    >
       <div className="flex flex-col gap-2">
         {label && (
           <label {...getLabelProps()} className="font-display font-medium">
@@ -45,12 +50,12 @@ export default function DropdownSelect({
         )}
         <button
           name={name}
-          onBlur={() => helpers.setTouched(!isOpen)}
+          // onBlur={() => helpers.setTouched(!isOpen)}
           aria-label="toggle menu"
           className={`flex w-full items-center justify-between rounded-[10px] border bg-white
           p-4 font-body placeholder-gray-300 focus:outline-none focus:ring-1
           ${
-            meta.error && meta.touched
+            meta.error && meta.touched && !isOpen
               ? "border-danger-500 focus:ring-danger-500"
               : "border-gray-200 focus:ring-green-500"
           }`}
@@ -72,7 +77,7 @@ export default function DropdownSelect({
             {infoMessage}
           </p>
         )}
-        {meta.error && meta.touched && (
+        {meta.error && meta.touched && !isOpen && (
           <p className="flex gap-1 text-sm text-danger-500">
             {/* <span>
             <Error size={16} className="-mt-[2px]" />
