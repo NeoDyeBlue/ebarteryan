@@ -22,7 +22,7 @@ export default function MobileNavbar({ className }) {
           </Link>
         </li>
         <li>
-          <Link href="/">
+          <Link href="/admin">
             <a>
               <BadgedIcon hasBadge={true}>
                 <ArrowsHorizontal size={24} />

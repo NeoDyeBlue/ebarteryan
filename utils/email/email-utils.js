@@ -35,7 +35,17 @@ async function createTransporter() {
     });
 
     const transporter = nodemailer.createTransport({
-      ...smtpConfig,
+      host: process.env.EMAIL_HOST,
+      service: process.env.EMAIL_SRVC,
+      port: process.env.EMAIL_PORT,
+      secure: true,
+      auth: {
+        type: "OAuth2",
+        user: process.env.EMAIL_USER,
+        clientId: process.env.GOOGLE_CLIENT_ID,
+        clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        refreshToken: process.env.GOOGLE_REFRESH_TOKEN,
+      },
       accessToken,
     });
 
@@ -55,7 +65,7 @@ async function createTransporter() {
  * @param {*} html - the html for the email
  */
 
-async function sendEmail(from, to, subject, text, html) {
+export async function sendEmail(from, to, subject, text, html) {
   try {
     const transporter = await createTransporter();
 
@@ -70,29 +80,3 @@ async function sendEmail(from, to, subject, text, html) {
     throw error;
   }
 }
-
-async function createVerificationHTMLEmail(link, receiverName) {
-  try {
-    const html = await ejs.renderFile(
-      path.join(__dirname, "./templates/verification.template.ejs"),
-      {
-        link,
-        name: receiverName,
-      }
-    );
-
-    return html;
-  } catch (error) {
-    throw error;
-  }
-}
-
-async function createResetHTMLEmail(link, receiverName) {
-  return html;
-}
-
-module.exports = {
-  sendEmail,
-  createVerificationHTMLEmail,
-  createResetHTMLEmail,
-};

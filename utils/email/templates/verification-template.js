@@ -3,7 +3,7 @@ export default function VerificationTemplate({
   verificationLink,
 }) {
   return (
-    <div>
+    <body>
       <section
         style={{
           padding: "2rem",
@@ -67,6 +67,6 @@ export default function VerificationTemplate({
         <p>Cheers,</p>
         <p>eBarterYan Team</p>
       </section>
-    </div>
+    </body>
   );
 }

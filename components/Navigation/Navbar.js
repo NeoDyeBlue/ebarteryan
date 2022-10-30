@@ -14,6 +14,7 @@ import { useRouter } from "next/router";
 import { NotificationsPopup } from "../Popups";
 import useOnClickOutside from "../../lib/hooks/useOnClickOutside";
 import useUiSizesStore from "../../store/useUiSizesStore";
+import { signOut } from "next-auth/react";
 
 export default function Navbar({ sticky }) {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -63,6 +64,9 @@ export default function Navbar({ sticky }) {
         <SearchBox className="container absolute top-0 left-0 z-10 mx-auto hidden h-full w-full max-w-[500px] px-4 lg:relative lg:block" />
         <div className="relative flex items-center gap-4 md:gap-7">
           <ul className="hidden items-center gap-7 md:flex">
+            <li>
+              <button onClick={() => signOut()}>logout</button>
+            </li>
             <li>
               <Link href="/">
                 <a className={`${currentRoute == "/" ? "text-green-500" : ""}`}>

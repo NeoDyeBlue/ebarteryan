@@ -4,10 +4,20 @@ import Link from "next/link";
 import { loginSchema } from "../../lib/validators/user-validator";
 import { Formik, Form } from "formik";
 import { InputField } from "../Inputs";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/router";
 
 export default function LoginForm() {
-  function handleSubmit() {
-    console.log("submitted");
+  const router = useRouter();
+  async function handleSubmit(values, actions) {
+    const res = await signIn("credentials", {
+      email: values.email,
+      password: values.password,
+      redirect: false,
+    });
+    if (res.ok) {
+      router.push("/");
+    }
   }
 
   return (

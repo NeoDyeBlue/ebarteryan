@@ -2,11 +2,11 @@ import Head from "next/head";
 import { LocationBarterButtons } from "../components/Buttons";
 import { ItemCard } from "../components/Cards";
 import { NavLayout, CategoryLayout } from "../components/Layouts";
-import useMapStore from "../store/useMapStore";
-import { Location } from "@carbon/icons-react";
+import { useSession } from "next-auth/react";
 
 export default function Home() {
-  const { listingRegion, listingRadius } = useMapStore();
+  const { data: session, status } = useSession();
+  console.log(session, status);
   return (
     <div className="flex w-full flex-col gap-4">
       <Head>

@@ -1,8 +1,35 @@
 import { NavLayout } from "../components/Layouts";
 import Head from "next/head";
-import { Email } from "@carbon/icons-react";
+import { DotLoader } from "react-spinners";
+import useSWR from "swr";
+import { useRouter } from "next/router";
+import { Checkmark, FaceDissatisfied, Email } from "@carbon/icons-react";
+import { useSession } from "next-auth/react";
+import { useEffect } from "react";
+import Link from "next/link";
+
+const verifyFetcher = (url, args) =>
+  fetch(`${url}?token=${args.token}`, { method: "PATCH" }).then((r) =>
+    r.json()
+  );
 
 export default function Verify() {
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const { token } = router.query;
+  const { data: verification, error } = useSWR(
+    token ? ["/api/verify", { token }] : null,
+    verifyFetcher
+  );
+
+  useEffect(() => {
+    if (verification) {
+      if (verification.success && session && status == "authenticated") {
+        router.push("/");
+      }
+    }
+  }, [verification, session, status]);
+
   return (
     <div className="w-full">
       <Head>
@@ -15,12 +42,34 @@ export default function Verify() {
           className="m-auto flex w-full max-w-[480px] flex-col items-center justify-center gap-6
         rounded-[10px] border border-gray-100 bg-white p-6 shadow-lg"
         >
-          <Email size={100} className="text-green-500" />
-          <h1 className="text-4xl font-semibold">Verifying...</h1>
-          {/* <p className="text-center">
-            We've sent an email containing a Verify link. Click the link to
-            finish setting up your account.
-          </p> */}
+          <span className="text-green-500">
+            {(!token || error) && <FaceDissatisfied size={100} />}
+            {token && !error && !verification && <Email size={100} />}
+            {token && verification?.data?.success && <Checkmark size={100} />}
+          </span>
+          <h1 className="text-4xl font-semibold">
+            {!token || error ? "Failed" : ""}
+            {token && !error && !verification ? "Verifying..." : ""}
+            {token && verification?.data?.success ? "Verified" : ""}
+          </h1>
+          {token && !error & !verification ? (
+            <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+              <DotLoader color="#C7EF83" size={48} />
+            </div>
+          ) : (
+            <p className="text-center">
+              {!token || error ? "invalid token" : ""}
+              {token && verification?.data?.success
+                ? `Setup successful! Redirecting to home page. Did not redirect? ${(
+                    <Link href={"/"}>
+                      <a className="font-display font-medium text-green-500 hover:underline">
+                        Click here
+                      </a>
+                    </Link>
+                  )}`
+                : ""}
+            </p>
+          )}
         </div>
       </div>
     </div>

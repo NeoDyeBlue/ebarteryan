@@ -4,10 +4,40 @@ import Link from "next/link";
 import { signupSchema } from "../../lib/validators/user-validator";
 import { Formik, Form } from "formik";
 import { InputField } from "../Inputs";
+import PropagateLoader from "react-spinners/PropagateLoader";
+import { signIn } from "next-auth/react";
+import { useRouter } from "next/router";
 
 export default function SignUpForm() {
-  function handleSubmit() {
-    console.log("submitted");
+  const router = useRouter();
+  async function handleSubmit(values, actions) {
+    try {
+      const res = await fetch("/api/register", {
+        method: "POST",
+        body: JSON.stringify(values),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (!data.success) {
+        if (data.error == "EmailError") {
+          actions.setFieldError("email", data.errorMessage);
+        }
+      }
+
+      if (data.success) {
+        const res = await signIn("credentials", {
+          email: values.email,
+          password: values.password,
+          redirect: false,
+        });
+
+        if (res.ok) {
+          router.push("/verification");
+        }
+      }
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -43,7 +73,14 @@ export default function SignUpForm() {
                 </a>
               </Link>
             </p>
-            <Button type="submit">Login</Button>
+            <Button disabled={props.isSubmitting} type="submit">
+              Sign Up
+            </Button>
+            {props.isSubmitting && (
+              <div className="flex h-[14px] flex-shrink-0 items-center justify-center">
+                <PropagateLoader color="#C7EF83" size={14} />
+              </div>
+            )}
           </Form>
         )}
       </Formik>
