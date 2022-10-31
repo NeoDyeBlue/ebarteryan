@@ -6,6 +6,7 @@ import {
   Bookmark,
   ArrowsHorizontal,
   Home,
+  UserAvatar,
 } from "@carbon/icons-react";
 import { SearchBox } from "../Inputs";
 import { useState, useRef, useEffect } from "react";
@@ -14,17 +15,22 @@ import { useRouter } from "next/router";
 import { NotificationsPopup } from "../Popups";
 import useOnClickOutside from "../../lib/hooks/useOnClickOutside";
 import useUiSizesStore from "../../store/useUiSizesStore";
-import { signOut } from "next-auth/react";
+import { useSession } from "next-auth/react";
+import ProfileMenu from "./ProfileMenu";
 
 export default function Navbar({ sticky }) {
   const [showNotifications, setShowNotifications] = useState(false);
-  const popupRef = useRef(null);
+  const [showProfile, setShowProfile] = useState(false);
+  const notificationsPopupRef = useRef(null);
+  const profileMenuRef = useRef(null);
   const navbarRef = useRef(null);
   const router = useRouter();
   const currentRoute = router.asPath;
   const { setNavbarHeight } = useUiSizesStore();
+  const { data: session, status } = useSession();
 
-  useOnClickOutside(popupRef, hideNotificationsPopup);
+  useOnClickOutside(notificationsPopupRef, hideNotificationsPopup);
+  useOnClickOutside(profileMenuRef, hideProfileMenu);
 
   useEffect(() => {
     function handleResize() {
@@ -43,6 +49,14 @@ export default function Navbar({ sticky }) {
 
   function hideNotificationsPopup() {
     setShowNotifications(false);
+  }
+
+  function showProfileMenu() {
+    setShowProfile((prev) => !prev);
+  }
+
+  function hideProfileMenu() {
+    setShowProfile(false);
   }
 
   return (
@@ -64,9 +78,6 @@ export default function Navbar({ sticky }) {
         <SearchBox className="container absolute top-0 left-0 z-10 mx-auto hidden h-full w-full max-w-[500px] px-4 lg:relative lg:block" />
         <div className="relative flex items-center gap-4 md:gap-7">
           <ul className="hidden items-center gap-7 md:flex">
-            <li>
-              <button onClick={() => signOut()}>logout</button>
-            </li>
             <li>
               <Link href="/">
                 <a className={`${currentRoute == "/" ? "text-green-500" : ""}`}>
@@ -91,7 +102,7 @@ export default function Navbar({ sticky }) {
             </li>
             <li
               className="relative"
-              ref={popupRef}
+              ref={notificationsPopupRef}
               onClick={showNotificationsPopup}
             >
               <button
@@ -124,15 +135,24 @@ export default function Navbar({ sticky }) {
           <button className="flex cursor-pointer items-center justify-center md:hidden">
             <Search size={24} />
           </button>
-          <Link href="/profile">
-            <a className="relative h-6 w-6 overflow-hidden rounded-full">
-              <Image
-                src="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-                layout="fill"
-                // objectFit="cover"
-              />
-            </a>
-          </Link>
+          <div
+            className="relative"
+            ref={profileMenuRef}
+            onClick={showProfileMenu}
+          >
+            <button className="relative h-[24px] w-[24px] overflow-hidden rounded-full">
+              {session && status == "authenticated" ? (
+                <Image
+                  src={session && session.user.image}
+                  layout="fill"
+                  // objectFit="cover"
+                />
+              ) : (
+                <UserAvatar size={24} />
+              )}
+            </button>
+            {showProfile && <ProfileMenu />}
+          </div>
         </div>
       </div>
     </nav>

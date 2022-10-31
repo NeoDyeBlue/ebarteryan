@@ -1,8 +1,8 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { signIn } from "../../../lib/controllers/user-controller";
+import { signIn, getUserInfo } from "../../../lib/controllers/user-controller";
 // import GithubProvider from "next-auth/providers/github";
-export const authOptions = {
+export const authOptions = (req) => ({
   // Configure one or more authentication providers
   session: {
     strategy: "jwt",
@@ -49,7 +49,7 @@ export const authOptions = {
       if (session.user) {
         session.user.id = token.sub;
         session.user.verified = token.verified;
-        session.user.fullName = token.fullName;
+        session.user.fullName = token.name;
         session.user.firstName = token.firstName;
         session.user.lastName = token.lastName;
         session.user.role = token.role;
@@ -66,9 +66,24 @@ export const authOptions = {
         token.firstName = user.firstName;
         token.lastName = user.lastName;
       }
+      if (req.url == "/api/auth/session?update" && token) {
+        const updatedUser = await getUserInfo(token.sub);
+        if (updatedUser) {
+          token.name = updatedUser.fullName;
+          token.picture = updatedUser.image.url;
+          token.verified = updatedUser.verified;
+          token.firstName = updatedUser.firstName;
+          token.lastName = updatedUser.lastName;
+          token.email = updatedUser.email;
+        }
+      }
       return token;
     },
   },
+});
+
+export default async (req, res) => {
+  return NextAuth(req, res, authOptions(req));
 };
 
-export default NextAuth(authOptions);
+// export default NextAuth(authOptions);

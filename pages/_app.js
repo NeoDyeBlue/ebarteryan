@@ -6,10 +6,9 @@ export default function MyApp({
   Component,
   pageProps: { session, ...pageProps },
 }) {
-  // Use the layout defined at the page level, if available
-  const getLayout = Component.getLayout || ((page) => page);
-
-  return getLayout(
+  // // Use the layout defined at the page level, if available
+  // const getLayout = Component.getLayout || ((page) => page);
+  return (
     <SessionProvider session={session}>
       <SWRConfig
         value={{
