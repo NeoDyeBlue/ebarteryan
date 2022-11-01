@@ -1,6 +1,12 @@
 import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { signIn, getUserInfo } from "../../../lib/controllers/user-controller";
+import {
+  signIn,
+  getUserInfo,
+  handleGoogleAuth,
+} from "../../../lib/controllers/user-controller";
+import GoogleProvider from "next-auth/providers/google";
+import FacebookProvider from "next-auth/providers/facebook";
 // import GithubProvider from "next-auth/providers/github";
 export const authOptions = (req) => ({
   // Configure one or more authentication providers
@@ -26,6 +32,14 @@ export const authOptions = (req) => ({
       },
     }),
     // ...add more providers here
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+    }),
   ],
   jwt: {
     secret: process.env.NEXTAUTH_SECRET,
@@ -39,9 +53,28 @@ export const authOptions = (req) => ({
     },
   },
   callbacks: {
-    // async signIn({ user, account, profile, email, credentials }) {
-    //   return true;
-    // },
+    async signIn({ user, account, profile }) {
+      if (account.provider === "google") {
+        await handleGoogleAuth(
+          profile.given_name,
+          profile.family_name,
+          profile.email,
+          profile.picture
+        );
+        return true;
+      }
+      if (account.provider === "facebook") {
+        // await handleGoogleAuth(
+        //   profile.given_name,
+        //   profile.family_name,
+        //   profile.email,
+        //   profile.picture
+        // );
+        console.log(profile);
+        return true;
+      }
+      return true; // do other things for other providers
+    },
     // async redirect({ url, baseUrl }) {
     //   return baseUrl;
     // },
@@ -56,8 +89,20 @@ export const authOptions = (req) => ({
       }
       return session;
     },
-    async jwt({ token, user }) {
-      if (user) {
+    async jwt({ token, user, profile }) {
+      //google or fb
+      if (profile) {
+        const userProfile = await getUserInfo({ email: profile.email });
+        token.sub = userProfile.id;
+        token.name = userProfile.fullName;
+        token.role = userProfile.role;
+        token.picture = userProfile.image.url;
+        token.verified = userProfile.verified;
+        token.firstName = userProfile.firstName;
+        token.lastName = userProfile.lastName;
+      }
+      //credentials
+      if (user && !profile) {
         token.sub = user.id;
         token.name = user.fullName;
         token.role = user.role;
@@ -67,7 +112,7 @@ export const authOptions = (req) => ({
         token.lastName = user.lastName;
       }
       if (req.url == "/api/auth/session?update" && token) {
-        const updatedUser = await getUserInfo(token.sub);
+        const updatedUser = await getUserInfo({ email: token.email });
         if (updatedUser) {
           token.name = updatedUser.fullName;
           token.picture = updatedUser.image.url;

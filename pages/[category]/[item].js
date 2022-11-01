@@ -24,10 +24,13 @@ import {
 import { OfferModal } from "../../components/Modals";
 import { useState } from "react";
 import { Textarea } from "../../components/Inputs";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function Item() {
   const [offerModalOpen, setOfferModalOpen] = useState(false);
   ReactModal.setAppElement("#__next");
+
+  const [showMinifiedBar, setShowMinifiedBar] = useState(false);
 
   function openOfferModal() {
     setOfferModalOpen(true);
@@ -62,9 +65,56 @@ export default function Item() {
             <OfferModal onClose={closeOfferModal} />
           </div>
         </ReactModal>
+        <AnimatePresence>
+          {showMinifiedBar && (
+            <motion.div
+              className="fixed z-40 w-full bg-white py-3 shadow-md"
+              initial={{ transform: "translateY(-100%)" }}
+              animate={{ transform: "translateY(0%)" }}
+              exit={{ transform: "translateY(-100%)" }}
+              transition={{ type: "just", stiffness: 100 }}
+            >
+              <div className="container mx-auto flex items-center justify-between gap-6">
+                <div className="flex w-full items-center gap-4">
+                  <div className="relative h-[60px] w-[60px] flex-shrink-0 overflow-hidden rounded-[10px]">
+                    <Image
+                      src="https://res.cloudinary.com/dppgyhery/image/upload/v1631456018/samples/ecommerce/leather-bag-gray.jpg"
+                      layout="fill"
+                      objectFit="cover"
+                    />
+                  </div>
+                  <div className="flex w-full flex-col gap-1 md:flex-row md:justify-between md:gap-4">
+                    <p
+                      className="max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap
+              font-display text-xl font-semibold"
+                    >
+                      Item Name
+                    </p>
+                    <div className="flex w-auto items-center gap-1 self-start rounded-full bg-gray-100/30 py-1 px-2">
+                      <Timer size={16} />
+                      <p className="text-sm">7d 3h 6m</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="flex max-w-[250px] gap-3">
+                  <Button onClick={openOfferModal}>Offer Now</Button>
+                  <div className="hidden md:block">
+                    <Button secondary={true}>
+                      <Bookmark size={20} /> Save
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         <div className="container mx-auto flex max-w-[1100px] flex-col gap-4 md:gap-6">
           {/* Carousel and other info */}
-          <div className="flex flex-col gap-6 border-b border-b-gray-100 pt-4 pb-6 md:grid md:grid-cols-2 md:gap-8 md:pt-8">
+          <motion.div
+            className="flex flex-col gap-6 border-b border-b-gray-100 pt-4 pb-6 md:grid md:grid-cols-2 md:gap-8 md:pt-8"
+            onViewportEnter={() => setShowMinifiedBar(false)}
+            onViewportLeave={() => setShowMinifiedBar(true)}
+          >
             <Carousel
               showThumbs={false}
               showStatus={false}
@@ -158,7 +208,7 @@ export default function Item() {
                 </Button>
               </div>
             </div>
-          </div>
+          </motion.div>
           {/* Description and Barterer*/}
           <div className="flex flex-col gap-4 md:flex-row md:gap-6">
             <div className="flex flex-col gap-3 border-b border-b-gray-100 pb-6 md:w-full md:border-0">

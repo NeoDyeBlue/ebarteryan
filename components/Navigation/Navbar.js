@@ -6,7 +6,9 @@ import {
   Bookmark,
   ArrowsHorizontal,
   Home,
+  UserProfile,
   UserAvatar,
+  User,
 } from "@carbon/icons-react";
 import { SearchBox } from "../Inputs";
 import { useState, useRef, useEffect } from "react";
@@ -17,6 +19,7 @@ import useOnClickOutside from "../../lib/hooks/useOnClickOutside";
 import useUiSizesStore from "../../store/useUiSizesStore";
 import { useSession } from "next-auth/react";
 import ProfileMenu from "./ProfileMenu";
+import IconLink from "./IconLink";
 
 export default function Navbar({ sticky }) {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -69,88 +72,84 @@ export default function Navbar({ sticky }) {
       <div className="container relative mx-auto flex items-center justify-between py-4 lg:py-3">
         <Link href="/">
           <a className="flex items-center gap-2">
-            <Logo responsive={true} />
+            <Logo size={36} />
             <p className="font-display text-xl font-semibold text-green-500 md:text-2xl">
               eBarterYan
             </p>
           </a>
         </Link>
         <SearchBox className="container absolute top-0 left-0 z-10 mx-auto hidden h-full w-full max-w-[500px] px-4 lg:relative lg:block" />
-        <div className="relative flex items-center gap-4 md:gap-7">
-          <ul className="hidden items-center gap-7 md:flex">
+        <div className="relative flex items-center gap-3">
+          <ul className="hidden items-center gap-2 md:flex">
             <li>
-              <Link href="/">
-                <a className={`${currentRoute == "/" ? "text-green-500" : ""}`}>
-                  <BadgedIcon>
-                    <Home size={24} />
-                  </BadgedIcon>
-                </a>
-              </Link>
+              <IconLink to="/">
+                <Home size={24} />
+              </IconLink>
             </li>
-            <li>
-              <Link href="/offers">
-                <a
-                  className={`${
-                    currentRoute == "/offers" ? "text-green-500" : ""
-                  }`}
+            {session && session.user.verified && status == "authenticated" ? (
+              <>
+                <li>
+                  <IconLink to="/offers">
+                    <BadgedIcon hasBadge={true}>
+                      <ArrowsHorizontal size={24} />
+                    </BadgedIcon>
+                  </IconLink>
+                </li>
+                <li
+                  className="relative"
+                  ref={notificationsPopupRef}
+                  onClick={showNotificationsPopup}
                 >
-                  <BadgedIcon hasBadge={true}>
-                    <ArrowsHorizontal size={24} />
-                  </BadgedIcon>
-                </a>
-              </Link>
-            </li>
-            <li
-              className="relative"
-              ref={notificationsPopupRef}
-              onClick={showNotificationsPopup}
-            >
-              <button
-                className={`${
-                  showNotifications || currentRoute == "/notifications"
-                    ? "text-green-500"
-                    : ""
-                }`}
-              >
-                <BadgedIcon hasBadge={true}>
-                  <Notification size={24} />
-                </BadgedIcon>
-              </button>
-              {showNotifications && <NotificationsPopup />}
-            </li>
-            <li>
-              <Link href="/saved">
-                <a
-                  className={`${
-                    currentRoute == "/saved" ? "text-green-500" : ""
-                  }`}
-                >
-                  <BadgedIcon hasBadge={true}>
-                    <Bookmark size={24} />
-                  </BadgedIcon>
-                </a>
-              </Link>
-            </li>
+                  <button
+                    className={`flex items-center justify-center rounded-full p-3 ${
+                      showNotifications || currentRoute == "/notifications"
+                        ? "bg-gray-100/30"
+                        : "hover:bg-gray-100/30"
+                    }`}
+                  >
+                    <BadgedIcon hasBadge={true}>
+                      <Notification size={24} />
+                    </BadgedIcon>
+                  </button>
+                  {showNotifications && <NotificationsPopup />}
+                </li>
+                <li>
+                  <IconLink to="/saved">
+                    <BadgedIcon hasBadge={true}>
+                      <Bookmark size={24} />
+                    </BadgedIcon>
+                  </IconLink>
+                </li>
+              </>
+            ) : null}
           </ul>
           <button className="flex cursor-pointer items-center justify-center md:hidden">
             <Search size={24} />
           </button>
           <div
-            className="relative"
+            className="relative flex items-center justify-center"
             ref={profileMenuRef}
             onClick={showProfileMenu}
           >
-            <button className="relative h-[24px] w-[24px] overflow-hidden rounded-full">
-              {session && status == "authenticated" ? (
+            {session && status == "authenticated" ? (
+              <button
+                className="relative h-[calc(24px+1rem)] w-[calc(24px+1rem)] overflow-hidden rounded-full 
+              hover:shadow-md"
+              >
                 <Image
                   src={session && session.user.image}
                   layout="fill"
                   // objectFit="cover"
                 />
-              ) : (
-                <UserAvatar size={24} />
-              )}
-            </button>
+              </button>
+            ) : (
+              <button
+                className={`flex items-center justify-center rounded-full border border-gray-100 p-2 text-center 
+                ${showProfile ? "shadow-md" : "hover:shadow-md"}`}
+              >
+                <User size={24} />
+              </button>
+            )}
             {showProfile && <ProfileMenu />}
           </div>
         </div>

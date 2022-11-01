@@ -20,6 +20,14 @@ export default function LoginForm() {
     }
   }
 
+  async function handleGoogleSignIn() {
+    await signIn("google", { callbackUrl: process.env.VERCEL_URL });
+  }
+
+  async function handleFacebookSignIn() {
+    // await signIn("facebook", { callbackUrl: process.env.VERCEL_URL });
+  }
+
   return (
     <div className="flex w-full flex-col gap-6 md:m-auto md:max-w-[480px]">
       <h1 className="mx-auto text-4xl font-semibold">Login</h1>
@@ -66,6 +74,7 @@ export default function LoginForm() {
       </div>
       <div className="flex flex-col gap-4">
         <ThirdPartyButton
+          onClick={handleGoogleSignIn}
           icon={
             <Icon
               icon="flat-color-icons:google"
@@ -75,6 +84,7 @@ export default function LoginForm() {
           text="Login with Google"
         />
         <ThirdPartyButton
+          onClick={handleFacebookSignIn}
           icon={<Icon icon="logos:facebook" className="h-[24px] w-[24px]" />}
           text="Login with Facebook"
         />
