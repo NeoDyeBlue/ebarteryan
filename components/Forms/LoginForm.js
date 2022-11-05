@@ -6,6 +6,7 @@ import { Formik, Form } from "formik";
 import { InputField } from "../Inputs";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/router";
+import { PropagateLoader } from "react-spinners";
 
 export default function LoginForm() {
   const router = useRouter();
@@ -18,6 +19,7 @@ export default function LoginForm() {
     if (res.ok) {
       router.push("/");
     }
+    actions.setFieldError("email", res.error);
   }
 
   async function handleGoogleSignIn() {
@@ -58,7 +60,17 @@ export default function LoginForm() {
                 </a>
               </Link>
             </p>
-            <Button type="submit">Login</Button>
+            <Button disabled={props.isSubmitting} type="submit">
+              {props.isSubmitting ? (
+                <PropagateLoader
+                  color="#fff"
+                  size={14}
+                  className="flex h-[22.5px] w-full items-center justify-center"
+                />
+              ) : (
+                "Login"
+              )}
+            </Button>
           </Form>
         )}
       </Formik>

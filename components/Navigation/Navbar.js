@@ -101,7 +101,7 @@ export default function Navbar({ sticky }) {
                   onClick={showNotificationsPopup}
                 >
                   <button
-                    className={`flex items-center justify-center rounded-full p-3 ${
+                    className={`flex h-[40px] w-[40px] items-center justify-center rounded-full ${
                       showNotifications || currentRoute == "/notifications"
                         ? "bg-gray-100/30"
                         : "hover:bg-gray-100/30"
@@ -133,7 +133,7 @@ export default function Navbar({ sticky }) {
           >
             {session && status == "authenticated" ? (
               <button
-                className="relative h-[calc(24px+1rem)] w-[calc(24px+1rem)] overflow-hidden rounded-full 
+                className="relative h-[40px] w-[40px] overflow-hidden rounded-full 
               hover:shadow-md"
               >
                 <Image
@@ -144,7 +144,7 @@ export default function Navbar({ sticky }) {
               </button>
             ) : (
               <button
-                className={`flex items-center justify-center rounded-full border border-gray-100 p-2 text-center 
+                className={`flex h-[40px] w-[40px] items-center justify-center rounded-full border border-gray-100 text-center 
                 ${showProfile ? "shadow-md" : "hover:shadow-md"}`}
               >
                 <User size={24} />

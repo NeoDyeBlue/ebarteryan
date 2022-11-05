@@ -1,9 +1,17 @@
 import { CategoryList, CategoryListItem } from "../Lists";
 import { LocationBarterButtons } from "../Buttons";
 import useUiSizesStore from "../../store/useUiSizesStore";
+import useSWR from "swr";
 
 export default function CategoryNavbar() {
+  const { data: categories, error } = useSWR("/api/categories");
   const { navbarHeight } = useUiSizesStore();
+
+  const categoryListItems =
+    categories?.success &&
+    categories.data.map((category) => (
+      <CategoryListItem to={`/${category.name}`} name={category.name} />
+    ));
 
   return (
     <div
@@ -18,14 +26,7 @@ export default function CategoryNavbar() {
         >
           <CategoryList>
             <CategoryListItem to="/" name="All Items" />
-            <CategoryListItem to="/appliances" name="Appliances" />
-            <CategoryListItem to="/automotive" name="Automotive" />
-            <CategoryListItem to="/clothings" name="Clothings" />
-            <CategoryListItem to="/electronics" name="Electronics" />
-            <CategoryListItem to="/furnitures" name="Furnitures" />
-            <CategoryListItem to="/groceries" name="Groceries" />
-            <CategoryListItem to="/plants" name="Plants" />
-            <CategoryListItem to="/others" name="Others" />
+            {categoryListItems}
           </CategoryList>
         </div>
         <LocationBarterButtons className="hidden w-full flex-row-reverse gap-4 py-4 lg:flex lg:max-w-[380px]" />

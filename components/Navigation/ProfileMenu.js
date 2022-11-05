@@ -12,20 +12,19 @@ export default function ProfileMenu() {
   const textRef = useCallback((node) => {
     if (node !== null) {
       const container = containerRef.current;
+      console.log(node.offsetWidth, container.clientWidth);
+      console.log(node.offsetWidth > container.scrollWidth);
       setIsTextOverflowing(node.offsetWidth > container.scrollWidth);
     }
   }, []);
   return (
     <div
-      className="absolute top-[calc(100%+0.75rem)] right-0 flex w-[220px] flex-col
-     gap-2 rounded-[10px] border border-gray-100 bg-white pb-2 shadow-lg"
+      className="absolute top-[calc(100%+0.5rem)] right-0 flex w-[220px] flex-col
+     rounded-[10px] border border-gray-100 bg-white pb-2 shadow-lg"
     >
       {session && status == "authenticated" && (
         <>
-          <div
-            className="border-b border-b-gray-100 px-4 py-5"
-            ref={containerRef}
-          >
+          <div className="mx-4 my-5" ref={containerRef}>
             <Marquee
               gradientWidth={isTextOverflowing ? 8 : 0}
               play={isTextOverflowing}
@@ -43,7 +42,7 @@ export default function ProfileMenu() {
               <p className="text-xs text-gray-300">not verified</p>
             )}
           </div>
-          <ul className="flex flex-col border-b border-gray-100 pb-2">
+          <ul className="flex flex-col border-y border-gray-100 py-2">
             <li>
               <Link href="/profile">
                 <a className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100/30">
@@ -77,7 +76,7 @@ export default function ProfileMenu() {
           </div>
         ) : (
           <button
-            className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100/30"
+            className="mt-2 flex items-center gap-2 px-4 py-3 hover:bg-gray-100/30"
             onClick={() => signOut()}
           >
             Logout

@@ -7,8 +7,10 @@ export default function IconLink({ children, to }) {
   return (
     <Link href={to}>
       <a
-        className={`flex items-center justify-center rounded-full
-        p-3 ${currentRoute == to ? "bg-gray-100/30" : "hover:bg-gray-100/30"}`}
+        className={`flex h-[40px] w-[40px] items-center
+        justify-center rounded-full ${
+          currentRoute == to ? "bg-gray-100/30" : "hover:bg-gray-100/30"
+        }`}
       >
         {children}
       </a>

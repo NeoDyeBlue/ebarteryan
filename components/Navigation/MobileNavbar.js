@@ -15,7 +15,9 @@ export default function MobileNavbar({ className }) {
   return (
     <nav className={className}>
       <ul className="container mx-auto flex w-full items-center justify-between">
-        <li className="mx-auto">
+        <li
+          className={`${session && status == "authenticated" ? "" : "mx-auto"}`}
+        >
           <IconLink to="/">
             <BadgedIcon>
               <Home size={24} />

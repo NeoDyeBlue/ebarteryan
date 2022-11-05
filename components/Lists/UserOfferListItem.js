@@ -20,7 +20,7 @@ export default function UserOfferListItem({ status }) {
       break;
   }
   return (
-    <li className="flex cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 p-3 hover:bg-gray-100/30">
+    <li className="flex cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 bg-white p-3 hover:shadow-md">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="relative h-[36px] w-[36px] overflow-hidden rounded-full">

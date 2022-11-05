@@ -12,7 +12,13 @@ export default function DropdownSelect({
   name,
 }) {
   const [field, meta, helpers] = useField(name);
-  const [selectedItem, setSelectedItem] = useState(meta.value);
+  const [selectedItem, setSelectedItem] = useState(
+    meta.value
+      ? items.find((item) =>
+          item?.value ? item.value == meta.value : item == meta.value
+        )
+      : ""
+  );
   const {
     isOpen,
     getToggleButtonProps,
@@ -29,19 +35,11 @@ export default function DropdownSelect({
   });
 
   useEffect(() => {
-    helpers.setValue(selectedItem);
+    helpers.setValue(selectedItem?.value ? selectedItem.value : selectedItem);
   }, [selectedItem]);
 
-  // console.log(meta.touched);
-
   return (
-    <div
-      className="relative"
-      id={name}
-      onBlur={field.onBlur}
-      // onClick={() => helpers.setTouched(!isOpen ? true : false)}
-      // onBlur={(event) => helpers.setTouched(!isOpen ? true : false)}
-    >
+    <div className="relative" id={name} onBlur={field.onBlur}>
       <div className="flex flex-col gap-2">
         {label && (
           <label {...getLabelProps()} className="font-display font-medium">
@@ -50,7 +48,6 @@ export default function DropdownSelect({
         )}
         <button
           name={name}
-          // onBlur={() => helpers.setTouched(!isOpen)}
           aria-label="toggle menu"
           className={`flex w-full items-center justify-between rounded-[10px] border bg-white
           p-4 font-body placeholder-gray-300 focus:outline-none focus:ring-1
@@ -62,8 +59,16 @@ export default function DropdownSelect({
           type="button"
           {...getToggleButtonProps()}
         >
-          <span className="font-body text-gray-300">
-            {selectedItem ? selectedItem : placeholder}
+          <span
+            className={`font-body capitalize ${
+              selectedItem ? "text-black-light" : "text-gray-300"
+            }`}
+          >
+            {selectedItem
+              ? selectedItem?.name
+                ? selectedItem.name
+                : selectedItem
+              : placeholder}
           </span>
           <span className="text-black-light">
             {isOpen ? <CaretUp size={16} /> : <CaretDown size={16} />}
@@ -88,8 +93,8 @@ export default function DropdownSelect({
       </div>
       <ul
         {...getMenuProps()}
-        className="absolute z-10 mt-1 max-h-80 w-full overflow-x-auto
-        rounded-[10px] bg-white shadow-[0_0_8px_0_rgba(0,0,0,0.2)]"
+        className="custom-scrollbar absolute z-20 mt-1 max-h-80 w-full
+        overflow-x-auto rounded-[10px] bg-white shadow-[0_0_8px_0_rgba(0,0,0,0.2)]"
       >
         {isOpen &&
           items.map((item, index) => (
@@ -97,13 +102,13 @@ export default function DropdownSelect({
               className={`
                 ${highlightedIndex === index && "bg-green-300"}
                 ${selectedItem === item && "font-bold"}
-                flex cursor-pointer flex-col p-4 font-body shadow-sm
+                flex cursor-pointer flex-col p-4 font-body capitalize shadow-sm
               `}
               key={index}
               // onClick={selectItem}
               {...getItemProps({ item, index })}
             >
-              <span>{item}</span>
+              <span>{item?.name ? item.name : item}</span>
             </li>
           ))}
       </ul>

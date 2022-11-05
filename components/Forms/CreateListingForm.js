@@ -21,11 +21,13 @@ const DropdownSelect = dynamic(() => import("../Inputs/DropdownSelect"), {
 });
 import { memo } from "react";
 import { listingCreationSchema } from "../../lib/validators/item-validator";
+import useSWR from "swr";
 
 const MemoizedImageSelector = memo(ImageSelector);
 const MemoizedDropdownSelect = memo(DropdownSelect);
 
 export default function CreateListingForm() {
+  ReactModal.setAppElement("#__next");
   const {
     creationPosition,
     creationRegion,
@@ -34,6 +36,14 @@ export default function CreateListingForm() {
     setCreationLocation,
     clearPositionRegion,
   } = useMapStore();
+
+  const { data: categories, error } = useSWR("/api/categories");
+  const categorySelections = categories?.success
+    ? categories.data.map((category) => ({
+        name: category.name,
+        value: category._id,
+      }))
+    : [];
 
   const [locationModalOpen, setLocationModalOpen] = useState(false);
 
@@ -64,6 +74,8 @@ export default function CreateListingForm() {
           claimingOptions: [],
           category: "",
           condition: "",
+          duration: "",
+          customDuration: "",
           location: {
             region: listingRegion,
             lat: listingPosition.lat,
@@ -106,7 +118,7 @@ export default function CreateListingForm() {
                 <Textarea label="Description" name="description" />
                 <MemoizedDropdownSelect
                   name="category"
-                  items={["1", "2", "3"]}
+                  items={categorySelections}
                   placeholder="Select a category"
                   label="Category"
                   tabIndex={0}
@@ -217,6 +229,33 @@ export default function CreateListingForm() {
                   <p className="flex gap-1 text-sm text-danger-500">
                     Please set your location correctly
                   </p>
+                )}
+              </div>
+              <div className="flex flex-col gap-4">
+                <p className="border-b border-gray-100 pb-2 text-sm text-gray-300">
+                  Duration
+                </p>
+                <MemoizedDropdownSelect
+                  name="duration"
+                  items={[
+                    { name: "I accept an offer", value: 0 },
+                    { name: "1 Day", value: 1 },
+                    { name: "3 Days", value: 3 },
+                    { name: "7 Days", value: 7 },
+                    { name: "30 days", value: 30 },
+                    { name: "Custom", value: "custom" },
+                  ]}
+                  placeholder="Select a duration"
+                  label="Offering will end until..."
+                  tabIndex={0}
+                />
+                {props.values.duration == "custom" && (
+                  <InputField
+                    type="number"
+                    min="1"
+                    name="customDuration"
+                    label="Enter days"
+                  />
                 )}
               </div>
               <div className="flex flex-col gap-4">

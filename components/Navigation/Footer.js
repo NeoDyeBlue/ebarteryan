@@ -1,7 +1,14 @@
 import { FooterLinkList, FooterLinkListItem } from "../Lists";
 import { LogoFacebook, LogoTwitter } from "@carbon/icons-react";
+import useSWR from "swr";
 
 export default function Footer() {
+  const { data: categories, error } = useSWR("/api/categories");
+  const categoryListItems =
+    categories?.success &&
+    categories.data.map((category) => (
+      <FooterLinkListItem to={`/${category.name}`} name={category.name} />
+    ));
   return (
     <footer className="border-t border-t-gray-100 bg-white-dark">
       <div className="container mx-auto flex flex-col gap-9 py-10">
@@ -10,10 +17,8 @@ export default function Footer() {
             eBarterYan
           </span>
           <FooterLinkList title="Listings">
-            <FooterLinkListItem to="/" name="Test1" />
-            <FooterLinkListItem to="/" name="Test2" />
-            <FooterLinkListItem to="/" name="Test3" />
-            <FooterLinkListItem to="/" name="Test4" />
+            <FooterLinkListItem to="/" name="All Items" />
+            {categoryListItems}
           </FooterLinkList>
           <FooterLinkList title="Listings">
             <FooterLinkListItem to="/" name="Test1" />

@@ -14,6 +14,7 @@
     "@ramonak/react-progress-bar": "^5.0.2",
     "bcrypt": "^5.1.0",
     "cloudinary": "^1.32.0",
+    "dotenv": "^16.0.3",
     "downshift": "^6.1.12",
     "formik": "^2.2.9",
     "framer-motion": "^7.4.0",

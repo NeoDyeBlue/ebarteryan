@@ -40,6 +40,10 @@ export default function SignUpForm() {
     }
   }
 
+  async function handleGoogleSignIn() {
+    await signIn("google", { callbackUrl: process.env.VERCEL_URL });
+  }
+
   return (
     <div className="flex w-full flex-col gap-6 md:m-auto md:max-w-[480px]">
       <h1 className="mx-auto text-4xl font-semibold">Sign Up</h1>
@@ -74,13 +78,16 @@ export default function SignUpForm() {
               </Link>
             </p>
             <Button disabled={props.isSubmitting} type="submit">
-              Sign Up
+              {props.isSubmitting ? (
+                <PropagateLoader
+                  color="#fff"
+                  size={14}
+                  className="flex h-[22.5px] w-full items-center justify-center"
+                />
+              ) : (
+                "Sign Up"
+              )}
             </Button>
-            {props.isSubmitting && (
-              <div className="flex h-[14px] flex-shrink-0 items-center justify-center">
-                <PropagateLoader color="#C7EF83" size={14} />
-              </div>
-            )}
           </Form>
         )}
       </Formik>
@@ -96,6 +103,7 @@ export default function SignUpForm() {
       </div>
       <div className="flex flex-col gap-4">
         <ThirdPartyButton
+          onClick={handleGoogleSignIn}
           icon={
             <Icon
               icon="flat-color-icons:google"
