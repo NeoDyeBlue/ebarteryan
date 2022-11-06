@@ -7,17 +7,47 @@ cloudinary.config({
 });
 
 export async function uploadImage(folder, image) {
-  let imageId = "";
-  let imageUrl = "";
+  let id = "";
+  let url = "";
   await cloudinary.uploader
     .upload(image, { folder, quality: "auto:best" })
     .then((result) => {
-      imageId = result.public_id;
-      imageUrl = result.url;
+      id = result.public_id;
+      url = result.url;
     })
     .catch((error) => {
       throw error;
     });
 
-  return { imageId, imageUrl };
+  return { id, url };
+}
+
+export async function upload(folder, files) {
+  try {
+    let uploadResults = [];
+    let uploadPromises = [];
+
+    files.forEach((file) => {
+      uploadPromises.push(
+        cloudinary.uploader
+          .upload(file?.content ? file.content : file, {
+            folder,
+            quality: "auto:best",
+          })
+          .then((result) => {
+            uploadResults.push({ id: result.public_id, url: result.url });
+          })
+          .catch((error) => {
+            console.log(error);
+            throw error;
+          })
+      );
+    });
+
+    return await Promise.all(uploadPromises).then(() => {
+      return uploadResults;
+    });
+  } catch (error) {
+    throw error;
+  }
 }

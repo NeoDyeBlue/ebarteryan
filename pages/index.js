@@ -2,6 +2,8 @@ import Head from "next/head";
 import { LocationBarterButtons } from "../components/Buttons";
 import { ItemCard } from "../components/Cards";
 import { NavLayout, CategoryLayout } from "../components/Layouts";
+import useSWR from "swr";
+import { ItemCardSkeleton } from "../components/Loaders";
 
 export default function Home() {
   return (
@@ -14,32 +16,14 @@ export default function Home() {
             <link rel="icon" href="/favicon.ico" />
           </Head>
           <LocationBarterButtons />
-          {/* {listingRegion && (
-        <div className="container mx-auto flex items-center justify-center gap-1 pb-4 lg:pb-0 lg:pt-10">
-          <div
-            className="flex gap-1 rounded-[10px] border border-gray-100 bg-white p-4 text-center
-          shadow-md"
-          >
-            <p className="text-gray-300">
-              <span>
-                <Location
-                  size={16}
-                  className="-mt-[2px] flex-shrink-0 text-gray-300 "
-                />
-              </span>
-              Listing items from{" "}
-              <span className="font-medium text-black-light">
-                {listingRegion} - {listingRadius}km
-              </span>
-            </p>
-          </div>
-        </div>
-      )} */}
           <div className="container relative mx-auto">
             <div
               className="grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
            lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:py-6"
             >
+              {[...Array(8)].map((_, i) => (
+                <ItemCardSkeleton key={i} />
+              ))}
               <ItemCard
                 name="Product Test"
                 description="A valid product description"

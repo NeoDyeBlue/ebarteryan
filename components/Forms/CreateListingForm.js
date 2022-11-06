@@ -56,9 +56,19 @@ export default function CreateListingForm() {
     clearPositionRegion();
   }
 
-  function handleFormSubmit(values) {
-    // event.preventDefault();
-    console.log("submit", values);
+  async function handleFormSubmit(values) {
+    try {
+      console.log("submit", values);
+      const res = await fetch("/api/items", {
+        method: "POST",
+        body: JSON.stringify(values),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -67,10 +77,9 @@ export default function CreateListingForm() {
       <Formik
         initialValues={{
           images: [],
-          itemName: "",
+          name: "",
           exchangeFor: "",
           description: "",
-          offeringTime: "",
           claimingOptions: [],
           category: "",
           condition: "",
@@ -83,9 +92,7 @@ export default function CreateListingForm() {
           },
         }}
         validationSchema={listingCreationSchema}
-        onSubmit={(values) => {
-          handleFormSubmit(values);
-        }}
+        onSubmit={handleFormSubmit}
       >
         {(props) => {
           // this effect is needed to actually change the values for location
@@ -113,7 +120,7 @@ export default function CreateListingForm() {
                   max={10}
                   infoMessage="You can upload up to 10 photos only."
                 />
-                <InputField type="text" name="itemName" label="Item Name" />
+                <InputField type="text" name="name" label="Item Name" />
                 <Textarea label="Exchange For" name="exchangeFor" />
                 <Textarea label="Description" name="description" />
                 <MemoizedDropdownSelect
@@ -316,7 +323,10 @@ export default function CreateListingForm() {
                   </MultiSelectItem>
                 </MultiSelect>
               </div>
-              <Button type="submit">Done</Button>
+              <div className="flex items-center gap-4">
+                <Button secondary={true}>Save to Drafts</Button>
+                <Button type="submit">Post</Button>
+              </div>
             </Form>
           );
         }}

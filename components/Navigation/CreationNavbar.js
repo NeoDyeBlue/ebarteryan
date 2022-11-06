@@ -20,12 +20,6 @@ export default function CreationNavbar() {
             </p>
           </a>
         </Link>
-        <button
-          type="button"
-          className="ml-auto font-display font-medium text-green-500"
-        >
-          Save as Draft
-        </button>
       </div>
     </nav>
   );

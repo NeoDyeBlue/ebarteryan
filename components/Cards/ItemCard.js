@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function ItemCard({
   image,
   name,
-  description,
+  exchangeFor,
   time,
   offers,
   to,
@@ -19,7 +19,11 @@ export default function ItemCard({
             <p className="text-sm">{time}</p>
           </div>
           <Image
-            src="https://res.cloudinary.com/dppgyhery/image/upload/v1631456018/samples/ecommerce/leather-bag-gray.jpg"
+            src={
+              image
+                ? image
+                : "https://res.cloudinary.com/dppgyhery/image/upload/v1631456018/samples/ecommerce/leather-bag-gray.jpg"
+            }
             layout="fill"
             objectFit="cover"
           />
@@ -30,7 +34,7 @@ export default function ItemCard({
           </p>
           <p className="text-[15px] font-medium">Exchange for:</p>
           <p className="overflow-hidden text-ellipsis whitespace-nowrap text-[15px]">
-            {description}
+            {exchangeFor}
           </p>
         </div>
         <div className="flex items-center gap-1 self-end text-black-light">

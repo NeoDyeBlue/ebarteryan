@@ -13,8 +13,26 @@ import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import { ItemCard } from "../../components/Cards";
 import ProgressBar from "@ramonak/react-progress-bar";
 import { ReviewList, ReviewListItem } from "../../components/Lists";
+import useSWR from "swr";
 
 export default function Profile() {
+  const { data: items, error } = useSWR("/api/items/user");
+
+  const itemCards =
+    items && items.data.length
+      ? items.data.map((item) => (
+          <ItemCard
+            key={item._id}
+            name={item.name}
+            description={item.description}
+            exchangeFor={item.exchangeFor}
+            image={item.images[0].url}
+            offers={1}
+            time="7d"
+            to="/1/1"
+          />
+        ))
+      : [];
   return (
     <NavLayout>
       <div className="w-full py-4">
@@ -116,6 +134,7 @@ export default function Profile() {
                     className="grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 py-4 
            lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:py-6"
                   >
+                    {itemCards}
                     <ItemCard
                       name="Product Test"
                       description="A valid product description"
