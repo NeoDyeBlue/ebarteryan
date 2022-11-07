@@ -2,20 +2,39 @@ import { CategoryList, CategoryListItem } from "../Lists";
 import { LocationBarterButtons } from "../Buttons";
 import useUiSizesStore from "../../store/useUiSizesStore";
 import useSWR from "swr";
+import { useRef, useEffect } from "react";
 
 export default function CategoryNavbar() {
   const { data: categories, error } = useSWR("/api/categories");
-  const { navbarHeight } = useUiSizesStore();
+  const { navbarHeight, setCategoryNavbarHeight } = useUiSizesStore();
+
+  const categoryNavbarRef = useRef(null);
+
+  useEffect(() => {
+    function handleResize() {
+      setCategoryNavbarHeight(
+        categoryNavbarRef.current?.getBoundingClientRect().height
+      );
+    }
+    window.addEventListener("resize", handleResize);
+    handleResize();
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const categoryListItems =
     categories?.success &&
-    categories.data.map((category) => (
-      <CategoryListItem to={`/${category.name}`} name={category.name} />
+    categories.data.map((category, index) => (
+      <CategoryListItem
+        key={index}
+        to={`/${category.name}`}
+        name={category.name}
+      />
     ));
 
   return (
     <div
       style={{ top: navbarHeight }}
+      ref={categoryNavbarRef}
       className="sticky z-40 w-full bg-white shadow-md"
     >
       <div className="container mx-auto flex flex-col lg:flex-row lg:gap-4">

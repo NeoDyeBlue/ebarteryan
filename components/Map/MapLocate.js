@@ -1,11 +1,12 @@
 import { LocationCurrent } from "@carbon/icons-react";
 import useMapStore from "../../store/useMapStore";
 
-export default function MapLocate() {
+export default function MapLocate({ onPositionChange }) {
   const { setPosition, map } = useMapStore();
 
   function autoLocate() {
     map.locate().on("locationfound", (location) => {
+      onPositionChange();
       setPosition(location.latlng);
       map.flyTo(location.latlng, map.getZoom());
     });

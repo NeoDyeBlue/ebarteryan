@@ -6,8 +6,12 @@ export default function Footer() {
   const { data: categories, error } = useSWR("/api/categories");
   const categoryListItems =
     categories?.success &&
-    categories.data.map((category) => (
-      <FooterLinkListItem to={`/${category.name}`} name={category.name} />
+    categories.data.map((category, index) => (
+      <FooterLinkListItem
+        key={index}
+        to={`/${category.name}`}
+        name={category.name}
+      />
     ));
   return (
     <footer className="border-t border-t-gray-100 bg-white-dark">

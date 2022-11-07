@@ -24,9 +24,7 @@ export default function MapPinDrop({ pinPosition, onPositionChange }) {
     ],
     tomtomFetcher
   );
-  // pinPosition && Object.keys(pinPosition).length
-  //   ? `https://api.tomtom.com/search/2/reverseGeocode/${pinPosition?.lat},${pinPosition?.lng}.json?key=awbTtEIZufAop7NYalmH11BPHSzr0QYv`
-  //   : null
+
   const iconMarkup = renderToStaticMarkup(
     <div className="text-danger-500">
       <LocationFilled size={32} />

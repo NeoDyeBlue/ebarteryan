@@ -43,6 +43,7 @@ export default function LocationBarterButtons({ className }) {
         >
           <LocationModal
             onClose={closeLocationModal}
+            applyInListing={true}
             onApply={() => {
               setListingLocation();
               closeLocationModal();

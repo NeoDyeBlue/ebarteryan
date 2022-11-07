@@ -3,6 +3,7 @@ import { LinkButton } from "../Buttons";
 import { signOut, useSession } from "next-auth/react";
 import Marquee from "react-fast-marquee";
 import { useRef, useState, useCallback } from "react";
+import useMapStore from "../../store/useMapStore";
 
 export default function ProfileMenu() {
   const { data: session, status } = useSession();
@@ -77,7 +78,9 @@ export default function ProfileMenu() {
         ) : (
           <button
             className="mt-2 flex items-center gap-2 px-4 py-3 hover:bg-gray-100/30"
-            onClick={() => signOut()}
+            onClick={() => {
+              signOut();
+            }}
           >
             Logout
           </button>

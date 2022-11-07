@@ -6,8 +6,6 @@ import {
   Bookmark,
   ArrowsHorizontal,
   Home,
-  UserProfile,
-  UserAvatar,
   User,
 } from "@carbon/icons-react";
 import { SearchBox } from "../Inputs";

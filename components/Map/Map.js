@@ -10,6 +10,10 @@ export default function Map({ withRadiusPicker, pinPosition }) {
   const { setRadius, radius, position, listingRadius, listingPosition } =
     useMapStore();
 
+  const defaultCenter = [12.8797, 121.774];
+
+  const [isRadiusChanged, setIsRadiusChanged] = useState(false);
+
   const [inInitialLocation, setInInitialLocation] = useState(
     pinPosition ? true : false
   );
@@ -18,19 +22,10 @@ export default function Map({ withRadiusPicker, pinPosition }) {
     setInInitialLocation(false);
   }
 
-  const hasPosition = Boolean(Object.keys(position).length);
-  const hasListingPosition = Boolean(Object.keys(listingPosition).length);
-
-  const center = useMemo(() => {
-    if (!inInitialLocation) {
-      if (hasPosition) {
-        return position;
-      }
-      return [12.8797, 121.774];
-    } else {
-      return pinPosition;
-    }
-  }, [position]);
+  const hasPosition = Boolean(position && Object.keys(position).length);
+  const hasListingPosition = Boolean(
+    listingPosition && Object.keys(listingPosition).length
+  );
 
   const newPinPos = useMemo(() => {
     if (inInitialLocation) {
@@ -41,7 +36,7 @@ export default function Map({ withRadiusPicker, pinPosition }) {
       }
       return null;
     }
-  }, [position]);
+  }, [position, inInitialLocation]);
 
   return (
     <div className="flex h-full w-full flex-col gap-4">
@@ -50,20 +45,25 @@ export default function Map({ withRadiusPicker, pinPosition }) {
           min={1}
           max={100}
           label="Radius"
-          defaultValue={listingRadius ? listingRadius : radius}
+          // defaultValue={listingRadius ? listingRadius : radius}
           // disabled={!(!initialMode && Object.keys(position).length)}
-          value={radius}
+          value={listingRadius && !isRadiusChanged ? listingRadius : radius}
           valueEndText="km"
           onChange={(value) => {
-            setNotInInitialLocation();
+            // setNotInInitialLocation();
+            setIsRadiusChanged(true);
             setRadius(value);
           }}
         />
       )}
       <div className="relative flex h-full w-full overflow-hidden rounded-[10px]">
-        <MapLocate />
+        <MapLocate onPositionChange={setNotInInitialLocation} />
         <div className="h-full w-full">
-          <MapContainer center={center} zoom={5} className="z-40 h-full w-full">
+          <MapContainer
+            center={newPinPos ? newPinPos : defaultCenter}
+            zoom={5}
+            className="z-40 h-full w-full"
+          >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -74,10 +74,10 @@ export default function Map({ withRadiusPicker, pinPosition }) {
             />
             {withRadiusPicker && (hasListingPosition || hasPosition) ? (
               <Circle
-                center={center}
+                center={newPinPos ? newPinPos : defaultCenter}
                 pathOptions={{ color: "#85CB33" }}
                 radius={
-                  listingRadius && inInitialLocation
+                  listingRadius && !isRadiusChanged
                     ? listingRadius * 1000
                     : radius * 1000
                 }

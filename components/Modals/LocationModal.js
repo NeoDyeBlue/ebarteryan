@@ -12,8 +12,12 @@ export default function LocationModal({ onClose, applyInListing, onApply }) {
 
   // check if there is a position set
   const initialPosition = useMemo(() => {
-    const hasListingPosition = Boolean(Object.keys(listingPosition).length);
-    const hasCreationPosition = Boolean(Object.keys(creationPosition).length);
+    const hasListingPosition = Boolean(
+      listingPosition && Object.keys(listingPosition).length
+    );
+    const hasCreationPosition = Boolean(
+      creationPosition && Object.keys(creationPosition).length
+    );
     if (applyInListing) {
       return hasListingPosition ? listingPosition : null;
     } else if (!applyInListing) {

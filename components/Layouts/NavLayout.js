@@ -4,6 +4,7 @@ import MobileNavbar from "../Navigation/MobileNavbar";
 import MessagesPopup from "../Popups/MessagesPopup";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
+import { useState, useEffect } from "react";
 
 export default function NavLayout({
   noFooter,
@@ -13,21 +14,34 @@ export default function NavLayout({
   const { data: session, status } = useSession();
   const router = useRouter();
   const currentPath = router.asPath;
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  //Wait till NextJS rehydration completes
+  useEffect(() => {
+    setIsHydrated(true);
+  }, []);
+
   return (
     <>
-      <Navbar sticky={!noStickyNavbar} />
-      {children}
-      <MobileNavbar
-        className="fixed bottom-0 z-20 flex h-[70px]
+      {isHydrated && (
+        <>
+          <Navbar sticky={!noStickyNavbar} />
+          {children}
+          <MobileNavbar
+            className="fixed bottom-0 z-20 flex h-[70px]
       w-full items-center border-t border-gray-200 bg-white py-4 lg:hidden"
-      />
-      {currentPath !== "/messages" && session && status == "authenticated" && (
-        <MessagesPopup
-          hasBadge={true}
-          className="pointer-events-none fixed bottom-0 z-40 hidden w-full lg:block"
-        />
+          />
+          {currentPath !== "/messages" &&
+            session &&
+            status == "authenticated" && (
+              <MessagesPopup
+                hasBadge={true}
+                className="pointer-events-none fixed bottom-0 z-40 hidden w-full lg:block"
+              />
+            )}
+          {!noFooter && <Footer />}
+        </>
       )}
-      {!noFooter && <Footer />}
     </>
   );
 }

@@ -93,7 +93,7 @@ export const authOptions = (req) => ({
       //google or fb
       if (profile) {
         const userProfile = await getUserInfo({ email: profile.email });
-        token.sub = userProfile.id;
+        token.sub = userProfile._id;
         token.name = userProfile.fullName;
         token.role = userProfile.role;
         token.picture = userProfile.image.url;
@@ -103,7 +103,7 @@ export const authOptions = (req) => ({
       }
       //credentials
       if (user && !profile) {
-        token.sub = user.id;
+        token.sub = user.id || user._id;
         token.name = user.fullName;
         token.role = user.role;
         token.picture = user.image.url;
