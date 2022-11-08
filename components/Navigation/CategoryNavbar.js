@@ -21,6 +21,8 @@ export default function CategoryNavbar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  console.log(categories);
+
   const categoryListItems =
     categories?.success &&
     categories.data.map((category, index) => (
