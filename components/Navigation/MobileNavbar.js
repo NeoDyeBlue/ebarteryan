@@ -18,10 +18,8 @@ export default function MobileNavbar({ className }) {
         <li
           className={`${session && status == "authenticated" ? "" : "mx-auto"}`}
         >
-          <IconLink to="/">
-            <BadgedIcon>
-              <Home size={24} />
-            </BadgedIcon>
+          <IconLink to="/" aka={["/items"]}>
+            <Home size={24} />
           </IconLink>
         </li>
         {session && status == "authenticated" && (

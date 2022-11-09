@@ -1,4 +1,4 @@
-import NavLayout from "../../components/Layouts/NavLayout";
+import NavLayout from "../../../components/Layouts/NavLayout";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from "react-responsive-carousel";
 import Image from "next/image";
@@ -11,8 +11,8 @@ import {
   ArrowsHorizontal,
   Bookmark,
 } from "@carbon/icons-react";
-import { Button } from "../../components/Buttons";
-import { IconLabel } from "../../components/Icons";
+import { Button } from "../../../components/Buttons";
+import { IconLabel } from "../../../components/Icons";
 import { Rating } from "react-simple-star-rating";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
@@ -20,10 +20,10 @@ import {
   OfferListItem,
   QuestionAnswerList,
   QuestionAnswerListItem,
-} from "../../components/Lists";
-import { OfferModal } from "../../components/Modals";
+} from "../../../components/Lists";
+import { OfferModal } from "../../../components/Modals";
 import { useState } from "react";
-import { Textarea } from "../../components/Inputs";
+import { Textarea } from "../../../components/Inputs";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function Item() {

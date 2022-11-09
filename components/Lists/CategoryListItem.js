@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 
-export default function CategoryListItem({ to, name }) {
+export default function CategoryListItem({ to, name, aka }) {
   const router = useRouter();
   const currentRoute = router.asPath;
   return (
@@ -10,7 +10,7 @@ export default function CategoryListItem({ to, name }) {
         <a
           className={`
           ${
-            currentRoute == to
+            currentRoute == to || (aka?.length && aka.includes(currentRoute))
               ? "text-black-light before:bg-green-500"
               : "hover:text-black-light hover:before:bg-gray-300"
           }

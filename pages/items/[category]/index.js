@@ -1,14 +1,14 @@
-import { NavLayout, CategoryLayout } from "../../components/Layouts";
-import { LocationBarterButtons, Button } from "../../components/Buttons";
-import { getAllCategories } from "../../lib/controllers/category-controller";
+import { NavLayout, CategoryLayout } from "../../../components/Layouts";
+import { LocationBarterButtons, Button } from "../../../components/Buttons";
+import { getAllCategories } from "../../../lib/controllers/category-controller";
 import { getSession } from "next-auth/react";
-import { getItems } from "../../lib/controllers/item-controller";
-import useMapStore from "../../store/useMapStore";
+import { getItems } from "../../../lib/controllers/item-controller";
+import useMapStore from "../../../store/useMapStore";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import usePaginate from "../../lib/hooks/usePaginate";
-import { ItemCard } from "../../components/Cards";
-import { ItemCardSkeleton } from "../../components/Loaders";
+import usePaginate from "../../../lib/hooks/usePaginate";
+import { ItemCard } from "../../../components/Cards";
+import { ItemCardSkeleton } from "../../../components/Loaders";
 import { FacePendingFilled } from "@carbon/icons-react";
 
 export async function getServerSideProps(context) {

@@ -80,7 +80,7 @@ export default function Navbar({ sticky }) {
         <div className="relative flex items-center gap-3">
           <ul className="hidden items-center gap-2 md:flex">
             <li>
-              <IconLink to="/">
+              <IconLink to="/" aka={["/items"]}>
                 <Home size={24} />
               </IconLink>
             </li>

@@ -21,8 +21,6 @@ export default function CategoryNavbar() {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  console.log(categories);
-
   const categoryListItems =
     categories?.success &&
     categories.data.map((category, index) => (
@@ -46,7 +44,7 @@ export default function CategoryNavbar() {
          after:h-full after:w-4 after:bg-gradient-to-l after:from-white after:to-transparent"
         >
           <CategoryList>
-            <CategoryListItem to="/" name="All Items" />
+            <CategoryListItem to="/" name="All Items" aka={["/items"]} />
             {categoryListItems}
           </CategoryList>
         </div>
