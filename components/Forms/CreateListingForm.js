@@ -14,7 +14,7 @@ import { Collaborate, Delivery, Chat, Location } from "@carbon/icons-react";
 import { Button } from "../Buttons";
 import ReactModal from "react-modal";
 import useMapStore from "../../store/useMapStore";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import dynamic from "next/dynamic";
 const DropdownSelect = dynamic(() => import("../Inputs/DropdownSelect"), {
   ssr: false,
@@ -22,12 +22,18 @@ const DropdownSelect = dynamic(() => import("../Inputs/DropdownSelect"), {
 import { memo } from "react";
 import { listingCreationSchema } from "../../lib/validators/item-validator";
 import useSWR from "swr";
+// import { toast } from "react-toastify";
+import toast from "react-hot-toast";
+import { useRouter } from "next/router";
+import useCreationStore from "../../store/useCreationStore";
+import { PopupLoader } from "../Loaders";
 
 const MemoizedImageSelector = memo(ImageSelector);
 const MemoizedDropdownSelect = memo(DropdownSelect);
 
 export default function CreateListingForm() {
   ReactModal.setAppElement("#__next");
+  const router = useRouter();
   const {
     creationPosition,
     creationRegion,
@@ -36,6 +42,18 @@ export default function CreateListingForm() {
     setCreationLocation,
     clearPositionRegion,
   } = useMapStore();
+
+  const { path, host } = useCreationStore();
+  const callbackUrl = useMemo(() => {
+    if (
+      window &&
+      host == `${window.location.protocol}//${window.location.host}` &&
+      path !== "/create"
+    ) {
+      return path;
+    }
+    return "/";
+  }, [path, host]);
 
   const { data: categories, error } = useSWR("/api/categories");
   const categorySelections = categories?.success
@@ -46,6 +64,7 @@ export default function CreateListingForm() {
     : [];
 
   const [locationModalOpen, setLocationModalOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   function openLocationModal() {
     setLocationModalOpen(true);
@@ -58,21 +77,31 @@ export default function CreateListingForm() {
 
   async function handleFormSubmit(values) {
     try {
-      console.log("submit", values);
+      setIsLoading(true);
       const res = await fetch("/api/items", {
         method: "POST",
         body: JSON.stringify(values),
         headers: { "Content-Type": "application/json" },
       });
       const data = await res.json();
-      console.log(data);
+      if (data && data.success) {
+        toast.success("Item Posted");
+        router.push(callbackUrl);
+      } else {
+        setIsLoading(false);
+        toast.error("Can't post the item");
+      }
     } catch (error) {
-      console.log(error);
+      setIsLoading(false);
+      toast.error("Can't post the item");
     }
   }
 
+  function showToast() {}
+
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 py-6 md:mb-6">
+      <PopupLoader isOpen={isLoading} message="Uploading item..." />
       <h1 className="text-2xl font-semibold">Make a Barter</h1>
       <Formik
         initialValues={{
@@ -245,7 +274,7 @@ export default function CreateListingForm() {
                 <MemoizedDropdownSelect
                   name="duration"
                   items={[
-                    { name: "I accept an offer", value: 0 },
+                    { name: "I accept an offer", value: "0" },
                     { name: "1 Day", value: 1 },
                     { name: "3 Days", value: 3 },
                     { name: "7 Days", value: 7 },
@@ -324,7 +353,9 @@ export default function CreateListingForm() {
                 </MultiSelect>
               </div>
               <div className="flex items-center gap-4">
-                <Button secondary={true}>Save to Drafts</Button>
+                <Button secondary={true} onClick={() => showToast()}>
+                  Save to Drafts
+                </Button>
                 <Button type="submit">Post</Button>
               </div>
             </Form>

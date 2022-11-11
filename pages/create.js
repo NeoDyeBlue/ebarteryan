@@ -1,8 +1,29 @@
 import Head from "next/head";
 import { CreationLayout } from "../components/Layouts";
 import { CreateListingForm } from "../components/Forms";
+import useCreationStore from "../store/useCreationStore";
+import { useEffect } from "react";
 
-export default function Create() {
+export async function getServerSideProps(context) {
+  if (context.req.headers.referer) {
+    const url = new URL(context.req.headers.referer) || null;
+    const path = url.pathname;
+    const host = `${url.protocol}//${context.req.headers.host}`;
+    return {
+      props: { path, host }, // will be passed to the page component as props
+    };
+  }
+  return {
+    props: { path: "/", host: process.env.VERCEL_URL },
+  };
+}
+
+export default function Create({ path, host }) {
+  const { setPath, setHost } = useCreationStore();
+  useEffect(() => {
+    setPath(path);
+    setHost(host);
+  }, []);
   return (
     <div className="w-full">
       <Head>

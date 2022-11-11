@@ -9,7 +9,7 @@ export default function Footer() {
     categories.data.map((category, index) => (
       <FooterLinkListItem
         key={index}
-        to={`/${category.name}`}
+        to={`/items/${category.name}`}
         name={category.name}
       />
     ));
@@ -21,7 +21,7 @@ export default function Footer() {
             eBarterYan
           </span>
           <FooterLinkList title="Listings">
-            <FooterLinkListItem to="/" name="All Items" />
+            <FooterLinkListItem to="/items" name="All Items" />
             {categoryListItems}
           </FooterLinkList>
           <FooterLinkList title="Listings">

@@ -7,7 +7,7 @@ export default function NotificationTabs() {
   return (
     <div className="w-full">
       <Tabs className="flex flex-col">
-        <TabList className="flex gap-4">
+        <TabList className="flex gap-4 px-4">
           <Tab className="tab" selectedClassName="tab-active">
             <p>All</p>
           </Tab>

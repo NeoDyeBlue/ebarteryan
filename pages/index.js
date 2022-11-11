@@ -21,7 +21,7 @@ export default function Home() {
     setSize,
     error,
     mutate,
-  } = usePaginate("/api/items", 2, {
+  } = usePaginate("/api/items", 8, {
     ...(listingPosition && Object.keys(listingPosition).length
       ? { ...listingPosition, radius: listingRadius }
       : {}),
