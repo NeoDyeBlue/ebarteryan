@@ -14,7 +14,13 @@ export async function getServerSideProps(context) {
     };
   }
   return {
-    props: { path: "/", host: process.env.VERCEL_URL },
+    props: {
+      path: "/",
+      host:
+        process.env.NODE_ENV == "production"
+          ? process.env.PRODUCTION_URL
+          : process.env.DEVELOPMENT_URL,
+    },
   };
 }
 

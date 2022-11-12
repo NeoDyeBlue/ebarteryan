@@ -35,9 +35,10 @@ export default function Home() {
         name={item.name}
         exchangeFor={item.exchangeFor}
         image={item.images[0].url}
-        to="/1/1"
+        to={`/items/${item.category.name}/${item._id}`}
         time={item.duration}
         offers={1}
+        createdAt={item.createdAt}
       />
     ));
   return (

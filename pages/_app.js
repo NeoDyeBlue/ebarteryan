@@ -5,6 +5,11 @@ import NextNProgress from "nextjs-progressbar";
 // import { ToastContainer, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "react-hot-toast";
+import { useEffect } from "react";
+import useSocketStore from "../store/useSocketStore";
+import { io } from "socket.io-client";
+
+const socket = io();
 
 /**
  * different _app.js for next-auth useSession()
@@ -24,6 +29,16 @@ export default function MyApp({
   Component,
   pageProps: { session, ...pageProps },
 }) {
+  const { setSocket } = useSocketStore();
+  useEffect(() => {
+    fetch("/api/socket").then(() => {
+      setSocket(socket);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
   const getLayout = Component.getLayout ?? ((page) => page);
   const layout = getLayout(<Component {...pageProps} />);
   return (

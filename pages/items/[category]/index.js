@@ -78,6 +78,7 @@ export default function Category({ data }) {
         to="/1/1"
         time={item.duration}
         offers={1}
+        createdAt={item.createdAt}
       />
     ));
 
