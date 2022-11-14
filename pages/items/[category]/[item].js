@@ -373,7 +373,7 @@ export default function Item({ itemData }) {
           <div className="container mx-auto max-w-[1100px]">
             <TabPanel>
               <OfferList>
-                <OfferListItem />
+                {/* <OfferListItem fromUser={true} /> */}
                 <OfferListItem />
                 <OfferListItem />
                 <OfferListItem />
