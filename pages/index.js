@@ -36,7 +36,7 @@ export default function Home() {
         exchangeFor={item.exchangeFor}
         image={item.images[0].url}
         to={`/items/${item.category.name}/${item._id}`}
-        time={item.duration}
+        duration={item.duration}
         offers={1}
         createdAt={item.createdAt}
       />
@@ -74,13 +74,14 @@ export default function Home() {
           {isLoading &&
             [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
         </div>
-        {!isEndReached && (
-          <div className="mx-auto mb-8 w-full max-w-[300px]">
-            <Button secondary={true} onClick={() => setSize(size + 1)}>
-              Load More
-            </Button>
-          </div>
-        )}
+        {!isEndReached ||
+          (!items && (
+            <div className="mx-auto mb-8 w-full max-w-[300px]">
+              <Button secondary={true} onClick={() => setSize(size + 1)}>
+                Load More
+              </Button>
+            </div>
+          ))}
       </div>
     </div>
   );

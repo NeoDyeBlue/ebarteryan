@@ -35,9 +35,11 @@ export default function MyApp({
       setSocket(socket);
     });
 
-    return () => {
-      socket.disconnect();
-    };
+    console.log(socket);
+
+    // return () => {
+    //   socket.disconnect();
+    // };
   }, []);
   const getLayout = Component.getLayout ?? ((page) => page);
   const layout = getLayout(<Component {...pageProps} />);

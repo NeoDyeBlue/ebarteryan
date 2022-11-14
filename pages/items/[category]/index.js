@@ -1,8 +1,8 @@
 import { NavLayout, CategoryLayout } from "../../../components/Layouts";
 import { LocationBarterButtons, Button } from "../../../components/Buttons";
 import { getAllCategories } from "../../../lib/controllers/category-controller";
-import { getSession } from "next-auth/react";
-import { getItems } from "../../../lib/controllers/item-controller";
+// import { getSession } from "next-auth/react";
+// import { getItems } from "../../../lib/controllers/item-controller";
 import useMapStore from "../../../store/useMapStore";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -13,8 +13,8 @@ import { FacePendingFilled } from "@carbon/icons-react";
 
 export async function getServerSideProps(context) {
   const { params } = context;
-  const { listingRadius, listingPosition } = useMapStore.getState();
-  const session = await getSession(context);
+  // const { listingRadius, listingPosition } = useMapStore.getState();
+  // const session = await getSession(context);
   const categories = await getAllCategories();
   const categoryNames = categories.map((category) =>
     category.name.split(" ").join("-").toLowerCase()
@@ -26,20 +26,21 @@ export async function getServerSideProps(context) {
 
   // console.log(categoryNames);
 
-  const data = await getItems(
-    session && session.user ? session.user.id : null,
-    params.category,
-    {
-      page: 1,
-      limit: 8,
-      ...(listingPosition && Object.keys(listingPosition).length
-        ? { ...listingPosition, radius: listingRadius }
-        : {}),
-    }
-  );
+  // const data = await getItems(
+  //   session && session.user ? session.user.id : null,
+  //   params.category,
+  //   {
+  //     page: 1,
+  //     limit: 8,
+  //     ...(listingPosition && Object.keys(listingPosition).length
+  //       ? { ...listingPosition, radius: listingRadius }
+  //       : {}),
+  //   }
+  // );
   return {
     props: {
-      data: JSON.parse(JSON.stringify(data)),
+      // data: JSON.parse(JSON.stringify(data)),
+      data: true,
     },
   };
 }
@@ -58,13 +59,13 @@ export default function Category({ data }) {
     mutate,
   } = usePaginate(
     `/api/items/${category}`,
-    2,
+    8,
     {
       ...(listingPosition && Object.keys(listingPosition).length
         ? { ...listingPosition, radius: listingRadius }
         : {}),
-    },
-    { initalData: data && data.length ? data : null }
+    }
+    // { initalData: data && data.length ? data : null }
   );
 
   const itemCards =
@@ -75,8 +76,8 @@ export default function Category({ data }) {
         name={item.name}
         exchangeFor={item.exchangeFor}
         image={item.images[0].url}
-        to="/1/1"
-        time={item.duration}
+        to={`/items/${item.category.name}/${item._id}`}
+        duration={item.duration}
         offers={1}
         createdAt={item.createdAt}
       />
@@ -122,13 +123,14 @@ export default function Category({ data }) {
           {isLoading &&
             [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
         </div>
-        {!isEndReached && (
-          <div className="mx-auto mb-8 w-full max-w-[300px]">
-            <Button secondary={true} onClick={() => setSize(size + 1)}>
-              Load More
-            </Button>
-          </div>
-        )}
+        {!isEndReached ||
+          (!items && (
+            <div className="mx-auto mb-8 w-full max-w-[300px]">
+              <Button secondary={true} onClick={() => setSize(size + 1)}>
+                Load More
+              </Button>
+            </div>
+          ))}
       </div>
     </div>
   );

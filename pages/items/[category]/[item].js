@@ -30,7 +30,10 @@ import { Textarea } from "../../../components/Inputs";
 import { motion, AnimatePresence } from "framer-motion";
 import { getItem } from "../../../lib/controllers/item-controller";
 import Link from "next/link";
-import useSocketStore from "../../../store/useSocketStore";
+import useCountdown from "../../../lib/hooks/useCountdown";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/router";
+import { format } from "date-fns";
 
 export async function getServerSideProps(context) {
   const { params } = context;
@@ -53,28 +56,37 @@ export default function Item({ itemData }) {
   const [offerModalOpen, setOfferModalOpen] = useState(false);
   ReactModal.setAppElement("#__next");
 
-  const { socket } = useSocketStore();
-
   const [showMinifiedBar, setShowMinifiedBar] = useState(false);
+  const { data: session, status } = useSession();
+  const router = useRouter();
 
   function openOfferModal() {
-    setOfferModalOpen(true);
+    console.log(session);
+    if (session && session.user.verified && status == "authenticated") {
+      setOfferModalOpen(true);
+    } else {
+      router.push("/login");
+    }
   }
 
   function closeOfferModal() {
     setOfferModalOpen(false);
   }
+  const countdown = itemData?.duration
+    ? useCountdown(itemData.duration.endDate)
+    : null;
 
   const itemImages =
     itemData?.images?.length &&
     itemData.images.map((image) => (
       <div className="relative aspect-square min-h-[200px] w-full">
         <Image
+          key={image.id}
           src={image.url}
           layout="fill"
           objectFit="cover"
           placeholder="blur"
-          blurDataURL="/public/images/placeholder.png"
+          blurDataURL="/images/placeholder.png"
         />
       </div>
     ));
@@ -129,27 +141,48 @@ export default function Item({ itemData }) {
             exit={{ transform: "translateY(-100%)" }}
             transition={{ type: "just", stiffness: 100 }}
           >
-            <div className="container mx-auto flex items-center justify-between gap-6">
-              <div className="flex w-full items-center gap-4">
-                <div className="relative h-[60px] w-[60px] flex-shrink-0 overflow-hidden rounded-[10px]">
+            <div className="container mx-auto flex items-center justify-between gap-4 md:gap-6">
+              <div className="flex w-full items-center gap-3 overflow-hidden md:gap-4">
+                <div className="relative h-[60px] w-[60px] flex-shrink-0 overflow-hidden rounded-[5px]">
                   <Image
                     src={itemData.images[0].url}
                     layout="fill"
                     objectFit="cover"
                     placeholder="blur"
-                    blurDataURL="/public/images/placeholder.png"
+                    blurDataURL="/images/placeholder.png"
                   />
                 </div>
-                <div className="flex w-full flex-col gap-1 md:flex-row md:justify-between md:gap-4">
+                <div
+                  className="flex w-full max-w-full flex-col gap-1 overflow-hidden
+                  md:flex-row md:justify-between md:gap-4"
+                >
                   <p
-                    className="max-w-full overflow-hidden overflow-ellipsis whitespace-nowrap
-              font-display text-xl font-semibold"
+                    className="overflow-hidden overflow-ellipsis
+              whitespace-nowrap font-display text-xl font-semibold"
                   >
                     {itemData.name}
                   </p>
-                  <div className="flex w-auto items-center gap-1 self-start rounded-full bg-gray-100/30 py-1 px-2">
+                  <div
+                    className={`flex w-auto items-center gap-1 self-start rounded-full py-1 px-2
+                  ${
+                    countdown.ended
+                      ? "bg-danger-500 text-white"
+                      : "bg-gray-100/30 text-black-light"
+                  }`}
+                  >
                     <Timer size={16} />
-                    <p className="text-sm">7d 3h 6m</p>
+                    {countdown ? (
+                      <p className="whitespace-nowrap text-sm">
+                        {!countdown.seconds &&
+                        !countdown.minutes &&
+                        !countdown.hours &&
+                        !countdown.days
+                          ? "ended"
+                          : `${countdown.days}d ${countdown.hours}h ${countdown.minutes}m ${countdown.seconds}s`}
+                      </p>
+                    ) : (
+                      "ongoing"
+                    )}
                   </div>
                 </div>
               </div>
@@ -182,7 +215,7 @@ export default function Item({ itemData }) {
             {itemImages}
           </Carousel>
           <div
-            className="item-center flex w-full gap-2 text-ellipsis whitespace-nowrap font-display text-sm text-gray-300
+            className="item-center flex w-full gap-2 text-ellipsis whitespace-nowrap font-display text-gray-300
           md:row-span-full md:row-start-1"
           >
             <Link href={`/items/${itemData.category.name}`}>
@@ -202,7 +235,7 @@ export default function Item({ itemData }) {
                 </span>
                 <p className="inline">
                   {itemData.region} •{" "}
-                  {new Date(itemData.createdAt).toLocaleDateString()}
+                  {format(new Date(itemData.createdAt), "PP")}
                 </p>
               </div>
             </div>
@@ -215,7 +248,18 @@ export default function Item({ itemData }) {
                 <p className="font-display font-medium">Will end in</p>
                 <div className="flex items-center gap-2">
                   <Timer size={24} />
-                  <p className="text-lg">7d 3h 6m</p>
+                  {countdown ? (
+                    <p className="text-lg">
+                      {!countdown.seconds &&
+                      !countdown.minutes &&
+                      !countdown.hours &&
+                      !countdown.days
+                        ? "ended"
+                        : `${countdown.days}d ${countdown.hours}h ${countdown.minutes}m ${countdown.seconds}s`}
+                    </p>
+                  ) : (
+                    "ongoing"
+                  )}
                 </div>
               </div>
               <div className="flex flex-col gap-3 rounded-[10px] border border-gray-100 p-4 md:flex-row md:items-center md:justify-between">
@@ -223,12 +267,15 @@ export default function Item({ itemData }) {
                 <div className="flex gap-3">{itemClaimingOptions}</div>
               </div>
             </div>
-            <div className="flex flex-col gap-3 md:flex-row">
-              <Button onClick={openOfferModal}>Offer Now</Button>
-              <Button secondary={true}>
-                <Bookmark size={20} /> Save
-              </Button>
-            </div>
+            {!countdown ||
+              (countdown && !countdown.ended && (
+                <div className="flex flex-col gap-3 md:flex-row">
+                  <Button onClick={openOfferModal}>Offer Now</Button>
+                  <Button secondary={true}>
+                    <Bookmark size={20} /> Save
+                  </Button>
+                </div>
+              ))}
           </div>
         </motion.div>
         {/* Description and Barterer*/}
@@ -246,14 +293,18 @@ export default function Item({ itemData }) {
             <div className="flex items-center justify-center gap-4">
               <div className="relative h-16 w-16 overflow-hidden rounded-full">
                 <Image
-                  src="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
+                  src={itemData.user.image.url}
                   layout="fill"
                   objectFit="cover"
                 />
               </div>
               <div>
-                <p className="font-display font-medium">Another User</p>
-                <p className="text-xs">Joined in 2022</p>
+                <p className="font-display font-medium">
+                  {itemData.user.firstName} {itemData.user.lastName}
+                </p>
+                <p className="text-xs">
+                  Joined in {new Date(itemData.user.createdAt).getFullYear()}
+                </p>
               </div>
             </div>
             <div className="flex flex-col items-center justify-center gap-2 rounded-[10px] border border-gray-100 p-4">

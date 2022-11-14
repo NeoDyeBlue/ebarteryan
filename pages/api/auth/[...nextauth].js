@@ -35,6 +35,9 @@ export const authOptions = (req) => ({
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      // httpOptions: {
+      //   timeout: 40000,
+      // },
     }),
     FacebookProvider({
       clientId: process.env.FACEBOOK_CLIENT_ID,

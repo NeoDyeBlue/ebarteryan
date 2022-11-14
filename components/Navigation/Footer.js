@@ -1,9 +1,11 @@
 import { FooterLinkList, FooterLinkListItem } from "../Lists";
 import { LogoFacebook, LogoTwitter } from "@carbon/icons-react";
 import useSWR from "swr";
+import { useSession } from "next-auth/react";
 
 export default function Footer() {
   const { data: categories, error } = useSWR("/api/categories");
+  const { data: session, status } = useSession();
   const categoryListItems =
     categories?.success &&
     categories.data.map((category, index) => (
@@ -24,11 +26,20 @@ export default function Footer() {
             <FooterLinkListItem to="/items" name="All Items" />
             {categoryListItems}
           </FooterLinkList>
-          <FooterLinkList title="Listings">
-            <FooterLinkListItem to="/" name="Test1" />
-            <FooterLinkListItem to="/" name="Test2" />
-            <FooterLinkListItem to="/" name="Test3" />
-            <FooterLinkListItem to="/" name="Test4" />
+          <FooterLinkList title="Account">
+            {session && session.user.verified && status == "authenticated" ? (
+              <>
+                <FooterLinkListItem to="/profile" name="Profile" />
+                <FooterLinkListItem to="/offers" name="Offers" />
+                <FooterLinkListItem to="/notifications" name="Notifications" />
+                <FooterLinkListItem to="/messages" name="Messages" />
+              </>
+            ) : (
+              <>
+                <FooterLinkListItem to="/login" name="Login" />
+                <FooterLinkListItem to="/signup" name="Sign Up" />
+              </>
+            )}
           </FooterLinkList>
           <div className="flex items-center gap-4">
             <a href="/">
