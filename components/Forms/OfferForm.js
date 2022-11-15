@@ -14,10 +14,12 @@ import { LocationModal } from "../Modals";
 import ReactModal from "react-modal";
 import useMapStore from "../../store/useMapStore";
 import { useState, useEffect } from "react";
+import useUserOfferStore from "../../store/useUserOfferStore";
+import { toast } from "react-hot-toast";
 
 const MemoizedImageSelector = memo(ImageSelector);
 
-export default function OfferForm() {
+export default function OfferForm({ onClose }) {
   const {
     creationPosition,
     creationRegion,
@@ -26,6 +28,8 @@ export default function OfferForm() {
     setCreationLocation,
     clearPositionRegion,
   } = useMapStore();
+  const { item, setOffer, setIsSubmitting, setIsSubmitSuccess } =
+    useUserOfferStore();
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   function openLocationModal() {
     setLocationModalOpen(true);
@@ -36,14 +40,45 @@ export default function OfferForm() {
     clearPositionRegion();
   }
 
-  function handleFormSubmit(values) {
-    console.log("submit", values);
+  async function handleFormSubmit(values) {
+    onClose();
+    setOffer(values);
+    try {
+      setIsSubmitting(true);
+      const res = await fetch(`/api/offers/${item}`, {
+        method: "POST",
+        body: JSON.stringify(values),
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+      if (data && data.success) {
+        setIsSubmitting(false);
+        setIsSubmitSuccess(true);
+        toast.success("Offer Added");
+      } else {
+        setIsSubmitting(false);
+        setIsSubmitSuccess(false);
+        // setOffer(null);
+        toast.error("Can't add offer");
+      }
+    } catch (error) {
+      setIsSubmitting(false);
+      setIsSubmitSuccess(false);
+      // setOffer(null);
+      toast.error("Can't add offer");
+    }
+    // onClose();
+    // setOffer(values);
+    // setIsSubmitting(true);
+    // await stall(5000);
+    // // setIsSubmitSuccess(true);
+    // toast.success("Offer Added");
   }
   return (
     <Formik
       initialValues={{
         images: [],
-        itemName: "",
+        name: "",
         description: "",
         condition: "",
         location: {
@@ -83,7 +118,7 @@ export default function OfferForm() {
                 max={10}
                 infoMessage="You can upload up to 10 photos only."
               />
-              <InputField type="text" name="itemName" label="Item Name" />
+              <InputField type="text" name="name" label="Item Name" />
               <Textarea label="Description" name="description" />
               <RadioSelect
                 label="Condition"
@@ -102,15 +137,15 @@ export default function OfferForm() {
                 </RadioSelectItem>
                 <RadioSelectItem
                   name="condition"
-                  value="slightly_used"
-                  checked={props.values.condition == "slightly_used"}
+                  value="slightly used"
+                  checked={props.values.condition == "slightly used"}
                 >
                   Slightly used
                 </RadioSelectItem>
                 <RadioSelectItem
                   name="condition"
-                  value="mostly_used"
-                  checked={props.values.condition == "mostly_used"}
+                  value="mostly used"
+                  checked={props.values.condition == "mostly used"}
                 >
                   Mostly used
                 </RadioSelectItem>
@@ -149,7 +184,6 @@ export default function OfferForm() {
                   >
                     <LocationModal
                       onClose={() => {
-                        console.log("closed");
                         closeLocationModal();
                         props.setFieldTouched("location", true, true);
                       }}

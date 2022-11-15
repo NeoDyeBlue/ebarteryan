@@ -176,15 +176,15 @@ export default function CreateListingForm() {
                   </RadioSelectItem>
                   <RadioSelectItem
                     name="condition"
-                    value="slightly_used"
-                    checked={props.values.condition == "slightly_used"}
+                    value="slightly used"
+                    checked={props.values.condition == "slightly used"}
                   >
                     Slightly used
                   </RadioSelectItem>
                   <RadioSelectItem
                     name="condition"
-                    value="mostly_used"
-                    checked={props.values.condition == "mostly_used"}
+                    value="mostly used"
+                    checked={props.values.condition == "mostly used"}
                   >
                     Mostly used
                   </RadioSelectItem>

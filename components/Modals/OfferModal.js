@@ -12,7 +12,7 @@ export default function OfferModal({ onClose }) {
           icon={<Add className="rotate-[135deg]" size={32} />}
         />
       </div>
-      <OfferForm />
+      <OfferForm onClose={() => onClose()} />
     </div>
   );
 }

@@ -14,7 +14,7 @@ import {
   Delivery,
   Chat,
 } from "@carbon/icons-react";
-import { Button } from "../../../components/Buttons";
+import { Button, LinkButton } from "../../../components/Buttons";
 import { IconLabel } from "../../../components/Icons";
 import { Rating } from "react-simple-star-rating";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
@@ -25,43 +25,56 @@ import {
   QuestionAnswerListItem,
 } from "../../../components/Lists";
 import { OfferModal } from "../../../components/Modals";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Textarea } from "../../../components/Inputs";
 import { motion, AnimatePresence } from "framer-motion";
 import { getItem } from "../../../lib/controllers/item-controller";
 import Link from "next/link";
 import useCountdown from "../../../lib/hooks/useCountdown";
-import { useSession } from "next-auth/react";
+import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { format } from "date-fns";
+import { ConditionBadge } from "../../../components/Misc";
+import useUserOfferStore from "../../../store/useUserOfferStore";
+import { getUserOffer } from "../../../lib/controllers/offer-controller";
 
 export async function getServerSideProps(context) {
   const { params } = context;
   try {
-    const data = await getItem(params.category, params.item);
-    if (!data) {
+    const item = await getItem(params.category, params.item);
+    const session = await getSession(context);
+    let userOffer = null;
+
+    if (!item) {
       return { notFound: true };
+    }
+
+    if (session && session?.user?.verified) {
+      userOffer = await getUserOffer(item._id, session?.user?.id);
     }
     return {
       props: {
-        itemData: JSON.parse(JSON.stringify(data)),
+        itemData: JSON.parse(JSON.stringify(item)),
+        userOffer: JSON.parse(JSON.stringify(userOffer)),
       },
     };
   } catch (error) {
+    console.log(error);
     return { notFound: true };
   }
 }
 
-export default function Item({ itemData }) {
+export default function Item({ itemData, userOffer }) {
   const [offerModalOpen, setOfferModalOpen] = useState(false);
   ReactModal.setAppElement("#__next");
 
   const [showMinifiedBar, setShowMinifiedBar] = useState(false);
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { offer, setOffer, setItem, isSubmitting, isSubmitSuccess, resubmit } =
+    useUserOfferStore();
 
   function openOfferModal() {
-    console.log(session);
     if (session && session.user.verified && status == "authenticated") {
       setOfferModalOpen(true);
     } else {
@@ -69,9 +82,15 @@ export default function Item({ itemData }) {
     }
   }
 
+  useEffect(() => {
+    setItem(itemData?._id);
+    setOffer(userOffer);
+  }, [itemData, userOffer]);
+
   function closeOfferModal() {
     setOfferModalOpen(false);
   }
+
   const countdown = itemData?.duration
     ? useCountdown(itemData.duration.endDate)
     : null;
@@ -79,9 +98,11 @@ export default function Item({ itemData }) {
   const itemImages =
     itemData?.images?.length &&
     itemData.images.map((image) => (
-      <div className="relative aspect-square min-h-[200px] w-full">
+      <div
+        key={image.id}
+        className="relative aspect-square min-h-[200px] w-full"
+      >
         <Image
-          key={image.id}
           src={image.url}
           layout="fill"
           objectFit="cover"
@@ -91,7 +112,7 @@ export default function Item({ itemData }) {
       </div>
     ));
 
-  const itemClaimingOptions = itemData.claimingOptions.map((option) => {
+  const itemClaimingOptions = itemData.claimingOptions.map((option, index) => {
     let icon = null;
     if (option == "meetup") {
       icon = <Collaborate size={16} />;
@@ -101,7 +122,7 @@ export default function Item({ itemData }) {
       icon = <Chat size={16} />;
     }
     return (
-      <IconLabel>
+      <IconLabel key={index}>
         {icon}
         <p className="text-sm capitalize">{option}</p>
       </IconLabel>
@@ -132,6 +153,7 @@ export default function Item({ itemData }) {
           <OfferModal onClose={closeOfferModal} />
         </div>
       </ReactModal>
+      {/* ScrollTriggered Bar */}
       <AnimatePresence>
         {showMinifiedBar && (
           <motion.div
@@ -141,7 +163,7 @@ export default function Item({ itemData }) {
             exit={{ transform: "translateY(-100%)" }}
             transition={{ type: "just", stiffness: 100 }}
           >
-            <div className="container mx-auto flex items-center justify-between gap-4 md:gap-6">
+            <div className="container mx-auto flex max-w-[1100px] items-center justify-between gap-4 md:gap-6">
               <div className="flex w-full items-center gap-3 overflow-hidden md:gap-4">
                 <div className="relative h-[60px] w-[60px] flex-shrink-0 overflow-hidden rounded-[5px]">
                   <Image
@@ -172,7 +194,7 @@ export default function Item({ itemData }) {
                   >
                     <Timer size={16} />
                     {countdown ? (
-                      <p className="whitespace-nowrap text-sm">
+                      <p className="whitespace-nowrap text-xs sm:text-sm">
                         {!countdown.seconds &&
                         !countdown.minutes &&
                         !countdown.hours &&
@@ -187,7 +209,11 @@ export default function Item({ itemData }) {
                 </div>
               </div>
               <div className="flex max-w-[250px] gap-3">
-                <Button onClick={openOfferModal}>Offer Now</Button>
+                {offer || userOffer ? (
+                  <LinkButton link="#offers">See Your Offer</LinkButton>
+                ) : (
+                  <Button onClick={openOfferModal}>Offer Now</Button>
+                )}
                 <div className="hidden md:block">
                   <Button secondary={true}>
                     <Bookmark size={20} /> Save
@@ -198,6 +224,7 @@ export default function Item({ itemData }) {
           </motion.div>
         )}
       </AnimatePresence>
+      {/* Item Info */}
       <div className="container mx-auto flex max-w-[1100px] flex-col gap-4 md:gap-6">
         {/* Carousel and other info */}
         <motion.div
@@ -215,8 +242,8 @@ export default function Item({ itemData }) {
             {itemImages}
           </Carousel>
           <div
-            className="item-center flex w-full gap-2 text-ellipsis whitespace-nowrap font-display text-gray-300
-          md:row-span-full md:row-start-1"
+            className="item-center flex w-full gap-2 text-ellipsis whitespace-nowrap font-display text-sm
+          text-gray-300 md:row-span-full md:row-start-1"
           >
             <Link href={`/items/${itemData.category.name}`}>
               <a className="capitalize underline">{itemData.category.name}</a>
@@ -236,7 +263,8 @@ export default function Item({ itemData }) {
                 <p className="inline">
                   {itemData.region} •{" "}
                   {format(new Date(itemData.createdAt), "PP")}
-                </p>
+                </p>{" "}
+                <ConditionBadge condition={itemData.condition} />
               </div>
             </div>
             <div className="flex flex-col gap-3 pb-4">
@@ -270,7 +298,11 @@ export default function Item({ itemData }) {
             {!countdown ||
               (countdown && !countdown.ended && (
                 <div className="flex flex-col gap-3 md:flex-row">
-                  <Button onClick={openOfferModal}>Offer Now</Button>
+                  {offer || userOffer ? (
+                    <LinkButton link="#offers">See Your Offer</LinkButton>
+                  ) : (
+                    <Button onClick={openOfferModal}>Offer Now</Button>
+                  )}
                   <Button secondary={true}>
                     <Bookmark size={20} /> Save
                   </Button>
@@ -349,7 +381,8 @@ export default function Item({ itemData }) {
           </div>
         </div>
       </div>
-      <div className="w-full pb-6">
+      {/* Tabs */}
+      <div className="w-full scroll-mt-24 pb-6" id="offers">
         <Tabs className="flex flex-col gap-6">
           <div className="border-y border-y-gray-100">
             <TabList
@@ -374,10 +407,24 @@ export default function Item({ itemData }) {
             <TabPanel>
               <OfferList>
                 {/* <OfferListItem fromUser={true} /> */}
+                {offer || userOffer ? (
+                  <OfferListItem
+                    fromUser={true}
+                    offer={offer}
+                    isLoading={
+                      userOffer
+                        ? false
+                        : isSubmitting && !isSubmitSuccess
+                        ? true
+                        : false
+                    }
+                    isSubmitSuccess={userOffer ? true : isSubmitSuccess}
+                    retryHandler={resubmit}
+                  />
+                ) : null}
+                {/* <OfferListItem />
                 <OfferListItem />
-                <OfferListItem />
-                <OfferListItem />
-                <OfferListItem />
+                <OfferListItem /> */}
               </OfferList>
             </TabPanel>
             <TabPanel>
