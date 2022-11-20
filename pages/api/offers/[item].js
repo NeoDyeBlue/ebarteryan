@@ -10,7 +10,8 @@ export default async function handler(req, res) {
     const { item } = req.query;
     const token = await getToken({ req });
     if (req.method == "GET") {
-      const data = await getItemOffers(item, token?.sub);
+      const { page, limit } = req.query;
+      const data = await getItemOffers(item, token?.sub, page, limit);
       return successResponse(req, res, data);
     }
     if (req.method == "POST") {

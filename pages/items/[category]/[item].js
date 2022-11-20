@@ -3,7 +3,6 @@ import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a lo
 import { Carousel } from "react-responsive-carousel";
 import Image from "next/image";
 import Head from "next/head";
-import ReactModal from "react-modal";
 import {
   Location,
   Timer,
@@ -37,6 +36,9 @@ import { format } from "date-fns";
 import { ConditionBadge } from "../../../components/Misc";
 import useUserOfferStore from "../../../store/useUserOfferStore";
 import { getUserOffer } from "../../../lib/controllers/offer-controller";
+import usePaginate from "../../../lib/hooks/usePaginate";
+import { DotLoader } from "react-spinners";
+import useSocketStore from "../../../store/useSocketStore";
 
 export async function getServerSideProps(context) {
   const { params } = context;
@@ -66,34 +68,29 @@ export async function getServerSideProps(context) {
 
 export default function Item({ itemData, userOffer }) {
   const [offerModalOpen, setOfferModalOpen] = useState(false);
-  ReactModal.setAppElement("#__next");
-
   const [showMinifiedBar, setShowMinifiedBar] = useState(false);
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { socket } = useSocketStore();
   const { offer, setOffer, setItem, isSubmitting, isSubmitSuccess, resubmit } =
     useUserOfferStore();
-
-  function openOfferModal() {
-    if (session && session.user.verified && status == "authenticated") {
-      setOfferModalOpen(true);
-    } else {
-      router.push("/login");
-    }
-  }
-
-  useEffect(() => {
-    setItem(itemData?._id);
-    setOffer(userOffer);
-  }, [itemData, userOffer]);
-
-  function closeOfferModal() {
-    setOfferModalOpen(false);
-  }
 
   const countdown = itemData?.duration
     ? useCountdown(itemData.duration.endDate)
     : null;
+
+  const {
+    data: offers,
+    totalDocs,
+    isEndReached,
+    isLoading,
+    size,
+    setSize,
+    error,
+    mutate,
+  } = usePaginate(`/api/offers/${itemData._id}`, 8);
+
+  const [newOffers, setNewOffers] = useState([]);
 
   const itemImages =
     itemData?.images?.length &&
@@ -128,6 +125,49 @@ export default function Item({ itemData, userOffer }) {
       </IconLabel>
     );
   });
+
+  const itemOffers = offers?.length
+    ? offers.map((offer) => <OfferListItem key={offer._id} offer={offer} />)
+    : null;
+
+  const newItemOffers = newOffers?.length
+    ? newOffers.map((offer) => <OfferListItem key={offer._id} offer={offer} />)
+    : null;
+
+  function openOfferModal() {
+    if (session && session.user.verified && status == "authenticated") {
+      setOfferModalOpen(true);
+    } else {
+      router.push("/login");
+    }
+  }
+
+  function closeOfferModal() {
+    setOfferModalOpen(false);
+  }
+
+  useEffect(() => {
+    setItem(itemData?._id);
+    setOffer(userOffer);
+  }, [itemData, userOffer]);
+
+  useEffect(() => {
+    if (socket) {
+      console.log("here");
+      socket.emit("join-item-room", itemData?._id);
+
+      socket.on("another-offer", (offer) => {
+        console.log(offer);
+        // console.log(isEndReached);
+        if (isEndReached || !offers || !offers.length) {
+          setNewOffers((prev) => [...prev, offer]);
+        }
+      });
+
+      return () => socket.emit("leave-item-room", itemData?._id);
+    }
+  }, [socket]);
+
   return (
     <div className="flex flex-col gap-6">
       <Head>
@@ -136,23 +176,7 @@ export default function Item({ itemData, userOffer }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       {/* Modal */}
-      <ReactModal
-        contentLabel="Offer Modal"
-        isOpen={offerModalOpen}
-        // closeTimeoutMS={300}
-        overlayClassName={`bg-black/20 fixed top-0 z-50 flex h-full w-full items-end`}
-        preventScroll={true}
-        onRequestClose={closeOfferModal}
-        bodyOpenClassName="modal-open-body"
-        className={`relative h-[70vh] w-full overflow-hidden rounded-t-[10px] bg-white
-         py-6 shadow-lg md:m-auto md:h-[90vh] md:max-w-[480px] md:rounded-[10px]`}
-      >
-        <div
-          className={`custom-scrollbar container max-h-full overflow-y-auto md:px-6`}
-        >
-          <OfferModal onClose={closeOfferModal} />
-        </div>
-      </ReactModal>
+      <OfferModal onClose={closeOfferModal} isOpen={offerModalOpen} />
       {/* ScrollTriggered Bar */}
       <AnimatePresence>
         {showMinifiedBar && (
@@ -382,32 +406,37 @@ export default function Item({ itemData, userOffer }) {
         </div>
       </div>
       {/* Tabs */}
-      <div className="w-full scroll-mt-24 pb-6" id="offers">
-        <Tabs className="flex flex-col gap-6">
-          <div className="border-y border-y-gray-100">
-            <TabList
-              className="container sticky top-[57.25px] mx-auto flex max-w-[1100px]
-            gap-4 md:top-[71.5px] md:gap-8"
-            >
-              <Tab className="tab" selectedClassName="tab-active">
-                <p>Offers</p>
-                <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
-                  0
-                </span>
-              </Tab>
-              <Tab className="tab" selectedClassName="tab-active">
-                <p>Questions</p>
-                <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
-                  0
-                </span>
-              </Tab>
-            </TabList>
-          </div>
-          <div className="container mx-auto max-w-[1100px]">
-            <TabPanel>
-              <OfferList>
-                {/* <OfferListItem fromUser={true} /> */}
-                {offer || userOffer ? (
+      <div
+        className="w-full scroll-mt-40 border-t border-t-gray-100
+        pb-6 sm:pt-6"
+        id="offers"
+      >
+        <Tabs className="container mx-auto grid max-w-[1100px] grid-cols-1 items-start gap-6 sm:grid-cols-[auto_2fr]">
+          <TabList className="flex w-full items-start gap-4 sm:h-full sm:w-[200px] sm:flex-col sm:gap-6 sm:border-r sm:border-gray-100">
+            <Tab className="tab-varying" selectedClassName="tab-active">
+              <p>Offers</p>
+              <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
+                {totalDocs
+                  ? totalDocs + userOffer
+                    ? 1
+                    : 0
+                  : 0 + userOffer
+                  ? 1
+                  : 0}
+              </span>
+            </Tab>
+            <Tab className="tab-varying" selectedClassName="tab-active">
+              <p>Questions</p>
+              <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
+                0
+              </span>
+            </Tab>
+          </TabList>
+          <TabPanel>
+            <OfferList>
+              {/* <OfferListItem fromUser={true} /> */}
+              {offer || userOffer ? (
+                <div className="border-b border-gray-100 pb-4">
                   <OfferListItem
                     fromUser={true}
                     offer={offer}
@@ -421,30 +450,52 @@ export default function Item({ itemData, userOffer }) {
                     isSubmitSuccess={userOffer ? true : isSubmitSuccess}
                     retryHandler={resubmit}
                   />
-                ) : null}
-                {/* <OfferListItem />
-                <OfferListItem />
-                <OfferListItem /> */}
-              </OfferList>
-            </TabPanel>
-            <TabPanel>
-              <div className="flex flex-col gap-8">
-                <form className="flex flex-col gap-4">
-                  <p className="font-display text-2xl font-semibold">
-                    Ask a question
-                  </p>
-                  <div className="flex flex-col items-end gap-4 md:flex-row">
-                    <Textarea placeholder="Type here..." />
-                    <Button autoWidth={true}>Ask</Button>
+                </div>
+              ) : null}
+              {itemOffers || userOffer ? (
+                itemOffers
+              ) : !isEndReached ? (
+                <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+                  <DotLoader color="#C7EF83" size={32} />
+                </div>
+              ) : (
+                <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                  No Offers
+                </p>
+              )}
+              {newItemOffers}
+              {isLoading && (
+                <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+                  <DotLoader color="#C7EF83" size={32} />
+                </div>
+              )}
+              {!isEndReached ||
+                (!offers && (
+                  <div className="mx-auto mb-8 w-full max-w-[300px]">
+                    <Button secondary={true} onClick={() => setSize(size + 1)}>
+                      Load More
+                    </Button>
                   </div>
-                </form>
-                <QuestionAnswerList>
-                  <QuestionAnswerListItem />
-                  <QuestionAnswerListItem />
-                </QuestionAnswerList>
-              </div>
-            </TabPanel>
-          </div>
+                ))}
+            </OfferList>
+          </TabPanel>
+          <TabPanel>
+            <div className="flex flex-col gap-8">
+              <form className="flex flex-col gap-4">
+                <p className="font-display text-2xl font-semibold">
+                  Ask a question
+                </p>
+                <div className="flex flex-col items-end gap-4 md:flex-row">
+                  <Textarea placeholder="Type here..." />
+                  <Button autoWidth={true}>Ask</Button>
+                </div>
+              </form>
+              <QuestionAnswerList>
+                <QuestionAnswerListItem />
+                <QuestionAnswerListItem />
+              </QuestionAnswerList>
+            </div>
+          </TabPanel>
         </Tabs>
       </div>
     </div>

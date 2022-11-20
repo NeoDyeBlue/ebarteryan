@@ -59,6 +59,13 @@
     before:h-[4px] before:w-full before:rounded-full before:transition-colors hover:text-black-light hover:before:bg-gray-300;
   }
 
+  .tab-varying {
+    @apply relative flex h-[60px] cursor-pointer items-center justify-center gap-3 whitespace-nowrap text-center 
+    font-display font-medium capitalize text-gray-300 outline-none before:absolute before:bottom-0 before:block
+    before:h-[4px] before:w-full before:rounded-full before:transition-colors hover:text-black-light hover:before:bg-gray-300
+    sm:h-[30px] sm:px-4 sm:before:left-0 sm:before:top-1/2 sm:before:h-full sm:before:w-[4px] sm:before:-translate-y-1/2;
+  }
+
   .tab-active {
     @apply text-black-light before:bg-green-500 hover:before:bg-green-500;
   }

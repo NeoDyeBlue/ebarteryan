@@ -16,6 +16,7 @@ import useMapStore from "../../store/useMapStore";
 import { useState, useEffect } from "react";
 import useUserOfferStore from "../../store/useUserOfferStore";
 import { toast } from "react-hot-toast";
+import useSocketStore from "../../store/useSocketStore";
 
 const MemoizedImageSelector = memo(ImageSelector);
 
@@ -31,6 +32,7 @@ export default function OfferForm({ onClose }) {
   const { item, setOffer, setIsSubmitting, setIsSubmitSuccess } =
     useUserOfferStore();
   const [locationModalOpen, setLocationModalOpen] = useState(false);
+  const { socket } = useSocketStore();
   function openLocationModal() {
     setLocationModalOpen(true);
   }
@@ -50,10 +52,14 @@ export default function OfferForm({ onClose }) {
         body: JSON.stringify(values),
         headers: { "Content-Type": "application/json" },
       });
-      const data = await res.json();
-      if (data && data.success) {
+      const result = await res.json();
+      if (result && result.success) {
         setIsSubmitting(false);
         setIsSubmitSuccess(true);
+        socket.emit("offer", {
+          offer: result.data,
+          room: result.data.item,
+        });
         toast.success("Offer Added");
       } else {
         setIsSubmitting(false);

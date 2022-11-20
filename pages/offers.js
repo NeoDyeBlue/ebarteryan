@@ -19,17 +19,17 @@ export default function Offers() {
           Offers
         </h1>
         <Tabs className="grid grid-cols-1 items-start gap-4 sm:grid-cols-[auto_2fr]">
-          <TabList className="flex w-full items-start gap-4 sm:w-[200px] sm:flex-col sm:gap-3 sm:pb-4">
-            <Tab className="tab" selectedClassName="tab-active">
+          <TabList className="flex w-full items-start gap-4 sm:w-[200px] sm:flex-col sm:gap-6 sm:pb-4">
+            <Tab className="tab-varying" selectedClassName="tab-active">
               <p>All</p>
             </Tab>
-            <Tab className="tab" selectedClassName="tab-active">
+            <Tab className="tab-varying" selectedClassName="tab-active">
               <p>Waiting</p>
             </Tab>
-            <Tab className="tab" selectedClassName="tab-active">
+            <Tab className="tab-varying" selectedClassName="tab-active">
               <p>Accepted</p>
             </Tab>
-            <Tab className="tab" selectedClassName="tab-active">
+            <Tab className="tab-varying" selectedClassName="tab-active">
               <p>Failed</p>
             </Tab>
           </TabList>
