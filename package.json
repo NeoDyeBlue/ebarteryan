@@ -48,6 +48,7 @@
     "react-modal": "^3.16.1",
     "react-range": "^1.8.14",
     "react-responsive-carousel": "^3.2.23",
+    "react-simple-image-viewer": "^1.2.2",
     "react-simple-star-rating": "^4.0.5",
     "react-spinners": "^0.13.6",
     "react-tabs": "^5.1.0",

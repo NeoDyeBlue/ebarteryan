@@ -36,7 +36,7 @@ const useUserOfferStore = create((set, get) => ({
       const result = await res.json();
       if (result && result.success) {
         set({ isSubmitting: false });
-        socket.emit("offer", { offer: result.data, room: result.data.item });
+        socket.emit("offer", { offer: result, room: result.data.docs[0].item });
         toast.success("Offer Added");
         set({ offer: result.data });
       } else {

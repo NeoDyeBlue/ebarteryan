@@ -86,11 +86,8 @@ export default function Item({ itemData, userOffer }) {
     isLoading,
     size,
     setSize,
-    error,
     mutate,
-  } = usePaginate(`/api/offers/${itemData._id}`, 8);
-
-  const [newOffers, setNewOffers] = useState([]);
+  } = usePaginate(`/api/offers/${itemData._id}`, 1);
 
   const itemImages =
     itemData?.images?.length &&
@@ -126,13 +123,12 @@ export default function Item({ itemData, userOffer }) {
     );
   });
 
-  const itemOffers = offers?.length
-    ? offers.map((offer) => <OfferListItem key={offer._id} offer={offer} />)
-    : null;
-
-  const newItemOffers = newOffers?.length
-    ? newOffers.map((offer) => <OfferListItem key={offer._id} offer={offer} />)
-    : null;
+  const itemOffers =
+    offers &&
+    offers
+      .map((page) => page.data.docs)
+      .flat()
+      .map((offer) => <OfferListItem key={offer._id} offer={offer} />);
 
   function openOfferModal() {
     if (session && session.user.verified && status == "authenticated") {
@@ -153,14 +149,12 @@ export default function Item({ itemData, userOffer }) {
 
   useEffect(() => {
     if (socket) {
-      console.log("here");
       socket.emit("join-item-room", itemData?._id);
 
       socket.on("another-offer", (offer) => {
         console.log(offer);
-        // console.log(isEndReached);
-        if (isEndReached || !offers || !offers.length) {
-          setNewOffers((prev) => [...prev, offer]);
+        if (isEndReached || !offers || !itemOffers.length) {
+          mutate(offers && offers.length ? [...offers, offer] : [offer]);
         }
       });
 
@@ -187,9 +181,9 @@ export default function Item({ itemData, userOffer }) {
             exit={{ transform: "translateY(-100%)" }}
             transition={{ type: "just", stiffness: 100 }}
           >
-            <div className="container mx-auto flex max-w-[1100px] items-center justify-between gap-4 md:gap-6">
+            <div className="container mx-auto flex items-center justify-between gap-4 md:gap-6">
               <div className="flex w-full items-center gap-3 overflow-hidden md:gap-4">
-                <div className="relative h-[60px] w-[60px] flex-shrink-0 overflow-hidden rounded-[5px]">
+                <div className="relative hidden h-[60px] w-[60px] flex-shrink-0 overflow-hidden rounded-[5px] xs:block">
                   <Image
                     src={itemData.images[0].url}
                     layout="fill"
@@ -202,14 +196,25 @@ export default function Item({ itemData, userOffer }) {
                   className="flex w-full max-w-full flex-col gap-1 overflow-hidden
                   md:flex-row md:justify-between md:gap-4"
                 >
-                  <p
-                    className="overflow-hidden overflow-ellipsis
+                  <div className="flex flex-col">
+                    <p
+                      className="overflow-hidden overflow-ellipsis
               whitespace-nowrap font-display text-xl font-semibold"
-                  >
-                    {itemData.name}
-                  </p>
+                    >
+                      {itemData.name}
+                    </p>
+                    <div className="hidden items-start break-words text-sm md:flex">
+                      <span className="mr-1 inline-block align-middle">
+                        <Location size={16} />
+                      </span>
+                      <span className="mt-[0.12rem] flex gap-2">
+                        <p className="inline">{itemData.region}</p>{" "}
+                        <ConditionBadge condition={itemData.condition} />
+                      </span>
+                    </div>
+                  </div>
                   <div
-                    className={`flex w-auto items-center gap-1 self-start rounded-full py-1 px-2
+                    className={`flex w-auto items-center gap-1 self-start rounded-full py-1 px-2 md:my-auto
                   ${
                     countdown.ended
                       ? "bg-danger-500 text-white"
@@ -280,15 +285,15 @@ export default function Item({ itemData, userOffer }) {
               <h1 className="text-3xl font-semibold md:text-3xl">
                 {itemData.name}
               </h1>
-              <div className="break-words text-sm">
+              <div className="flex items-start break-words text-sm">
                 <span className="mr-1 inline-block align-middle">
                   <Location size={16} />
                 </span>
-                <p className="inline">
-                  {itemData.region} •{" "}
-                  {format(new Date(itemData.createdAt), "PP")}
-                </p>{" "}
-                <ConditionBadge condition={itemData.condition} />
+                <span className="mt-[0.12rem]">
+                  <p className="inline">{itemData.region}</p> •{" "}
+                  {format(new Date(itemData.createdAt), "PP")}{" "}
+                  <ConditionBadge condition={itemData.condition} />
+                </span>
               </div>
             </div>
             <div className="flex flex-col gap-3 pb-4">
@@ -416,13 +421,7 @@ export default function Item({ itemData, userOffer }) {
             <Tab className="tab-varying" selectedClassName="tab-active">
               <p>Offers</p>
               <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
-                {totalDocs
-                  ? totalDocs + userOffer
-                    ? 1
-                    : 0
-                  : 0 + userOffer
-                  ? 1
-                  : 0}
+                {totalDocs}
               </span>
             </Tab>
             <Tab className="tab-varying" selectedClassName="tab-active">
@@ -452,7 +451,7 @@ export default function Item({ itemData, userOffer }) {
                   />
                 </div>
               ) : null}
-              {itemOffers || userOffer ? (
+              {itemOffers?.length || userOffer || offer ? (
                 itemOffers
               ) : !isEndReached ? (
                 <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
@@ -463,20 +462,18 @@ export default function Item({ itemData, userOffer }) {
                   No Offers
                 </p>
               )}
-              {newItemOffers}
               {isLoading && (
                 <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
                   <DotLoader color="#C7EF83" size={32} />
                 </div>
               )}
-              {!isEndReached ||
-                (!offers && (
-                  <div className="mx-auto mb-8 w-full max-w-[300px]">
-                    <Button secondary={true} onClick={() => setSize(size + 1)}>
-                      Load More
-                    </Button>
-                  </div>
-                ))}
+              {(!isEndReached || !offers) && !isLoading ? (
+                <div className="mx-auto mb-8 w-full max-w-[200px]">
+                  <Button secondary={true} onClick={() => setSize(size + 1)}>
+                    Load More
+                  </Button>
+                </div>
+              ) : null}
             </OfferList>
           </TabPanel>
           <TabPanel>

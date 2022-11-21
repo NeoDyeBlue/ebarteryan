@@ -1,11 +1,14 @@
 import Image from "next/image";
 import { Rating } from "react-simple-star-rating";
 import { CircleButton } from "../Buttons";
-import { OverflowMenuVertical } from "@carbon/icons-react";
+import { OverflowMenuVertical, Add } from "@carbon/icons-react";
 import { BarLoader } from "react-spinners";
 import { Button } from "../Buttons";
 import { ConditionBadge } from "../Misc";
 import { useSession } from "next-auth/react";
+import { useState, useCallback } from "react";
+import ImageViewer from "react-simple-image-viewer";
+import format from "date-fns/format";
 
 export default function OfferListItem({
   fromUser = false,
@@ -15,10 +18,13 @@ export default function OfferListItem({
   retryHandler,
 }) {
   const { data: session, status } = useSession();
+  const [currentImage, setCurrentImage] = useState(0);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
   const itemImages = offer?.images?.map((image, index) => (
     <div
       key={index}
-      className="relative aspect-square w-full overflow-hidden rounded-md"
+      onClick={() => openImageViewer(index)}
+      className="relative aspect-square w-full cursor-pointer overflow-hidden rounded-md"
     >
       <Image
         src={image.url || image.content}
@@ -29,6 +35,16 @@ export default function OfferListItem({
       />
     </div>
   ));
+
+  const openImageViewer = useCallback((index) => {
+    setCurrentImage(index);
+    setIsViewerOpen(true);
+  }, []);
+
+  const closeImageViewer = () => {
+    setCurrentImage(0);
+    setIsViewerOpen(false);
+  };
 
   async function resubmit() {
     await retryHandler();
@@ -47,6 +63,21 @@ export default function OfferListItem({
          : "border-b pb-4"
      }`}
     >
+      {isViewerOpen && (
+        <ImageViewer
+          backgroundStyle={{
+            zIndex: 100,
+            backgroundColor: "rgba(0,0,0,0.75)",
+            padding: "1.5rem",
+          }}
+          closeComponent={<Add className="rotate-[135deg]" size={48} />}
+          src={offer?.images.map((image) => image.url)}
+          currentIndex={currentImage}
+          disableScroll={true}
+          closeOnClickOutside={true}
+          onClose={closeImageViewer}
+        />
+      )}
       {fromUser && !isLoading && !isSubmitSuccess ? (
         <div className="absolute top-0 left-0 z-20 flex h-full w-full items-center justify-center bg-white/50 p-4">
           <div className="flex w-full max-w-[200px] flex-col gap-3 drop-shadow-md md:flex-row">
@@ -79,7 +110,7 @@ export default function OfferListItem({
             <p className="min-w-[150px] font-display text-sm md:mt-[0.1rem]">
               {fromUser
                 ? `(You) ${
-                    session.user && status == "authenticated"
+                    session?.user && status == "authenticated"
                       ? `${session.user.firstName}`
                       : ""
                   }`
@@ -112,7 +143,8 @@ export default function OfferListItem({
               {offer?.name || "Item Name"}
             </p>
             <p className="mt-[0.05rem] text-sm text-gray-300">
-              {offer?.region || offer?.location?.region} • 1h ago{" "}
+              {offer?.region || offer?.location?.region} •{" "}
+              {offer?.createdAt && format(new Date(offer?.createdAt), "PPp")}{" "}
               <ConditionBadge condition={offer?.condition} />
             </p>
           </div>

@@ -69,19 +69,22 @@ export default function Category({ data }) {
   );
 
   const itemCards =
-    items?.length &&
-    items.map((item) => (
-      <ItemCard
-        key={item._id}
-        name={item.name}
-        exchangeFor={item.exchangeFor}
-        image={item.images[0].url}
-        to={`/items/${item.category.name}/${item._id}`}
-        duration={item.duration}
-        offers={1}
-        createdAt={item.createdAt}
-      />
-    ));
+    items &&
+    items
+      .map((page) => page.data.docs)
+      .flat()
+      .map((item) => (
+        <ItemCard
+          key={item._id}
+          name={item.name}
+          exchangeFor={item.exchangeFor}
+          image={item.images[0].url}
+          to={`/items/${item.category.name}/${item._id}`}
+          duration={item.duration}
+          offers={1}
+          createdAt={item.createdAt}
+        />
+      ));
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -102,12 +105,12 @@ export default function Category({ data }) {
         <div
           className={`grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
            lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:py-6 ${
-             items && !items.length && isEndReached
+             itemCards && !itemCards.length && isEndReached
                ? "min-h-[80vh] grid-cols-1 lg:grid-cols-1"
                : ""
            }`}
         >
-          {itemCards ? (
+          {itemCards?.length ? (
             itemCards
           ) : !isEndReached ? (
             [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
@@ -123,14 +126,13 @@ export default function Category({ data }) {
           {isLoading &&
             [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
         </div>
-        {!isEndReached ||
-          (!items && (
-            <div className="mx-auto mb-8 w-full max-w-[300px]">
-              <Button secondary={true} onClick={() => setSize(size + 1)}>
-                Load More
-              </Button>
-            </div>
-          ))}
+        {(!isEndReached || !items) && !isLoading ? (
+          <div className="mx-auto mb-8 w-full max-w-[300px]">
+            <Button secondary={true} onClick={() => setSize(size + 1)}>
+              Load More
+            </Button>
+          </div>
+        ) : null}
       </div>
     </div>
   );

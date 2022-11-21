@@ -5,7 +5,7 @@ import {
   RadioSelect,
   RadioSelectItem,
 } from "../Inputs";
-import { Location } from "@carbon/icons-react";
+import { Location, Router } from "@carbon/icons-react";
 import { Button } from "../Buttons";
 import { memo } from "react";
 import { Formik, Form } from "formik";
@@ -17,10 +17,12 @@ import { useState, useEffect } from "react";
 import useUserOfferStore from "../../store/useUserOfferStore";
 import { toast } from "react-hot-toast";
 import useSocketStore from "../../store/useSocketStore";
+import { useRouter } from "next/router";
 
 const MemoizedImageSelector = memo(ImageSelector);
 
 export default function OfferForm({ onClose }) {
+  const router = useRouter();
   const {
     creationPosition,
     creationRegion,
@@ -44,6 +46,7 @@ export default function OfferForm({ onClose }) {
 
   async function handleFormSubmit(values) {
     onClose();
+    router.push("#offers");
     setOffer(values);
     try {
       setIsSubmitting(true);
@@ -57,8 +60,8 @@ export default function OfferForm({ onClose }) {
         setIsSubmitting(false);
         setIsSubmitSuccess(true);
         socket.emit("offer", {
-          offer: result.data,
-          room: result.data.item,
+          offer: result,
+          room: result.data.docs[0].item,
         });
         toast.success("Offer Added");
       } else {
