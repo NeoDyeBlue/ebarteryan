@@ -2,8 +2,22 @@ import Head from "next/head";
 import { NavLayout } from "../components/Layouts";
 import { UserOfferList, UserOfferListItem } from "../components/Lists";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
+import usePaginate from "../lib/hooks/usePaginate";
+import { useState } from "react";
+import { Button } from "../components/Buttons";
+import { FacePendingFilled } from "@carbon/icons-react";
 
 export default function Offers() {
+  const tabs = ["all", "accepted", "waiting", "failed"];
+  const [activeTab, setActiveTab] = useState(tabs[0]);
+  const {
+    data: offers,
+    isEndReached,
+    isLoading,
+    size,
+    setSize,
+  } = usePaginate("/api/offers/user", 8, { status: activeTab });
+
   return (
     <div className="container mx-auto w-full">
       <Head>
@@ -18,16 +32,19 @@ export default function Offers() {
         >
           Offers
         </h1>
-        <Tabs className="grid grid-cols-1 items-start gap-4 sm:grid-cols-[auto_2fr]">
+        <Tabs
+          className="grid grid-cols-1 items-start gap-4 sm:grid-cols-[auto_2fr]"
+          onSelect={(index) => setActiveTab(tabs[index])}
+        >
           <TabList className="flex w-full items-start gap-4 sm:w-[200px] sm:flex-col sm:gap-6 sm:pb-4">
             <Tab className="tab-varying" selectedClassName="tab-active">
               <p>All</p>
             </Tab>
             <Tab className="tab-varying" selectedClassName="tab-active">
-              <p>Waiting</p>
+              <p>Accepted</p>
             </Tab>
             <Tab className="tab-varying" selectedClassName="tab-active">
-              <p>Accepted</p>
+              <p>Waiting</p>
             </Tab>
             <Tab className="tab-varying" selectedClassName="tab-active">
               <p>Failed</p>

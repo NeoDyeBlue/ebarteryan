@@ -25,8 +25,6 @@ export default function Home() {
       : {}),
   });
 
-  console.log(items);
-
   const itemCards =
     items &&
     items
