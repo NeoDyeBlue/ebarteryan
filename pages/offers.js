@@ -4,6 +4,7 @@ import { UserOfferList, UserOfferListItem } from "../components/Lists";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import usePaginate from "../lib/hooks/usePaginate";
 import { useState } from "react";
+import { OfferCardSkeleton } from "../components/Loaders";
 import { Button } from "../components/Buttons";
 import { FacePendingFilled } from "@carbon/icons-react";
 
@@ -17,6 +18,24 @@ export default function Offers() {
     size,
     setSize,
   } = usePaginate("/api/offers/user", 8, { status: activeTab });
+
+  const userOffers =
+    offers &&
+    offers
+      .map((page) => page.data.docs)
+      .flat()
+      .map((offer) => {
+        let status;
+        if (offer.accepted) {
+          status = "accepted";
+        } else if (!offer.item.ended && offer.item.available) {
+          status = "waiting";
+        } else if (offer.item.ended || !offer.item.available) {
+          status = "failed";
+        }
+
+        return <UserOfferListItem offer={offer} status={status} />;
+      });
 
   return (
     <div className="container mx-auto w-full">
@@ -51,18 +70,106 @@ export default function Offers() {
             </Tab>
           </TabList>
           <div>
-            <TabPanel>
+            <TabPanel className="flex flex-col gap-6">
               <UserOfferList>
-                <UserOfferListItem status="waiting" />
-                <UserOfferListItem status="failed" />
-                <UserOfferListItem status="success" />
-                <UserOfferListItem status="success" />
-                <UserOfferListItem status="success" />
+                {userOffers?.length ? (
+                  userOffers
+                ) : !isEndReached ? (
+                  [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)
+                ) : (
+                  <li className="col-span-full row-span-full flex items-center justify-center">
+                    <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                      <FacePendingFilled size={100} />
+                      Nothing to show
+                    </p>
+                  </li>
+                )}
+                {isLoading &&
+                  [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)}
               </UserOfferList>
+              {(!isEndReached || !offers) && !isLoading ? (
+                <div className="mx-auto mb-8 w-full max-w-[300px]">
+                  <Button secondary={true} onClick={() => setSize(size + 1)}>
+                    Load More
+                  </Button>
+                </div>
+              ) : null}
             </TabPanel>
-            <TabPanel></TabPanel>
-            <TabPanel></TabPanel>
-            <TabPanel></TabPanel>
+            <TabPanel className="flex flex-col gap-6">
+              <UserOfferList>
+                {userOffers?.length ? (
+                  userOffers
+                ) : !isEndReached ? (
+                  [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)
+                ) : (
+                  <li className="col-span-full row-span-full flex items-center justify-center">
+                    <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                      <FacePendingFilled size={100} />
+                      Nothing to show
+                    </p>
+                  </li>
+                )}
+                {isLoading &&
+                  [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)}
+              </UserOfferList>
+              {(!isEndReached || !offers) && !isLoading ? (
+                <div className="mx-auto mb-8 w-full max-w-[300px]">
+                  <Button secondary={true} onClick={() => setSize(size + 1)}>
+                    Load More
+                  </Button>
+                </div>
+              ) : null}
+            </TabPanel>
+            <TabPanel className="flex flex-col gap-6">
+              <UserOfferList>
+                {userOffers?.length ? (
+                  userOffers
+                ) : !isEndReached ? (
+                  [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)
+                ) : (
+                  <li className="col-span-full row-span-full flex items-center justify-center">
+                    <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                      <FacePendingFilled size={100} />
+                      Nothing to show
+                    </p>
+                  </li>
+                )}
+                {isLoading &&
+                  [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)}
+              </UserOfferList>
+              {(!isEndReached || !offers) && !isLoading ? (
+                <div className="mx-auto mb-8 w-full max-w-[300px]">
+                  <Button secondary={true} onClick={() => setSize(size + 1)}>
+                    Load More
+                  </Button>
+                </div>
+              ) : null}
+            </TabPanel>
+            <TabPanel className="flex flex-col gap-6">
+              <UserOfferList>
+                {userOffers?.length ? (
+                  userOffers
+                ) : !isEndReached ? (
+                  [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)
+                ) : (
+                  <li className="col-span-full row-span-full flex items-center justify-center">
+                    <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                      <FacePendingFilled size={100} />
+                      Nothing to show
+                    </p>
+                  </li>
+                )}
+                {isLoading &&
+                  [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)}
+              </UserOfferList>
+              {(!isEndReached || !offers) && !isLoading ? (
+                <div className="mx-auto mb-8 w-full max-w-[300px]">
+                  <Button secondary={true} onClick={() => setSize(size + 1)}>
+                    Load More
+                  </Button>
+                </div>
+              ) : null}
+            </TabPanel>
           </div>
         </Tabs>
       </div>

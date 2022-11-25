@@ -112,8 +112,6 @@ export default function CreateListingForm() {
           claimingOptions: [],
           category: "",
           condition: "",
-          duration: "",
-          customDuration: "",
           location: {
             region: listingRegion,
             lat: listingPosition.lat,
@@ -265,33 +263,6 @@ export default function CreateListingForm() {
                   <p className="flex gap-1 text-sm text-danger-500">
                     Please set your location correctly
                   </p>
-                )}
-              </div>
-              <div className="flex flex-col gap-4">
-                <p className="border-b border-gray-100 pb-2 text-sm text-gray-300">
-                  Duration
-                </p>
-                <MemoizedDropdownSelect
-                  name="duration"
-                  items={[
-                    { name: "I accept an offer", value: "0" },
-                    { name: "1 Day", value: 1 },
-                    { name: "3 Days", value: 3 },
-                    { name: "7 Days", value: 7 },
-                    { name: "30 days", value: 30 },
-                    { name: "Custom", value: "custom" },
-                  ]}
-                  placeholder="Select a duration"
-                  label="Offering will end until..."
-                  tabIndex={0}
-                />
-                {props.values.duration == "custom" && (
-                  <InputField
-                    type="number"
-                    min="1"
-                    name="customDuration"
-                    label="Enter days"
-                  />
                 )}
               </div>
               <div className="flex flex-col gap-4">
