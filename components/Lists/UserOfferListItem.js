@@ -2,8 +2,12 @@ import Image from "next/image";
 import { ArrowsHorizontal } from "@carbon/icons-react";
 import { StatusBadge } from "../Misc";
 import { ItemMiniCard } from "../Cards";
+import { OverflowMenuVertical } from "@carbon/icons-react";
+import { CircleButton } from "../Buttons";
+import { useRouter } from "next/router";
 
 export default function UserOfferListItem({ offer, status }) {
+  const router = useRouter();
   let colors = "";
   switch (status) {
     case "info":
@@ -19,10 +23,18 @@ export default function UserOfferListItem({ offer, status }) {
       colors = "bg-danger-500 text-white";
       break;
   }
+
+  function menuClickHandler(event) {
+    event.stopPropagation();
+    console.log("clicked");
+  }
   return (
     <li
       className="flex h-fit cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 bg-white p-3
     hover:shadow-md"
+      onClick={() =>
+        router.push(`/items/${offer?.item?.category?.name}/${offer?.item?._id}`)
+      }
     >
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -33,11 +45,15 @@ export default function UserOfferListItem({ offer, status }) {
               objectFit="cover"
             />
           </div>
-          <p className="overflow-ellipsis whitespace-nowrap font-display font-medium">
+          <p className="overflow-ellipsis whitespace-nowrap font-display text-sm font-medium">
             {offer?.item?.user?.firstName} {offer?.item?.user?.lastName}
           </p>
+          <StatusBadge status={status} statusText={status} />
         </div>
-        <StatusBadge status={status} statusText={status} />
+        <CircleButton
+          icon={<OverflowMenuVertical size={24} />}
+          onClick={menuClickHandler}
+        />
       </div>
       {/* items */}
       <div className="relative flex flex-col items-center gap-2">
@@ -45,6 +61,7 @@ export default function UserOfferListItem({ offer, status }) {
           from="Your item"
           itemName={offer?.name}
           image={offer?.image?.url}
+          createdAt={offer?.createdAt}
         />
         <div
           className={`absolute top-[50%] right-0 z-20 flex h-[36px] w-[36px] translate-y-[-50%] items-center
@@ -60,6 +77,7 @@ export default function UserOfferListItem({ offer, status }) {
           from={`${offer?.item?.user?.firstName}'s item`}
           itemName={offer?.item?.name}
           image={offer?.item?.image?.url}
+          createdAt={offer?.item?.createdAt}
         />
       </div>
     </li>

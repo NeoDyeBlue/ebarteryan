@@ -39,6 +39,7 @@ import usePaginate from "../../../lib/hooks/usePaginate";
 import { DotLoader } from "react-spinners";
 import useSocketStore from "../../../store/useSocketStore";
 import ImageViewer from "react-simple-image-viewer";
+import { UserOfferCard } from "../../../components/Cards";
 
 export async function getServerSideProps(context) {
   const { params } = context;
@@ -279,7 +280,7 @@ export default function Item({ itemData, userOffer }) {
       <div className="container mx-auto flex max-w-[1100px] flex-col gap-4 md:gap-6">
         {/* Carousel and other info */}
         <motion.div
-          className="flex flex-col gap-6 border-b border-b-gray-100 pt-4 pb-6 md:grid md:grid-cols-2 md:gap-8 md:pt-8"
+          className="flex flex-col gap-6 pt-4 md:grid md:grid-cols-2 md:gap-8 md:pt-8"
           onViewportEnter={() => setShowMinifiedBar(false)}
           onViewportLeave={() => setShowMinifiedBar(true)}
         >
@@ -363,13 +364,14 @@ export default function Item({ itemData, userOffer }) {
             )}
           </div>
         </motion.div>
-        {/* Description and Barterer*/}
-        <div className="flex flex-col gap-4 md:flex-row md:gap-6">
-          <div className="flex flex-col gap-3 border-b border-b-gray-100 pb-6 md:w-full md:border-0">
+      </div>
+      {/* Description and Barterer*/}
+      <div className="border-t border-gray-100">
+        <div className="container mx-auto flex max-w-[1100px] flex-col gap-4 pt-6 md:flex-row md:gap-6">
+          <div className="flex flex-col gap-3 pb-6 md:w-full md:border-0">
             <h2 className="text-xl font-medium">Description</h2>
             <p>{itemData.description}</p>
           </div>
-          {/* <div className="hidden w-[1px] bg-gray-100 md:block"></div> */}
           <div
             className="flex flex-col gap-4 rounded-[10px] border border-gray-100 bg-white p-6
           shadow-lg md:w-3/5"
@@ -441,7 +443,7 @@ export default function Item({ itemData, userOffer }) {
         id="offers"
       >
         <Tabs className="container mx-auto grid max-w-[1100px] grid-cols-1 items-start gap-6 sm:grid-cols-[auto_2fr]">
-          <TabList className="flex w-full items-start gap-4 sm:h-full sm:w-[200px] sm:flex-col sm:gap-6 sm:border-r sm:border-gray-100">
+          <TabList className="flex w-full items-start gap-4 sm:h-full sm:w-[200px] sm:flex-col sm:gap-6">
             <Tab className="tab-varying" selectedClassName="tab-active">
               <p>Offers</p>
               <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
@@ -455,10 +457,25 @@ export default function Item({ itemData, userOffer }) {
               </span>
             </Tab>
           </TabList>
-          <TabPanel>
-            <OfferList>
-              {/* <OfferListItem fromUser={true} /> */}
-              {offer || userOffer ? (
+          <TabPanel className="flex flex-col gap-4">
+            {offer || userOffer ? (
+              <div className="flex flex-col gap-2 border-b-2 border-b-green-200 pb-4">
+                <p className="font-display text-lg font-semibold">Your Offer</p>
+                <UserOfferCard
+                  offer={offer}
+                  isLoading={
+                    userOffer
+                      ? false
+                      : isSubmitting && !isSubmitSuccess
+                      ? true
+                      : false
+                  }
+                  isSubmitSuccess={userOffer ? true : isSubmitSuccess}
+                  retryHandler={resubmit}
+                />
+              </div>
+            ) : null}
+            {/* {offer || userOffer ? (
                 <div className="border-b border-gray-100 pb-4">
                   <OfferListItem
                     fromUser={true}
@@ -474,31 +491,35 @@ export default function Item({ itemData, userOffer }) {
                     retryHandler={resubmit}
                   />
                 </div>
-              ) : null}
-              {itemOffers?.length || userOffer || offer ? (
-                itemOffers
-              ) : !isEndReached ? (
-                <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
-                  <DotLoader color="#C7EF83" size={32} />
-                </div>
-              ) : (
-                <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
-                  No Offers
+              ) : null} */}
+            {itemOffers?.length || userOffer || offer ? (
+              <div className="flex flex-col gap-2 pb-4">
+                <p className="font-display text-lg font-semibold">
+                  Other Offers
                 </p>
-              )}
-              {isLoading && (
-                <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
-                  <DotLoader color="#C7EF83" size={32} />
-                </div>
-              )}
-              {(!isEndReached || !offers) && !isLoading ? (
-                <div className="mx-auto mb-8 w-full max-w-[200px]">
-                  <Button secondary={true} onClick={() => setSize(size + 1)}>
-                    Load More
-                  </Button>
-                </div>
-              ) : null}
-            </OfferList>
+                <OfferList>{itemOffers}</OfferList>
+              </div>
+            ) : !isEndReached ? (
+              <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+                <DotLoader color="#C7EF83" size={32} />
+              </div>
+            ) : (
+              <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                No Offers
+              </p>
+            )}
+            {isLoading && (
+              <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+                <DotLoader color="#C7EF83" size={32} />
+              </div>
+            )}
+            {(!isEndReached || !offers) && !isLoading ? (
+              <div className="mx-auto mb-8 w-full max-w-[200px]">
+                <Button secondary={true} onClick={() => setSize(size + 1)}>
+                  Load More
+                </Button>
+              </div>
+            ) : null}
           </TabPanel>
           <TabPanel>
             <div className="flex flex-col gap-8">

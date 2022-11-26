@@ -32,13 +32,13 @@ export default function Home() {
       .flat()
       .map((item) => (
         <ItemCard
-          key={item._id}
+          key={item._id || item.id}
           name={item.name}
           exchangeFor={item.exchangeFor}
-          image={item.images[0].url}
-          to={`/items/${item.category.name}/${item._id}`}
+          image={item.image.url}
+          to={`/items/${item.category.name}/${item._id || item.id}`}
           duration={item.duration}
-          offers={1}
+          offers={item.offersCount}
           createdAt={item.createdAt}
         />
       ));
