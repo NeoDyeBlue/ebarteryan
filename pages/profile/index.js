@@ -8,31 +8,46 @@ import {
   Need,
   StarFilled,
   Settings,
+  FacePendingFilled,
 } from "@carbon/icons-react";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import { ItemCard } from "../../components/Cards";
 import ProgressBar from "@ramonak/react-progress-bar";
 import { ReviewList, ReviewListItem } from "../../components/Lists";
-import useSWR from "swr";
+import { Button } from "../../components/Buttons";
+import { ItemCardSkeleton } from "../../components/Loaders";
+import usePaginate from "../../lib/hooks/usePaginate";
+import { useSession } from "next-auth/react";
 
 export default function Profile() {
-  const { data: items, error } = useSWR("/api/items/user");
+  const { data: session, status } = useSession();
+  const {
+    data: items,
+    isEndReached,
+    isLoading,
+    size,
+    totalDocs,
+    setSize,
+    error,
+  } = usePaginate("/api/items/user", 8);
 
   const itemCards =
-    items && items.data.length
-      ? items.data.map((item) => (
-          <ItemCard
-            key={item._id}
-            name={item.name}
-            description={item.description}
-            exchangeFor={item.exchangeFor}
-            image={item.images[0].url}
-            offers={1}
-            time="7d"
-            to="/1/1"
-          />
-        ))
-      : [];
+    items &&
+    items
+      .map((page) => page.data.docs)
+      .flat()
+      .map((item) => (
+        <ItemCard
+          key={item._id || item.id}
+          name={item.name}
+          exchangeFor={item.exchangeFor}
+          image={item.image.url}
+          to={`/items/${item.category.name}/${item._id || item.id}`}
+          duration={item.duration}
+          offers={item.offersCount}
+          createdAt={item.createdAt}
+        />
+      ));
   return (
     <div className="w-full py-4">
       <Head>
@@ -44,14 +59,18 @@ export default function Profile() {
         {/* profile info */}
         <div className="flex flex-col items-center gap-8 md:flex-row md:items-end md:py-4">
           <div className="relative min-h-[150px] min-w-[150px] overflow-hidden rounded-full shadow-md">
-            <Image
-              src="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-              layout="fill"
-              objectFit="cover"
-            />
+            {session?.user?.image && (
+              <Image
+                src={session?.user?.image}
+                layout="fill"
+                objectFit="cover"
+              />
+            )}
           </div>
           <div className="flex flex-col items-center gap-2 md:w-full md:items-start">
-            <h1 className="text-3xl font-semibold">Current User</h1>
+            <h1 className="text-center text-3xl font-semibold md:text-left">
+              {session?.user?.firstName} {session?.user?.lastName}
+            </h1>
             <div className="flex flex-col items-center gap-2 md:items-start md:gap-2">
               <p className="text-gray-300">Joined in 2022</p>
               <div className="flex w-full items-end justify-center gap-2">
@@ -108,14 +127,14 @@ export default function Profile() {
         </div>
         {/* tabs */}
         <div className="w-full border-b border-gray-100">
-          <Tabs className="flex flex-col">
+          <Tabs className="flex flex-col gap-4">
             <div className="border-t border-t-gray-100">
-              <TabList className="flex gap-4 py-2 md:gap-8">
+              <TabList className="flex gap-4 md:gap-8">
                 <Tab className="tab" selectedClassName="tab-active">
                   {/* <Thumbnail_2 size={24} /> */}
                   <p>Listings</p>
                   <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
-                    0
+                    {totalDocs}
                   </span>
                 </Tab>
                 <Tab className="tab" selectedClassName="tab-active">
@@ -130,74 +149,33 @@ export default function Profile() {
             <div>
               <TabPanel>
                 <div
-                  className="grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 py-4 
-           lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:py-6"
+                  className={`grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
+           lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:pb-6 ${
+             itemCards && !itemCards.length && isEndReached
+               ? "min-h-[80vh] grid-cols-1 lg:grid-cols-1"
+               : ""
+           }`}
                 >
-                  {itemCards}
-                  <ItemCard
-                    name="Product Test"
-                    description="A valid product description"
-                    offers={1}
-                    time="7d"
-                    to="/1/1"
-                  />
-                  <ItemCard
-                    name="Product Test"
-                    description="A valid product description"
-                    offers={1}
-                    time="7d"
-                    to="/"
-                  />
-                  <ItemCard
-                    name="Product Test"
-                    description="A valid product description a very very very long description with a story of some sort"
-                    offers={1}
-                    time="7d"
-                    to="/"
-                  />
-                  <ItemCard
-                    name="Product Test"
-                    description="A valid product description"
-                    offers={1}
-                    time="7d"
-                    to="/"
-                  />
-                  <ItemCard
-                    name="Product Test"
-                    description="A valid product description"
-                    offers={1}
-                    time="7d"
-                    to="/"
-                  />
-                  <ItemCard
-                    name="Product Test"
-                    description="A valid product description"
-                    offers={1}
-                    time="7d"
-                    to="/"
-                  />
-                  <ItemCard
-                    name="Product Test"
-                    description="A valid product description"
-                    offers={1}
-                    time="7d"
-                    to="/"
-                  />
-                  <ItemCard
-                    name="Product Test"
-                    description="A valid product description"
-                    offers={1}
-                    time="7d"
-                    to="/"
-                  />
-                  <ItemCard
-                    name="Product Test"
-                    description="A valid product description"
-                    offers={1}
-                    time="7d"
-                    to="/"
-                  />
+                  {itemCards?.length ? (
+                    itemCards
+                  ) : !isEndReached || !error ? (
+                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
+                  ) : (
+                    <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                      <FacePendingFilled size={100} />
+                      Nothing to show
+                    </p>
+                  )}
+                  {isLoading &&
+                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
                 </div>
+                {(!isEndReached || !items) && !isLoading ? (
+                  <div className="mx-auto mb-8 w-full max-w-[300px]">
+                    <Button secondary={true} onClick={() => setSize(size + 1)}>
+                      Load More
+                    </Button>
+                  </div>
+                ) : null}
               </TabPanel>
               <TabPanel>
                 <h2>Any content 2</h2>

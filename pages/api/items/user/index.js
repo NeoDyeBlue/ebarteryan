@@ -8,11 +8,10 @@ import { getToken } from "next-auth/jwt";
 export default async function handler(req, res) {
   try {
     const token = await getToken({ req });
-    const { draftsOnly } = req.query;
     if (token && token.verified) {
-      console.log(req.query);
       if (req.method == "GET") {
-        const items = await getUserItems(token.sub, draftsOnly ? true : false);
+        const { drafts, page, limit } = req.query;
+        const items = await getUserItems(token?.sub, drafts, page, limit);
         return successResponse(req, res, items);
       }
       return errorResponse(req, res, "method not allowed", 405);

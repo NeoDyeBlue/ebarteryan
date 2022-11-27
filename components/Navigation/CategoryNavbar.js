@@ -26,7 +26,7 @@ export default function CategoryNavbar() {
     categories.data.map((category, index) => (
       <CategoryListItem
         key={index}
-        to={`/items/${category.name}`}
+        to={`/${category.name}`}
         name={category.name}
       />
     ));

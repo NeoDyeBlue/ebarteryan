@@ -11,7 +11,7 @@ export default function Footer() {
     categories.data.map((category, index) => (
       <FooterLinkListItem
         key={index}
-        to={`/items/${category.name}`}
+        to={`/${category.name}`}
         name={category.name}
       />
     ));

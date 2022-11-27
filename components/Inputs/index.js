@@ -1,5 +1,6 @@
 export { default as InputField } from "./InputField";
 export { default as DropdownSelect } from "./DropdownSelect";
+export { default as InlineDropdownSelect } from "./InlineDropdownSelect";
 export { default as ImageSelector } from "./ImageSelector";
 export { default as MultiSelect } from "./MultiSelect";
 export { default as MultiSelectItem } from "./MultiSelectItem";

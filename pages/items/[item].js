@@ -1,4 +1,4 @@
-import NavLayout from "../../../components/Layouts/NavLayout";
+import NavLayout from "../../components/Layouts/NavLayout";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from "react-responsive-carousel";
 import Image from "next/image";
@@ -13,8 +13,12 @@ import {
   Delivery,
   Chat,
 } from "@carbon/icons-react";
-import { Button, LinkButton } from "../../../components/Buttons";
-import { IconLabel } from "../../../components/Icons";
+import {
+  Button,
+  LinkButton,
+  EditDeleteButtons,
+} from "../../components/Buttons";
+import { IconLabel } from "../../components/Icons";
 import { Rating } from "react-simple-star-rating";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
@@ -22,31 +26,41 @@ import {
   OfferListItem,
   QuestionAnswerList,
   QuestionAnswerListItem,
-} from "../../../components/Lists";
-import { OfferModal } from "../../../components/Modals";
+} from "../../components/Lists";
+import { OfferModal, ConfirmationModal } from "../../components/Modals";
 import { useState, useEffect, useCallback } from "react";
-import { Textarea } from "../../../components/Inputs";
+import { Textarea } from "../../components/Inputs";
 import { motion, AnimatePresence } from "framer-motion";
-import { getItem } from "../../../lib/controllers/item-controller";
+import { getItem } from "../../lib/controllers/item-controller";
 import Link from "next/link";
 import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { format } from "date-fns";
-import { ConditionBadge } from "../../../components/Misc";
-import useUserOfferStore from "../../../store/useUserOfferStore";
-import { getUserOffer } from "../../../lib/controllers/offer-controller";
-import usePaginate from "../../../lib/hooks/usePaginate";
+import { ConditionBadge } from "../../components/Misc";
+import useUserOfferStore from "../../store/useUserOfferStore";
+import { getUserOffer } from "../../lib/controllers/offer-controller";
+import usePaginate from "../../lib/hooks/usePaginate";
 import { DotLoader } from "react-spinners";
-import useSocketStore from "../../../store/useSocketStore";
+import useSocketStore from "../../store/useSocketStore";
 import ImageViewer from "react-simple-image-viewer";
-import { UserOfferCard } from "../../../components/Cards";
+import { UserOfferCard } from "../../components/Cards";
+import { PopupLoader } from "../../components/Loaders";
+import { toast } from "react-hot-toast";
+import dynamic from "next/dynamic";
+const InlineDropdownSelect = dynamic(
+  () => import("../../components/Inputs/InlineDropdownSelect"),
+  {
+    ssr: false,
+  }
+);
 
 export async function getServerSideProps(context) {
   const { params } = context;
   try {
-    const item = await getItem(params.category, params.item);
+    const item = await getItem(params.item);
     const session = await getSession(context);
     let userOffer = null;
+    let fromUser = false;
 
     if (!item) {
       return { notFound: true };
@@ -54,30 +68,34 @@ export async function getServerSideProps(context) {
 
     if (session && session?.user?.verified) {
       userOffer = await getUserOffer(item._id, session?.user?.id);
+      fromUser = item?.user?._id == session?.user?.id;
     }
     return {
       props: {
         itemData: JSON.parse(JSON.stringify(item)),
         userOffer: JSON.parse(JSON.stringify(userOffer)),
+        fromUser,
       },
     };
   } catch (error) {
-    console.log(error);
     return { notFound: true };
   }
 }
 
-export default function Item({ itemData, userOffer }) {
+export default function Item({ itemData, userOffer, fromUser }) {
   const [offerModalOpen, setOfferModalOpen] = useState(false);
+  const [availabilityConfirmationOpen, setAvailabilityConfirmationOpen] =
+    useState(false);
   const [showMinifiedBar, setShowMinifiedBar] = useState(false);
   const { data: session, status } = useSession();
   const router = useRouter();
   const { socket } = useSocketStore();
   const { offer, setOffer, setItem, isSubmitting, isSubmitSuccess, resubmit } =
     useUserOfferStore();
-
+  const [available, setAvailable] = useState(itemData?.available);
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   const {
     data: offers,
@@ -87,7 +105,7 @@ export default function Item({ itemData, userOffer }) {
     size,
     setSize,
     mutate,
-  } = usePaginate(`/api/offers/${itemData._id}`, 1);
+  } = usePaginate(`/api/offers/${itemData._id}`, 10);
 
   const itemImages =
     itemData?.images?.length &&
@@ -139,6 +157,40 @@ export default function Item({ itemData, userOffer }) {
     }
   }
 
+  function closeOfferModal() {
+    setOfferModalOpen(false);
+  }
+
+  function closeAvailabilityConfirmationModal() {
+    setAvailabilityConfirmationOpen(false);
+  }
+
+  async function updateAvailability() {
+    setIsUpdating(true);
+    const res = await fetch(`/api/items/${itemData?._id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ available }),
+    });
+    const data = await res.json();
+    if (data && data.success) {
+      toast.success("Availability changed");
+      setIsUpdating(false);
+    } else {
+      setIsUpdating(false);
+      toast.error("Can't update availability");
+    }
+
+    console.log(data);
+  }
+
+  async function handleAvailabilityConfirmChange() {
+    await updateAvailability();
+  }
+
+  function revertAvailabilityChange() {
+    setAvailable(true);
+  }
+
   const openImageViewer = useCallback((index) => {
     setCurrentImage(index);
     setIsViewerOpen(true);
@@ -149,9 +201,16 @@ export default function Item({ itemData, userOffer }) {
     setIsViewerOpen(false);
   };
 
-  function closeOfferModal() {
-    setOfferModalOpen(false);
-  }
+  useEffect(() => {
+    const availabilityCheck = async () => {
+      if (!available) {
+        setAvailabilityConfirmationOpen(true);
+      } else {
+        await updateAvailability();
+      }
+    };
+    availabilityCheck();
+  }, [available]);
 
   useEffect(() => {
     setItem(itemData?._id);
@@ -197,6 +256,15 @@ export default function Item({ itemData, userOffer }) {
         />
       )}
       {/* Modal */}
+      <PopupLoader isOpen={isUpdating} message="Changing availability" />
+      <ConfirmationModal
+        onClose={closeAvailabilityConfirmationModal}
+        isOpen={availabilityConfirmationOpen}
+        label="Change Availability?"
+        message="Changing availability to unavailable prevents others from sending offers to your item."
+        onConfirm={handleAvailabilityConfirmChange}
+        onCancel={revertAvailabilityChange}
+      />
       <OfferModal onClose={closeOfferModal} isOpen={offerModalOpen} />
       {/* ScrollTriggered Bar */}
       <AnimatePresence>
@@ -236,19 +304,19 @@ export default function Item({ itemData, userOffer }) {
                       </span>
                       <span className="mt-[0.12rem] flex gap-2">
                         <p className="inline">{itemData.region}</p>{" "}
-                        {/* <ConditionBadge condition={itemData.condition} /> */}
+                        <ConditionBadge condition={itemData.condition} />
                       </span>
                     </div>
                   </div>
                   <div
                     className={`flex w-auto items-center gap-1 self-start rounded-full py-1 px-2 md:my-auto
-                  ${
-                    itemData.ended
-                      ? "bg-warning-500 text-black-light"
-                      : !itemData.available
-                      ? "bg-danger-500 text-white"
-                      : "bg-success-500 text-white"
-                  }`}
+                              ${
+                                itemData.ended
+                                  ? "bg-warning-500 text-black-light"
+                                  : !itemData.available
+                                  ? "bg-danger-500 text-white"
+                                  : "bg-success-500 text-white"
+                              }`}
                   >
                     <p className="text-xs capitalize sm:text-sm">
                       {itemData.ended
@@ -260,18 +328,22 @@ export default function Item({ itemData, userOffer }) {
                   </div>
                 </div>
               </div>
-              <div className="flex max-w-[250px] gap-3">
-                {offer || userOffer ? (
-                  <LinkButton link="#offers">See Your Offer</LinkButton>
-                ) : !itemData.ended || itemData.available ? (
-                  <Button onClick={openOfferModal}>Offer Now</Button>
-                ) : null}
-                <div className="hidden md:block">
-                  <Button secondary={true}>
-                    <Bookmark size={20} /> Save
-                  </Button>
+              {itemData.available && !itemData.ended && !fromUser ? (
+                <div className="flex max-w-[250px] gap-3">
+                  {offer || userOffer ? (
+                    <LinkButton link="#offers">See Your Offer</LinkButton>
+                  ) : !itemData.ended || itemData.available ? (
+                    <Button onClick={openOfferModal}>Offer Now</Button>
+                  ) : null}
+                  <div className="hidden md:block">
+                    <Button secondary={true}>
+                      <Bookmark size={20} /> Save
+                    </Button>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <EditDeleteButtons />
+              )}
             </div>
           </motion.div>
         )}
@@ -293,15 +365,18 @@ export default function Item({ itemData, userOffer }) {
           >
             {itemImages}
           </Carousel>
-          <div
-            className="item-center flex w-full gap-2 text-ellipsis whitespace-nowrap font-display text-sm
-          text-gray-300 md:row-span-full md:row-start-1"
-          >
-            <Link href={`/items/${itemData.category.name}`}>
-              <a className="capitalize underline">{itemData.category.name}</a>
-            </Link>
-            <p>&#62;</p>
-            <p className="text-black-light">{itemData.name}</p>
+          <div className="item-center flex w-full justify-between gap-2 md:col-span-full md:row-span-full">
+            <span
+              className="flex w-full flex-row items-center gap-2 text-ellipsis whitespace-nowrap font-display 
+            text-sm text-gray-300"
+            >
+              <Link href={`/items/${itemData.category.name}`}>
+                <a className="capitalize underline">{itemData.category.name}</a>
+              </Link>
+              <p>&#62;</p>
+              <p className="text-black-light">{itemData.name}</p>
+            </span>
+            {fromUser && <EditDeleteButtons />}
           </div>
           <div className="flex flex-col gap-4 md:col-start-2 md:row-start-2">
             <div className="flex flex-col gap-1 border-b border-b-gray-100 pb-6">
@@ -326,8 +401,25 @@ export default function Item({ itemData, userOffer }) {
             <div className="flex flex-col gap-4 pb-6">
               <div className="flex items-center justify-between rounded-[10px] border border-gray-100 p-4">
                 <p className="font-display font-medium">Availability</p>
-                <div
-                  className={`flex items-center gap-2 rounded-full py-[0.2rem] px-3 
+                {fromUser ? (
+                  <InlineDropdownSelect
+                    name="availability"
+                    items={[
+                      { name: "available", value: true },
+                      { name: "unavailable", value: false },
+                    ]}
+                    selected={
+                      available
+                        ? { name: "available", value: true }
+                        : { name: "unavailable", value: false }
+                    }
+                    onChange={(value) => {
+                      setAvailable(value);
+                    }}
+                  />
+                ) : (
+                  <div
+                    className={`flex items-center gap-2 rounded-full py-[0.2rem] px-3 
                   ${
                     itemData.ended
                       ? "bg-warning-500 text-black-light"
@@ -335,22 +427,23 @@ export default function Item({ itemData, userOffer }) {
                       ? "bg-danger-500 text-white"
                       : "bg-success-500 text-white"
                   }`}
-                >
-                  <p className="text-md capitalize">
-                    {itemData.ended
-                      ? "ended"
-                      : !itemData.available
-                      ? "unavailable"
-                      : "available"}
-                  </p>
-                </div>
+                  >
+                    <p className="text-md capitalize">
+                      {itemData.ended
+                        ? "ended"
+                        : !itemData.available
+                        ? "unavailable"
+                        : "available"}
+                    </p>
+                  </div>
+                )}
               </div>
               <div className="flex flex-col gap-3 rounded-[10px] border border-gray-100 p-4 md:flex-row md:items-center md:justify-between">
                 <p className="font-display font-medium">Claiming Options</p>
                 <div className="flex gap-3">{itemClaimingOptions}</div>
               </div>
             </div>
-            {itemData.available && !itemData.ended && (
+            {itemData.available && !itemData.ended && !fromUser ? (
               <div className="flex flex-col gap-3 md:flex-row">
                 {offer || userOffer ? (
                   <LinkButton link="#offers">See Your Offer</LinkButton>
@@ -361,6 +454,8 @@ export default function Item({ itemData, userOffer }) {
                   <Bookmark size={20} /> Save
                 </Button>
               </div>
+            ) : (
+              <LinkButton link="#offers">See Offers</LinkButton>
             )}
           </div>
         </motion.div>
@@ -457,9 +552,12 @@ export default function Item({ itemData, userOffer }) {
               </span>
             </Tab>
           </TabList>
-          <TabPanel className="flex flex-col gap-4">
+          <TabPanel className="flex flex-col gap-10">
             {offer || userOffer ? (
-              <div className="flex flex-col gap-2 border-b-2 border-b-green-200 pb-4">
+              <div
+                // id="offers"
+                className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
+              >
                 <p className="font-display text-lg font-semibold">Your Offer</p>
                 <UserOfferCard
                   offer={offer}

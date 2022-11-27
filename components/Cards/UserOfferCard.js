@@ -131,9 +131,11 @@ export default function UserOfferCard({
             <p className="font-display font-medium">
               {offer?.name || "Item Name"}
             </p>
-            <p className="mt-[0.05rem] text-sm text-gray-300">
-              {offer?.region || offer?.location?.region} •{" "}
-              {offer?.createdAt && format(new Date(offer?.createdAt), "PP")}{" "}
+            <p className="mt-[0.05rem] flex flex-col gap-2 text-sm text-gray-300 sm:flex-row">
+              <span>
+                {offer?.region || offer?.location?.region} •{" "}
+                {offer?.createdAt && format(new Date(offer?.createdAt), "PP")}{" "}
+              </span>
               <ConditionBadge condition={offer?.condition} />
             </p>
           </div>
