@@ -76,6 +76,8 @@ export default function CreateListingForm() {
   }
 
   async function handleFormSubmit(values) {
+    console.log(values);
+    return;
     try {
       setIsLoading(true);
       const res = await fetch("/api/items", {
@@ -113,9 +115,13 @@ export default function CreateListingForm() {
           category: "",
           condition: "",
           location: {
-            region: listingRegion,
-            lat: listingPosition.lat,
-            lng: listingPosition.lng,
+            region: creationRegion ? creationRegion : listingRegion,
+            lat: creationPosition.lat
+              ? creationPosition.lat
+              : listingPosition.lat,
+            lng: creationPosition.lng
+              ? creationPosition.lng
+              : listingPosition.lng,
           },
         }}
         validationSchema={listingCreationSchema}
@@ -123,17 +129,17 @@ export default function CreateListingForm() {
       >
         {(props) => {
           // this effect is needed to actually change the values for location
-          useEffect(() => {
-            props.setFieldValue(
-              "location",
-              {
-                region: creationRegion,
-                lat: creationPosition.lat,
-                lng: creationPosition.lng,
-              },
-              true
-            );
-          }, [creationRegion]);
+          // useEffect(() => {
+          //   props.setFieldValue(
+          //     "location",
+          //     {
+          //       region: creationRegion,
+          //       lat: creationPosition.lat,
+          //       lng: creationPosition.lng,
+          //     },
+          //     true
+          //   );
+          // }, [creationRegion]);
 
           return (
             <Form className="flex flex-col gap-6">
@@ -222,7 +228,6 @@ export default function CreateListingForm() {
                   >
                     <LocationModal
                       onClose={() => {
-                        console.log("closed");
                         closeLocationModal();
                         props.setFieldTouched("location", true, true);
                       }}

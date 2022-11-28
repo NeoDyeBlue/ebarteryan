@@ -24,6 +24,7 @@ export default function SavedListItem({
               src="https://res.cloudinary.com/dppgyhery/image/upload/v1631456018/samples/ecommerce/leather-bag-gray.jpg"
               layout="fill"
               objectFit="cover"
+              alt="item image"
             />
           </div>
           <div className="flex w-full flex-col gap-1 text-gray-400">

@@ -43,6 +43,7 @@ export default function UserOfferListItem({ offer, status }) {
               src={offer?.item?.user?.image?.url}
               layout="fill"
               objectFit="cover"
+              alt="user image"
             />
           </div>
           <p className="overflow-ellipsis whitespace-nowrap font-display text-sm font-medium">

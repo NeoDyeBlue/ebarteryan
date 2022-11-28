@@ -1,6 +1,7 @@
 import { profileSchema } from "../../lib/validators/user-validator";
 import { Formik, Form } from "formik";
 import { InputField } from "../Inputs";
+import { Button } from "../Buttons";
 
 export default function ProfileForm() {
   return (

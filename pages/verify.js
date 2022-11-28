@@ -1,13 +1,12 @@
-import { NavLayout } from "../components/Layouts";
 import Head from "next/head";
 import { DotLoader } from "react-spinners";
-import useSWR from "swr";
 import { useRouter } from "next/router";
 import { Checkmark, FaceDissatisfied, Email } from "@carbon/icons-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Logo } from "../components/Icons";
+import { useCallback } from "react";
 
 const verifyFetcher = (url, args) =>
   fetch(`${url}?token=${args.token}`, { method: "PATCH" }).then((r) =>
@@ -18,13 +17,22 @@ export default function Verify() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { token } = router.query;
-  // const { data: verification, error } = useSWR(
-  //   token ? ["/api/verify", { token }] : null,
-  //   verifyFetcher
-  // );
 
   const [verification, setVerification] = useState(null);
 
+  //useCallbacks
+  const updateSession = useCallback(() => {
+    async function sessionUpdater() {
+      if (verification) {
+        if (verification.success && session && status == "authenticated") {
+          fetch("/api/auth/session?update").then(() => router.push("/"));
+        }
+      }
+    }
+    sessionUpdater();
+  }, [verification, router, session, status]);
+
+  //useEffects
   useEffect(() => {
     async function verify() {
       const res = await fetch(`/api/verify?token=${token}`, {
@@ -34,18 +42,11 @@ export default function Verify() {
       setVerification(data);
     }
     verify();
-  }, []);
+  }, [token]);
 
   useEffect(() => {
-    async function sessionUpdater() {
-      if (verification) {
-        if (verification.success && session && status == "authenticated") {
-          fetch("/api/auth/session?update").then(() => router.push("/"));
-        }
-      }
-    }
-    sessionUpdater();
-  }, [verification]);
+    updateSession();
+  }, [updateSession]);
 
   const isLoading =
     (!verification || status == "loading") && token ? true : false;

@@ -2,6 +2,7 @@ import { FooterLinkList, FooterLinkListItem } from "../Lists";
 import { LogoFacebook, LogoTwitter } from "@carbon/icons-react";
 import useSWR from "swr";
 import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 export default function Footer() {
   const { data: categories, error } = useSWR("/api/categories");
@@ -42,12 +43,16 @@ export default function Footer() {
             )}
           </FooterLinkList>
           <div className="flex items-center gap-4">
-            <a href="/">
-              <LogoFacebook size={36} />
-            </a>
-            <a href="/">
-              <LogoTwitter size={36} />
-            </a>
+            <Link href="/">
+              <a>
+                <LogoFacebook size={36} />
+              </a>
+            </Link>
+            <Link href="/">
+              <a>
+                <LogoTwitter size={36} />
+              </a>
+            </Link>
           </div>
         </div>
         <p className="mx-auto text-xs text-gray-400">

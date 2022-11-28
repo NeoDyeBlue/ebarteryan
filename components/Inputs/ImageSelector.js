@@ -1,8 +1,8 @@
 import { useFilePicker } from "use-file-picker";
-import { Image } from "@carbon/icons-react";
+import { Image as ImageIcon } from "@carbon/icons-react";
 import ImageSelectorItem from "./ImageSelectorItem";
-import { useCallback, useEffect, useMemo } from "react";
-import { Information, Error } from "@carbon/icons-react";
+import { useEffect } from "react";
+import { Information } from "@carbon/icons-react";
 import { memo } from "react";
 import { useField } from "formik";
 
@@ -18,21 +18,17 @@ export default function ImageSelector({ label, infoMessage, max, ...props }) {
     maxFileSize: 10,
   });
 
-  const removeImage = useCallback(
-    (image) => {
-      const newSelected = meta.value.filter((img) => img !== image);
-      // onChange(newSelected);
-      helpers.setValue(newSelected);
-    },
-    [filesContent]
-  );
+  const removeImage = (image) => {
+    const newSelected = meta.value.filter((img) => img !== image);
+    helpers.setValue(newSelected);
+  };
 
   useEffect(() => {
-    // onChange([...values, ...filesContent.slice(0, max - values.length)]);
     helpers.setValue([
       ...meta.value,
       ...filesContent.slice(0, max - meta.value.length),
     ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filesContent]);
 
   const selectedImages = meta.value.map((file, index) => (
@@ -57,7 +53,7 @@ export default function ImageSelector({ label, infoMessage, max, ...props }) {
             className="flex aspect-square flex-col items-center justify-center overflow-hidden 
         rounded-[10px] bg-gray-100 p-2 font-body text-sm text-gray-300"
           >
-            <Image size={32} /> Add Photo
+            <ImageIcon size={32} /> Add Photo
           </button>
         )}
       </div>

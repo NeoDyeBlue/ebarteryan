@@ -80,6 +80,7 @@ export default function EditProfile() {
                           }
                           layout="fill"
                           objectFit="cover"
+                          alt="user image"
                         />
                       </button>
                     </div>

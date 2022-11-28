@@ -13,6 +13,7 @@ export default function Conversation({ onClose }) {
               src="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
               layout="fill"
               className="rounded-full"
+              alt="user image"
             />
             <span
               className="absolute right-0 z-10 h-[12px] w-[12px] 

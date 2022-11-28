@@ -53,7 +53,7 @@ export default function LoginForm() {
               </Link>
             </div>
             <p className="text-center">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/signup">
                 <a className="font-display font-medium text-green-500 hover:underline">
                   Sign Up

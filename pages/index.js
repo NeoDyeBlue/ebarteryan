@@ -19,7 +19,7 @@ export default function Home() {
     isLoading,
     size,
     setSize,
-  } = usePaginate("/api/items", 8, {
+  } = usePaginate("/api/categories/all", 8, {
     ...(listingPosition && Object.keys(listingPosition).length
       ? { ...listingPosition, radius: listingRadius }
       : {}),

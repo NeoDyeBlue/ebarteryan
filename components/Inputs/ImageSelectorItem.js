@@ -11,7 +11,7 @@ export default function ImageSelectorItem({ src, onRemove }) {
       >
         <Add size={24} />
       </button>
-      <Image src={src} layout="fill" objectFit="cover" />
+      <Image src={src} layout="fill" objectFit="cover" alt="selected image" />
     </div>
   );
 }

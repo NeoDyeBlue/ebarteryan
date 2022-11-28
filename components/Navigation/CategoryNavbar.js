@@ -19,7 +19,7 @@ export default function CategoryNavbar() {
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [setCategoryNavbarHeight]);
 
   const categoryListItems =
     categories?.success &&

@@ -29,7 +29,7 @@ export default function LocationModal({ onClose, applyInListing, onApply }) {
         return null;
       }
     }
-  }, [listingPosition, creationPosition]);
+  }, [listingPosition, creationPosition, applyInListing]);
 
   return (
     <div

@@ -22,6 +22,7 @@ export default function OfferListItem({ offer }) {
         objectFit="cover"
         placeholder="blur"
         blurDataURL="/images/placeholder.png"
+        alt="selected image"
       />
     </div>
   ));
@@ -62,6 +63,7 @@ export default function OfferListItem({ offer }) {
           <Image
             src={offer?.user?.image?.url}
             layout="fill"
+            alt="user image"
             // objectFit="cover"
           />
         </div>

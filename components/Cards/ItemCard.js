@@ -17,6 +17,7 @@ export default function ItemCard({ image, name, exchangeFor, offers, to }) {
             objectFit="cover"
             placeholder="blur"
             blurDataURL="/images/placeholder.png"
+            alt="item image"
           />
         </div>
         <div className="flex flex-col gap-1 text-gray-400">

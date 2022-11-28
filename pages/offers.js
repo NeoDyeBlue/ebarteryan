@@ -22,7 +22,7 @@ export default function Offers() {
   const userOffers =
     offers &&
     offers
-      .map((page) => page.data.docs)
+      .map((page, index) => page.data.docs)
       .flat()
       .map((offer) => {
         let status;
@@ -34,7 +34,7 @@ export default function Offers() {
           status = "failed";
         }
 
-        return <UserOfferListItem offer={offer} status={status} />;
+        return <UserOfferListItem key={index} offer={offer} status={status} />;
       });
 
   return (

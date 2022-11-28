@@ -40,7 +40,7 @@ export default function Navbar({ sticky }) {
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [setNavbarHeight]);
 
   function showNotificationsPopup() {
     if (currentRoute != "/notifications") {
@@ -137,6 +137,7 @@ export default function Navbar({ sticky }) {
                 <Image
                   src={session && session.user.image}
                   layout="fill"
+                  alt="user image"
                   // objectFit="cover"
                 />
               </button>

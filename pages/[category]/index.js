@@ -58,7 +58,7 @@ export default function Category({ data }) {
     error,
     mutate,
   } = usePaginate(
-    `/api/items/${category}`,
+    `/api/categories/${category}`,
     8,
     {
       ...(listingPosition && Object.keys(listingPosition).length

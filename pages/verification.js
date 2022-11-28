@@ -18,11 +18,11 @@ export default function Verification() {
           <Email size={100} className="text-green-500" />
           <h1 className="text-4xl font-semibold">Verification</h1>
           <p className="text-center">
-            We've sent an email containing a verification link. Click the link
-            to finish setting up your account.
+            We&apos;ve sent an email containing a verification link. Click the
+            link to finish setting up your account.
           </p>
           <p>
-            Did'nt receive it?{" "}
+            Did&apos;nt receive it?{" "}
             <span className="font-display font-medium text-green-500 hover:underline">
               Resend
             </span>

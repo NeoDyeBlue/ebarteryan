@@ -1,6 +1,6 @@
 import { Edit, TrashCan } from "@carbon/icons-react";
 
-export default function ({ onEditClick, onDeleteClick }) {
+export default function EditDeleteButtons({ onEditClick, onDeleteClick }) {
   return (
     <div className="flex gap-3">
       <button

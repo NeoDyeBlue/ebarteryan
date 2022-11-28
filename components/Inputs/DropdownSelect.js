@@ -1,8 +1,6 @@
 import { useSelect } from "downshift";
-import { CaretDown, CaretUp } from "@carbon/icons-react";
-// import "react-dropdown/style.css";
+import { CaretDown, CaretUp, Information } from "@carbon/icons-react";
 import { useField } from "formik";
-import { useState, useEffect } from "react";
 
 export default function DropdownSelect({
   items,
@@ -12,35 +10,32 @@ export default function DropdownSelect({
   name,
 }) {
   const [field, meta, helpers] = useField(name);
-  const [selectedItem, setSelectedItem] = useState(
-    meta.value
-      ? items.find((item) =>
-          item?.value ? item.value == meta.value : item == meta.value
-        )
-      : ""
-  );
+  const initialSelectedItem = meta.value
+    ? items.find((item) =>
+        item?.value ? item.value == meta.value : item == meta.value
+      )
+    : "";
   const {
     isOpen,
     getToggleButtonProps,
     getLabelProps,
     getMenuProps,
     highlightedIndex,
+    selectedItem,
     getItemProps,
   } = useSelect({
     items,
-    selectedItem,
+    initialSelectedItem,
     onSelectedItemChange: ({ selectedItem: newSelectedItem }) => {
-      setSelectedItem(newSelectedItem);
+      helpers.setValue(
+        newSelectedItem?.value ? newSelectedItem.value : newSelectedItem
+      );
     },
   });
 
-  useEffect(() => {
-    helpers.setValue(selectedItem?.value ? selectedItem.value : selectedItem);
-  }, [selectedItem]);
-
   return (
-    <div className="relative" id={name} onBlur={field.onBlur}>
-      <div className="flex flex-col gap-2">
+    <div className="relative">
+      <div className="flex flex-col gap-2" id={name} onBlur={field.onBlur}>
         {label && (
           <label {...getLabelProps()} className="font-display font-medium">
             {label}

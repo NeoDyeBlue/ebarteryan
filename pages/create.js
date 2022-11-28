@@ -2,7 +2,7 @@ import Head from "next/head";
 import { CreationLayout } from "../components/Layouts";
 import { CreateListingForm } from "../components/Forms";
 import useCreationStore from "../store/useCreationStore";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 
 export async function getServerSideProps(context) {
   if (context.req.headers.referer) {
@@ -29,7 +29,9 @@ export default function Create({ path, host }) {
   useEffect(() => {
     setPath(path);
     setHost(host);
-  }, []);
+  }, [path, host, setPath, setHost]);
+
+  console.log("i rerender");
   return (
     <div className="w-full">
       <Head>

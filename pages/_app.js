@@ -5,7 +5,7 @@ import NextNProgress from "nextjs-progressbar";
 // import { ToastContainer, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "react-hot-toast";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import useSocketStore from "../store/useSocketStore";
 import { io } from "socket.io-client";
 
@@ -31,16 +31,16 @@ export default function MyApp({
 }) {
   const { setSocket } = useSocketStore();
   useEffect(() => {
-    fetch("/api/socket").then(() => {
-      setSocket(socket);
-    });
-
-    console.log(socket);
-
+    function handleSocket() {
+      fetch("/api/socket").then(() => {
+        setSocket(socket);
+      });
+    }
     // return () => {
     //   socket.disconnect();
     // };
-  }, []);
+    handleSocket();
+  }, [setSocket]);
   const getLayout = Component.getLayout ?? ((page) => page);
   const layout = getLayout(<Component {...pageProps} />);
   return (

@@ -5,6 +5,7 @@ import { divIcon } from "leaflet";
 import useMapStore from "../../store/useMapStore";
 import { useRef, useMemo, useEffect } from "react";
 import useSWR from "swr";
+import { useCallback } from "react";
 
 const tomtomFetcher = (url, args) =>
   fetch(`${url}/${args.lat},${args.lng}.json?key=${args.token}`).then((r) =>
@@ -31,23 +32,6 @@ export default function MapPinDrop({ pinPosition, onPositionChange }) {
     </div>
   );
 
-  useEffect(() => {
-    if (revGeoCoding?.addresses?.length) {
-      console.log(revGeoCoding);
-      const city = revGeoCoding.addresses[0].address.municipality;
-      const state =
-        revGeoCoding.addresses[0].address.countrySecondarySubdivision;
-
-      if (city && state) {
-        setRegion(`${city}, ${state}`);
-      } else {
-        setRegion("");
-      }
-    }
-  }, [revGeoCoding]);
-
-  // console.log("rerender", pinPosition);
-
   const map = useMapEvent("click", (location) => {
     onPositionChange();
     setPosition(location.latlng);
@@ -72,10 +56,31 @@ export default function MapPinDrop({ pinPosition, onPositionChange }) {
         }
       },
     }),
-    []
+    [onPositionChange, setPosition]
   );
 
-  useEffect(() => setMap(map), [map]);
+  const handleRevGeoCoding = useCallback(() => {
+    if (revGeoCoding?.addresses?.length) {
+      console.log(revGeoCoding);
+      const city = revGeoCoding.addresses[0].address.municipality;
+      const state =
+        revGeoCoding.addresses[0].address.countrySecondarySubdivision;
+
+      if (city && state) {
+        setRegion(`${city}, ${state}`);
+      } else {
+        setRegion("");
+      }
+    }
+  }, [revGeoCoding, setRegion]);
+
+  useEffect(() => {
+    handleRevGeoCoding();
+  }, [handleRevGeoCoding]);
+
+  useEffect(() => setMap(map), [map, setMap]);
+
+  // console.log("rerender", pinPosition);
   // console.log(pinPosition);
   return pinPosition ? (
     <Marker

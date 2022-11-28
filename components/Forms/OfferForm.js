@@ -91,9 +91,13 @@ export default function OfferForm({ onClose }) {
         description: "",
         condition: "",
         location: {
-          region: listingRegion,
-          lat: listingPosition.lat,
-          lng: listingPosition.lng,
+          region: creationRegion ? creationRegion : listingRegion,
+          lat: creationPosition.lat
+            ? creationPosition.lat
+            : listingPosition.lat,
+          lng: creationPosition.lng
+            ? creationPosition.lng
+            : listingPosition.lng,
         },
       }}
       validationSchema={offerSchema}
@@ -103,17 +107,17 @@ export default function OfferForm({ onClose }) {
     >
       {(props) => {
         // this effect is needed to actually change the values for location
-        useEffect(() => {
-          props.setFieldValue(
-            "location",
-            {
-              region: creationRegion,
-              lat: creationPosition.lat,
-              lng: creationPosition.lng,
-            },
-            true
-          );
-        }, [creationRegion]);
+        // useEffect(() => {
+        //   props.setFieldValue(
+        //     "location",
+        //     {
+        //       region: creationRegion,
+        //       lat: creationPosition.lat,
+        //       lng: creationPosition.lng,
+        //     },
+        //     true
+        //   );
+        // }, [creationRegion]);
 
         return (
           <Form>

@@ -130,8 +130,8 @@ export const authOptions = (req) => ({
   },
 });
 
-export default async (req, res) => {
+export default async function handler(req, res) {
   return NextAuth(req, res, authOptions(req));
-};
+}
 
 // export default NextAuth(authOptions);

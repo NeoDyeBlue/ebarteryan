@@ -42,7 +42,7 @@ export default function Profile() {
           name={item.name}
           exchangeFor={item.exchangeFor}
           image={item.image.url}
-          to={`/items/${item.category.name}/${item._id || item.id}`}
+          to={`/items/${item._id || item.id}`}
           duration={item.duration}
           offers={item.offersCount}
           createdAt={item.createdAt}
@@ -64,6 +64,7 @@ export default function Profile() {
                 src={session?.user?.image}
                 layout="fill"
                 objectFit="cover"
+                alt="user image"
               />
             )}
           </div>

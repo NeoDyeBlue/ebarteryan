@@ -2,7 +2,6 @@ import { successResponse, errorResponse } from "../../../utils/response-utils";
 import {
   addItem,
   getItemsAggregate,
-  updateItem,
 } from "../../../lib/controllers/item-controller";
 import { getToken } from "next-auth/jwt";
 
@@ -13,14 +12,6 @@ export default async function handler(req, res) {
       if (token && token.verified) {
         const item = await addItem({ user: token.sub, ...req.body });
         return successResponse(req, res, item);
-      }
-      return errorResponse(req, res, "unauthorized request", 401);
-    }
-    if (req.method == "PATCH") {
-      const { item } = req.query;
-      if (token && token.verified) {
-        const updatedItem = await updateItem(token?.sub, item, req.body);
-        return successResponse(req, res, updatedItem);
       }
       return errorResponse(req, res, "unauthorized request", 401);
     }

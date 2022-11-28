@@ -7,6 +7,7 @@ export default function ReviewListItem() {
         <Image
           src="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
           layout="fill"
+          alt="user image"
           // objectFit="cover"
         />
       </div>

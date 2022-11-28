@@ -45,6 +45,7 @@ import useSocketStore from "../../store/useSocketStore";
 import ImageViewer from "react-simple-image-viewer";
 import { UserOfferCard } from "../../components/Cards";
 import { PopupLoader } from "../../components/Loaders";
+import useDidMountEffect from "../../lib/hooks/useDidMountEffect";
 import { toast } from "react-hot-toast";
 import dynamic from "next/dynamic";
 const InlineDropdownSelect = dynamic(
@@ -92,11 +93,10 @@ export default function Item({ itemData, userOffer, fromUser }) {
   const { socket } = useSocketStore();
   const { offer, setOffer, setItem, isSubmitting, isSubmitSuccess, resubmit } =
     useUserOfferStore();
-  const [available, setAvailable] = useState(itemData?.available);
+  const [available, setAvailable] = useState(itemData.available);
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-
   const {
     data: offers,
     totalDocs,
@@ -121,6 +121,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
           objectFit="cover"
           placeholder="blur"
           blurDataURL="/images/placeholder.png"
+          alt="item image"
         />
       </div>
     ));
@@ -149,6 +150,65 @@ export default function Item({ itemData, userOffer, fromUser }) {
       .flat()
       .map((offer) => <OfferListItem key={offer._id} offer={offer} />);
 
+  //useCallbacks
+  const updateOfferStore = useCallback(() => {
+    setItem(itemData?._id);
+    setOffer(userOffer);
+  }, [itemData, userOffer, setItem, setOffer]);
+
+  // const socketHandler = useCallback(() => {
+  //   if (socket) {
+  //     socket.emit("join-item-room", itemData?._id);
+
+  //     socket.on("another-offer", (offer) => {
+  //       console.log(offer);
+  //       if (isEndReached || !offers || !itemOffers.length) {
+  //         mutate(offers && offers.length ? [...offers, offer] : [offer]);
+  //       }
+  //     });
+
+  //     return () => socket.emit("leave-item-room", itemData?._id);
+  //   }
+  // }, [socket, isEndReached, itemOffers?.length, itemData?._id, mutate, offers]);
+
+  const openImageViewer = useCallback((index) => {
+    setCurrentImage(index);
+    setIsViewerOpen(true);
+  }, []);
+
+  //useEffects
+  useEffect(() => {
+    updateOfferStore();
+  }, [updateOfferStore]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.emit("join-item-room", itemData?._id);
+
+      socket.on("another-offer", (offer) => {
+        if (isEndReached || !offers || !itemOffers.length) {
+          mutate(offers && offers.length ? [...offers, offer] : [offer]);
+        }
+      });
+
+      return () => socket.emit("leave-item-room", itemData?._id);
+    }
+  }, [socket, isEndReached, itemOffers?.length, itemData?._id, mutate, offers]);
+
+  useDidMountEffect(() => {
+    const availabilityCheck = async () => {
+      if (fromUser) {
+        if (!available) {
+          setAvailabilityConfirmationOpen(true);
+        } else {
+          await updateAvailability();
+        }
+      }
+    };
+    availabilityCheck();
+  }, [available]);
+
+  //other functions
   function openOfferModal() {
     if (session && session.user.verified && status == "authenticated") {
       setOfferModalOpen(true);
@@ -191,46 +251,10 @@ export default function Item({ itemData, userOffer, fromUser }) {
     setAvailable(true);
   }
 
-  const openImageViewer = useCallback((index) => {
-    setCurrentImage(index);
-    setIsViewerOpen(true);
-  }, []);
-
-  const closeImageViewer = () => {
+  function closeImageViewer() {
     setCurrentImage(0);
     setIsViewerOpen(false);
-  };
-
-  useEffect(() => {
-    const availabilityCheck = async () => {
-      if (!available) {
-        setAvailabilityConfirmationOpen(true);
-      } else {
-        await updateAvailability();
-      }
-    };
-    availabilityCheck();
-  }, [available]);
-
-  useEffect(() => {
-    setItem(itemData?._id);
-    setOffer(userOffer);
-  }, [itemData, userOffer]);
-
-  useEffect(() => {
-    if (socket) {
-      socket.emit("join-item-room", itemData?._id);
-
-      socket.on("another-offer", (offer) => {
-        console.log(offer);
-        if (isEndReached || !offers || !itemOffers.length) {
-          mutate(offers && offers.length ? [...offers, offer] : [offer]);
-        }
-      });
-
-      return () => socket.emit("leave-item-room", itemData?._id);
-    }
-  }, [socket]);
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -285,6 +309,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
                     objectFit="cover"
                     placeholder="blur"
                     blurDataURL="/images/placeholder.png"
+                    alt="thumbnail image"
                   />
                 </div>
                 <div
@@ -478,6 +503,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
                   src={itemData.user.image.url}
                   layout="fill"
                   objectFit="cover"
+                  alt="user image"
                 />
               </div>
               <div>

@@ -36,7 +36,7 @@ export default function Map({ withRadiusPicker, pinPosition }) {
       }
       return null;
     }
-  }, [position, inInitialLocation]);
+  }, [position, inInitialLocation, pinPosition, hasPosition]);
 
   return (
     <div className="flex h-full w-full flex-col gap-4">

@@ -31,6 +31,7 @@ export default function UserOfferCard({
         objectFit="cover"
         placeholder="blur"
         blurDataURL="/images/placeholder.png"
+        alt="item image"
       />
     </div>
   ));
@@ -98,6 +99,7 @@ export default function UserOfferCard({
             }
             layout="fill"
             // objectFit="cover"
+            alt="user image"
           />
         </div>
         <div className="flex w-full items-center justify-between">
