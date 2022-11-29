@@ -1,7 +1,6 @@
 import { useSelect } from "downshift";
 import { CaretDown, CaretUp } from "@carbon/icons-react";
-// import "react-dropdown/style.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function DropdownSelect({
   items,
@@ -11,18 +10,31 @@ export default function DropdownSelect({
   onChange,
 }) {
   //   const [selectedItem, setSelectedItem] = useState(selected);
+  // const initialSelectedItem = items.find(
+  //   (item) => item.value == selected || item == selected
+  // );
+
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  useEffect(() => {
+    if (items.length) {
+      setSelectedItem(
+        items.find((item) => item?.value == selected || item == selected)
+      );
+    }
+  }, [items, selected]);
+
   const {
     isOpen,
     getToggleButtonProps,
     getMenuProps,
-    selectedItem,
     highlightedIndex,
     getItemProps,
   } = useSelect({
     items,
-    selectedItem: selected,
+    selectedItem,
     onSelectedItemChange: ({ selectedItem: newSelectedItem }) => {
-      //   setSelectedItem(newSelectedItem);
+      setSelectedItem(newSelectedItem);
       onChange(newSelectedItem ? newSelectedItem.value : newSelectedItem);
     },
   });

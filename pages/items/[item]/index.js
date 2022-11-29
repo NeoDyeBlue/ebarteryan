@@ -1,4 +1,4 @@
-import NavLayout from "../../components/Layouts/NavLayout";
+import NavLayout from "../../../components/Layouts/NavLayout";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from "react-responsive-carousel";
 import Image from "next/image";
@@ -17,8 +17,8 @@ import {
   Button,
   LinkButton,
   EditDeleteButtons,
-} from "../../components/Buttons";
-import { IconLabel } from "../../components/Icons";
+} from "../../../components/Buttons";
+import { IconLabel } from "../../../components/Icons";
 import { Rating } from "react-simple-star-rating";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import {
@@ -26,34 +26,35 @@ import {
   OfferListItem,
   QuestionAnswerList,
   QuestionAnswerListItem,
-} from "../../components/Lists";
-import { OfferModal, ConfirmationModal } from "../../components/Modals";
-import { useState, useEffect, useCallback } from "react";
-import { Textarea } from "../../components/Inputs";
+} from "../../../components/Lists";
+import { OfferModal, ConfirmationModal } from "../../../components/Modals";
+import { useState, useEffect, useCallback, memo } from "react";
+import { Textarea } from "../../../components/Inputs";
 import { motion, AnimatePresence } from "framer-motion";
-import { getItem } from "../../lib/controllers/item-controller";
+import { getItem } from "../../../lib/controllers/item-controller";
 import Link from "next/link";
 import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { format } from "date-fns";
-import { ConditionBadge } from "../../components/Misc";
-import useUserOfferStore from "../../store/useUserOfferStore";
-import { getUserOffer } from "../../lib/controllers/offer-controller";
-import usePaginate from "../../lib/hooks/usePaginate";
+import { ConditionBadge } from "../../../components/Misc";
+import useUserOfferStore from "../../../store/useUserOfferStore";
+import { getUserOffer } from "../../../lib/controllers/offer-controller";
+import usePaginate from "../../../lib/hooks/usePaginate";
 import { DotLoader } from "react-spinners";
-import useSocketStore from "../../store/useSocketStore";
+import useSocketStore from "../../../store/useSocketStore";
 import ImageViewer from "react-simple-image-viewer";
-import { UserOfferCard } from "../../components/Cards";
-import { PopupLoader } from "../../components/Loaders";
-import useDidMountEffect from "../../lib/hooks/useDidMountEffect";
+import { UserOfferCard } from "../../../components/Cards";
+import { PopupLoader } from "../../../components/Loaders";
 import { toast } from "react-hot-toast";
 import dynamic from "next/dynamic";
 const InlineDropdownSelect = dynamic(
-  () => import("../../components/Inputs/InlineDropdownSelect"),
+  () => import("../../../components/Inputs/InlineDropdownSelect"),
   {
     ssr: false,
   }
 );
+
+const MemoizedInlineDropdownSelect = memo(InlineDropdownSelect);
 
 export async function getServerSideProps(context) {
   const { params } = context;
@@ -94,6 +95,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
   const { offer, setOffer, setItem, isSubmitting, isSubmitSuccess, resubmit } =
     useUserOfferStore();
   const [available, setAvailable] = useState(itemData.available);
+  const [prevAvailability, setPrevAvailbility] = useState(itemData.available);
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -155,8 +157,6 @@ export default function Item({ itemData, userOffer, fromUser }) {
     setItem(itemData?._id);
     setOffer(userOffer);
   }, [itemData, userOffer, setItem, setOffer]);
-
-  // const socketHandler = useCallback(() => {
   //   if (socket) {
   //     socket.emit("join-item-room", itemData?._id);
 
@@ -175,6 +175,25 @@ export default function Item({ itemData, userOffer, fromUser }) {
     setCurrentImage(index);
     setIsViewerOpen(true);
   }, []);
+
+  const updateAvailability = useCallback(async () => {
+    setIsUpdating(true);
+    const res = await fetch(`/api/items/${itemData?._id}`, {
+      method: "PATCH",
+      body: JSON.stringify({ available }),
+      headers: { "Content-Type": "application/json" },
+    });
+    const data = await res.json();
+    if (data && data.success) {
+      toast.success("Availability changed");
+      setIsUpdating(false);
+      setPrevAvailbility(available);
+    } else {
+      setIsUpdating(false);
+      toast.error("Can't update availability");
+      //   }
+    }
+  }, [available, itemData._id]);
 
   //useEffects
   useEffect(() => {
@@ -195,18 +214,19 @@ export default function Item({ itemData, userOffer, fromUser }) {
     }
   }, [socket, isEndReached, itemOffers?.length, itemData?._id, mutate, offers]);
 
-  useDidMountEffect(() => {
+  useEffect(() => {
     const availabilityCheck = async () => {
-      if (fromUser) {
+      if (fromUser && available !== prevAvailability) {
         if (!available) {
           setAvailabilityConfirmationOpen(true);
         } else {
           await updateAvailability();
+          setPrevAvailbility(available);
         }
       }
     };
     availabilityCheck();
-  }, [available]);
+  }, [available, fromUser, prevAvailability, updateAvailability]);
 
   //other functions
   function openOfferModal() {
@@ -225,23 +245,23 @@ export default function Item({ itemData, userOffer, fromUser }) {
     setAvailabilityConfirmationOpen(false);
   }
 
-  async function updateAvailability() {
-    setIsUpdating(true);
-    const res = await fetch(`/api/items/${itemData?._id}`, {
-      method: "PATCH",
-      body: JSON.stringify({ available }),
-    });
-    const data = await res.json();
-    if (data && data.success) {
-      toast.success("Availability changed");
-      setIsUpdating(false);
-    } else {
-      setIsUpdating(false);
-      toast.error("Can't update availability");
-    }
-
-    console.log(data);
-  }
+  // async function updateAvailability() {
+  //   setIsUpdating(true);
+  //   const res = await fetch(`/api/items/${itemData?._id}`, {
+  //     method: "PATCH",
+  //     body: JSON.stringify({ available }),
+  //     headers: { "Content-Type": "application/json" },
+  //   });
+  //   const data = await res.json();
+  //   if (data && data.success) {
+  //     toast.success("Availability changed");
+  //     setIsUpdating(false);
+  //     setPrevAvailbility(available);
+  //   } else {
+  //     setIsUpdating(false);
+  //     toast.error("Can't update availability");
+  //   }
+  // }
 
   async function handleAvailabilityConfirmChange() {
     await updateAvailability();
@@ -338,17 +358,27 @@ export default function Item({ itemData, userOffer, fromUser }) {
                               ${
                                 itemData.ended
                                   ? "bg-warning-500 text-black-light"
-                                  : !itemData.available
+                                  : ""
+                              }
+                              ${
+                                !available && available == prevAvailability
                                   ? "bg-danger-500 text-white"
-                                  : "bg-success-500 text-white"
+                                  : ""
+                              }
+                              ${
+                                available && available == prevAvailability
+                                  ? "bg-success-500 text-white"
+                                  : ""
                               }`}
                   >
                     <p className="text-xs capitalize sm:text-sm">
-                      {itemData.ended
-                        ? "ended"
-                        : !itemData.available
+                      {itemData.ended ? "ended" : ""}
+                      {!available && available == prevAvailability
                         ? "unavailable"
-                        : "available"}
+                        : ""}
+                      {available && available == prevAvailability
+                        ? "available"
+                        : ""}
                     </p>
                   </div>
                 </div>
@@ -395,8 +425,10 @@ export default function Item({ itemData, userOffer, fromUser }) {
               className="flex w-full flex-row items-center gap-2 text-ellipsis whitespace-nowrap font-display 
             text-sm text-gray-300"
             >
-              <Link href={`/items/${itemData.category.name}`}>
-                <a className="capitalize underline">{itemData.category.name}</a>
+              <Link href={`/${itemData.category.name}`}>
+                <a className="capitalize underline hover:text-green-500">
+                  {itemData.category.name}
+                </a>
               </Link>
               <p>&#62;</p>
               <p className="text-black-light">{itemData.name}</p>
@@ -427,17 +459,13 @@ export default function Item({ itemData, userOffer, fromUser }) {
               <div className="flex items-center justify-between rounded-[10px] border border-gray-100 p-4">
                 <p className="font-display font-medium">Availability</p>
                 {fromUser ? (
-                  <InlineDropdownSelect
+                  <MemoizedInlineDropdownSelect
                     name="availability"
                     items={[
                       { name: "available", value: true },
                       { name: "unavailable", value: false },
                     ]}
-                    selected={
-                      available
-                        ? { name: "available", value: true }
-                        : { name: "unavailable", value: false }
-                    }
+                    selected={available}
                     onChange={(value) => {
                       setAvailable(value);
                     }}

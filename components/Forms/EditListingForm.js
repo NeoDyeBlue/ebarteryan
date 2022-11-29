@@ -30,7 +30,7 @@ import { PopupLoader } from "../Loaders";
 const MemoizedImageSelector = memo(ImageSelector);
 const MemoizedDropdownSelect = memo(DropdownSelect);
 
-export default function CreateListingForm() {
+export default function EditListingForm({ item }) {
   ReactModal.setAppElement("#__next");
   const router = useRouter();
   const {
@@ -43,6 +43,7 @@ export default function CreateListingForm() {
   } = useMapStore();
 
   const { path, host } = useUrlCallbackStore();
+  //   const { item } = useUserItemStore();
   const callbackUrl = useMemo(() => {
     if (
       window &&
@@ -53,6 +54,8 @@ export default function CreateListingForm() {
     }
     return "/";
   }, [path, host]);
+
+  //   console.log(item);
 
   const { data: categories, error } = useSWR("/api/categories");
   const categorySelections = categories?.success
@@ -102,17 +105,19 @@ export default function CreateListingForm() {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 py-6 md:mb-6">
-      <PopupLoader isOpen={isLoading} message="Uploading item..." />
-      <h1 className="text-2xl font-semibold">Make a Barter</h1>
+      <PopupLoader isOpen={isLoading} message="Updating item..." />
+      <h1 className="text-2xl font-semibold">Edit Item</h1>
       <Formik
         initialValues={{
-          images: [],
-          name: "",
-          exchangeFor: "",
-          description: "",
-          claimingOptions: [],
-          category: "",
-          condition: "",
+          images: item?.images?.length ? [...item?.images] : [],
+          name: item?.name,
+          exchangeFor: item?.exchangeFor,
+          description: item?.description,
+          claimingOptions: item?.claimingOptions?.length
+            ? [...item?.claimingOptions]
+            : [],
+          category: item?.category?._id,
+          condition: item?.condition,
           location: {
             region: creationRegion ? creationRegion : listingRegion,
             lat: creationPosition.lat

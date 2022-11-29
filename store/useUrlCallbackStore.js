@@ -1,6 +1,6 @@
 import create from "zustand";
 
-const useCreationStore = create((set) => ({
+const useUrlCallbackStore = create((set) => ({
   path: "",
   host: "",
   setPath: (payload) =>
@@ -13,4 +13,4 @@ const useCreationStore = create((set) => ({
     })),
 }));
 
-export default useCreationStore;
+export default useUrlCallbackStore;

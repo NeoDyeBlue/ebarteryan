@@ -34,7 +34,7 @@ export default function ImageSelector({ label, infoMessage, max, ...props }) {
   const selectedImages = meta.value.map((file, index) => (
     <MemoizedImageSelectorItem
       key={index}
-      src={file.content}
+      src={file.content || file.url}
       onRemove={() => removeImage(file)}
     />
   ));

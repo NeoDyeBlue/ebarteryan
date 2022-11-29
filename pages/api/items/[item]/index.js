@@ -11,14 +11,15 @@ import { getToken } from "next-auth/jwt";
 export default async function handler(req, res) {
   try {
     if (req.method == "GET") {
-      const { category, item } = req.query;
-      const data = await getItem(category, item);
+      const { item } = req.query;
+      const data = await getItem(item);
       return successResponse(req, res, data);
     }
     if (req.method == "PATCH") {
       const { item } = req.query;
       const token = await getToken({ req });
       if (token && token.verified) {
+        console.log(req.body);
         const updatedItem = await updateItem(token?.sub, item, req.body);
         return successResponse(req, res, updatedItem);
       }

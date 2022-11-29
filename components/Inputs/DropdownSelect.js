@@ -1,6 +1,7 @@
 import { useSelect } from "downshift";
 import { CaretDown, CaretUp, Information } from "@carbon/icons-react";
 import { useField } from "formik";
+import { useState, useEffect } from "react";
 
 export default function DropdownSelect({
   items,
@@ -10,23 +11,30 @@ export default function DropdownSelect({
   name,
 }) {
   const [field, meta, helpers] = useField(name);
-  const initialSelectedItem = meta.value
-    ? items.find((item) =>
-        item?.value ? item.value == meta.value : item == meta.value
-      )
-    : "";
+  const [selectedItem, setSelectedItem] = useState(null);
+
+  useEffect(() => {
+    if (items.length) {
+      setSelectedItem(
+        items.find((item) => item?.value == meta.value || item == meta.value)
+      );
+    }
+  }, [items, meta.value]);
+
   const {
     isOpen,
     getToggleButtonProps,
     getLabelProps,
     getMenuProps,
     highlightedIndex,
-    selectedItem,
+    // selectedItem,
     getItemProps,
   } = useSelect({
     items,
-    initialSelectedItem,
+    selectedItem,
+    // defaultSelectedItem: initialSelected,
     onSelectedItemChange: ({ selectedItem: newSelectedItem }) => {
+      setSelectedItem(newSelectedItem);
       helpers.setValue(
         newSelectedItem?.value ? newSelectedItem.value : newSelectedItem
       );
@@ -96,7 +104,11 @@ export default function DropdownSelect({
             <li
               className={`
                 ${highlightedIndex === index && "bg-green-300"}
-                ${selectedItem === item && "font-bold"}
+                ${
+                  (selectedItem === item ||
+                    selectedItem?.value == item?.value) &&
+                  "font-bold"
+                }
                 flex cursor-pointer flex-col p-4 font-body capitalize shadow-sm
               `}
               key={index}
