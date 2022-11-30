@@ -51,3 +51,29 @@ export async function upload(folder, files) {
     throw error;
   }
 }
+
+export async function destroy(public_ids) {
+  try {
+    let destroyResults = [];
+    let destroyPromises = [];
+
+    public_ids.forEach((public_id) => {
+      destroyPromises.push(
+        cloudinary.uploader
+          .destroy(public_id)
+          .then(() => {
+            destroyResults.push(public_id);
+          })
+          .catch((error) => {
+            throw error;
+          })
+      );
+    });
+
+    return await Promise.all(destroyPromises).then(() => {
+      return destroyResults;
+    });
+  } catch (error) {
+    throw error;
+  }
+}

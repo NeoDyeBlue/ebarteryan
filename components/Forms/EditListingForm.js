@@ -14,7 +14,7 @@ import { Collaborate, Delivery, Chat, Location } from "@carbon/icons-react";
 import { Button } from "../Buttons";
 import ReactModal from "react-modal";
 import useMapStore from "../../store/useMapStore";
-import { useState, useMemo, memo } from "react";
+import { useState, useMemo, useEffect, memo } from "react";
 import dynamic from "next/dynamic";
 const DropdownSelect = dynamic(() => import("../Inputs/DropdownSelect"), {
   ssr: false,
@@ -36,10 +36,10 @@ export default function EditListingForm({ item }) {
   const {
     creationPosition,
     creationRegion,
-    listingPosition,
-    listingRegion,
     setCreationLocation,
     clearPositionRegion,
+    region,
+    position,
   } = useMapStore();
 
   const { path, host } = useUrlCallbackStore();
@@ -54,8 +54,6 @@ export default function EditListingForm({ item }) {
     }
     return "/";
   }, [path, host]);
-
-  //   console.log(item);
 
   const { data: categories, error } = useSWR("/api/categories");
   const categorySelections = categories?.success
@@ -78,29 +76,68 @@ export default function EditListingForm({ item }) {
   }
 
   async function handleFormSubmit(values) {
-    console.log(values);
-    return;
+    // console.log(values);
+    const newImages = values.images.filter(
+      (image) => !Object.keys(image).includes("url")
+    );
+    const toRemoveImages = item?.images?.filter(
+      (image) => !values.images.includes(image)
+    );
+    const newLocation =
+      item?.location?.coordinates[1] != values?.location?.lat &&
+      item?.location?.coordinates[0] != values?.location?.lng
+        ? {
+            region: values.location.region,
+            location: {
+              type: "Point",
+              coordinates: [values.location.lng, values.location.lat],
+            },
+          }
+        : null;
+
+    let { location, images, ...newFormBody } = values;
+    if (newLocation) {
+      newFormBody = { ...newLocation, ...newFormBody };
+    }
+    newFormBody.newImages = newImages;
+    newFormBody.toRemoveImages = toRemoveImages;
+
+    // console.log(newFormBody);
+    // // console.table(newImages);
+    // // console.table(toRemoveImages);
+    // return;
     try {
       setIsLoading(true);
-      const res = await fetch("/api/items", {
-        method: "POST",
-        body: JSON.stringify(values),
+      const res = await fetch(`/api/items/${item?._id}`, {
+        method: "PATCH",
+        body: JSON.stringify(newFormBody),
         headers: { "Content-Type": "application/json" },
       });
       const data = await res.json();
       if (data && data.success) {
-        toast.success("Item Posted");
-        router.push(callbackUrl);
+        toast.success("Item Updated");
+        router.push(`/items/${item?._id}`);
       } else {
         setIsLoading(false);
-        toast.error("Can't post the item");
+        toast.error("Can't update item");
       }
     } catch (error) {
       setIsLoading(false);
-      toast.error("Can't post the item");
+      toast.error("Can't update item");
     }
   }
 
+  useEffect(() => {
+    setCreationLocation({
+      region: item?.region,
+      position: {
+        lng: item?.location?.coordinates[0],
+        lat: item?.location?.coordinates[1],
+      },
+    });
+  }, [item?.region, item?.location?.coordinates, setCreationLocation]);
+
+  // console.log(creationRegion, creationPosition);
   function showToast() {}
 
   return (
@@ -119,32 +156,19 @@ export default function EditListingForm({ item }) {
           category: item?.category?._id,
           condition: item?.condition,
           location: {
-            region: creationRegion ? creationRegion : listingRegion,
-            lat: creationPosition.lat
+            region: creationRegion ? creationRegion : item?.region,
+            lat: creationPosition?.lat
               ? creationPosition.lat
-              : listingPosition.lat,
-            lng: creationPosition.lng
+              : item?.location?.coordinates[1],
+            lng: creationPosition?.lng
               ? creationPosition.lng
-              : listingPosition.lng,
+              : item?.location?.coordinates[0],
           },
         }}
         validationSchema={listingCreationSchema}
         onSubmit={handleFormSubmit}
       >
         {(props) => {
-          // this effect is needed to actually change the values for location
-          // useEffect(() => {
-          //   props.setFieldValue(
-          //     "location",
-          //     {
-          //       region: creationRegion,
-          //       lat: creationPosition.lat,
-          //       lng: creationPosition.lng,
-          //     },
-          //     true
-          //   );
-          // }, [creationRegion]);
-
           return (
             <Form className="flex flex-col gap-6">
               <div className="flex flex-col gap-4">
@@ -237,6 +261,15 @@ export default function EditListingForm({ item }) {
                       }}
                       onApply={() => {
                         setCreationLocation();
+                        props.setFieldValue(
+                          "location",
+                          {
+                            region: region,
+                            lat: position.lat,
+                            lng: position.lng,
+                          },
+                          true
+                        );
                         closeLocationModal();
                         // handleLocationChange();
                       }}
@@ -250,11 +283,10 @@ export default function EditListingForm({ item }) {
                   <div className="flex items-center gap-1">
                     <Location size={20} />
                     <p className="font-medium">
-                      {!listingRegion && !creationRegion
+                      {/* {!props.values.location.region
                         ? "Choose Location"
-                        : ""}
-                      {listingRegion && !creationRegion ? listingRegion : ""}
-                      {creationRegion ? creationRegion : ""}
+                        : props.values.location.region} */}
+                      {creationRegion ? creationRegion : "Choose Location"}
                     </p>
                   </div>
                   <span>|</span>
@@ -333,10 +365,7 @@ export default function EditListingForm({ item }) {
                 </MultiSelect>
               </div>
               <div className="flex items-center gap-4">
-                <Button secondary={true} onClick={() => showToast()}>
-                  Save to Drafts
-                </Button>
-                <Button type="submit">Post</Button>
+                <Button type="submit">Done</Button>
               </div>
             </Form>
           );

@@ -14,7 +14,7 @@ import { Collaborate, Delivery, Chat, Location } from "@carbon/icons-react";
 import { Button } from "../Buttons";
 import ReactModal from "react-modal";
 import useMapStore from "../../store/useMapStore";
-import { useState, useMemo, memo } from "react";
+import { useState, useMemo, useEffect, memo } from "react";
 import dynamic from "next/dynamic";
 const DropdownSelect = dynamic(() => import("../Inputs/DropdownSelect"), {
   ssr: false,
@@ -40,6 +40,8 @@ export default function CreateListingForm() {
     listingRegion,
     setCreationLocation,
     clearPositionRegion,
+    position,
+    region,
   } = useMapStore();
 
   const { path, host } = useUrlCallbackStore();
@@ -61,6 +63,8 @@ export default function CreateListingForm() {
         value: category._id,
       }))
     : [];
+
+  console.log(categories);
 
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -232,6 +236,15 @@ export default function CreateListingForm() {
                       }}
                       onApply={() => {
                         setCreationLocation();
+                        props.setFieldValue(
+                          "location",
+                          {
+                            region: region,
+                            lat: position.lat,
+                            lng: position.lng,
+                          },
+                          true
+                        );
                         closeLocationModal();
                         // handleLocationChange();
                       }}
@@ -245,11 +258,11 @@ export default function CreateListingForm() {
                   <div className="flex items-center gap-1">
                     <Location size={20} />
                     <p className="font-medium">
-                      {!listingRegion && !creationRegion
-                        ? "Choose Location"
-                        : ""}
-                      {listingRegion && !creationRegion ? listingRegion : ""}
-                      {creationRegion ? creationRegion : ""}
+                      {props.values.location.region
+                        ? props.values.location.region
+                        : "Choose Location"}
+                      {/* {listingRegion && !creationRegion ? listingRegion : ""}
+                      {creationRegion ? creationRegion : ""} */}
                     </p>
                   </div>
                   <span>|</span>

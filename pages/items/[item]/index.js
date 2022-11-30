@@ -115,7 +115,8 @@ export default function Item({ itemData, userOffer, fromUser }) {
       <div
         key={image.id}
         onClick={() => openImageViewer(index)}
-        className="relative aspect-square min-h-[200px] w-full cursor-pointer"
+        className="relative aspect-square min-h-[200px] w-full cursor-pointer
+        "
       >
         <Image
           src={image.url}
@@ -150,7 +151,9 @@ export default function Item({ itemData, userOffer, fromUser }) {
     offers
       .map((page) => page.data.docs)
       .flat()
-      .map((offer) => <OfferListItem key={offer._id} offer={offer} />);
+      .map((offer) => (
+        <OfferListItem key={offer._id} offer={offer} withButtons={fromUser} />
+      ));
 
   //useCallbacks
   const updateOfferStore = useCallback(() => {
@@ -397,29 +400,39 @@ export default function Item({ itemData, userOffer, fromUser }) {
                   </div>
                 </div>
               ) : (
-                <EditDeleteButtons />
+                <EditDeleteButtons editLink={`/items/${itemData._id}/edit`} />
               )}
             </div>
           </motion.div>
         )}
       </AnimatePresence>
       {/* Item Info */}
-      <div className="container mx-auto flex max-w-[1100px] flex-col gap-4 md:gap-6">
+      <div className="container mx-auto flex flex-col gap-4 md:gap-6 lg:max-w-[1100px]">
         {/* Carousel and other info */}
         <motion.div
           className="flex flex-col gap-6 pt-4 md:grid md:grid-cols-2 md:gap-8 md:pt-8"
           onViewportEnter={() => setShowMinifiedBar(false)}
           onViewportLeave={() => setShowMinifiedBar(true)}
         >
-          <Carousel
+          <div className="-mx-6 -mt-4 w-auto md:col-start-1 md:row-start-2 md:m-0">
+            <Carousel
+              showThumbs={false}
+              showStatus={false}
+              infiniteLoop
+              className="md:overflow-hidden md:rounded-[10px]"
+            >
+              {itemImages}
+            </Carousel>
+          </div>
+          {/* <Carousel
             showThumbs={false}
             showStatus={false}
             infiniteLoop
-            className="-mx-6 -mt-4 w-auto md:col-start-1 md:row-start-2 md:m-0 md:overflow-hidden md:rounded-[10px]
+            className="-mx-6 -mt-4 w-auto md:col-start-1 md:row-start-2 md:m-0
             "
           >
             {itemImages}
-          </Carousel>
+          </Carousel> */}
           <div className="item-center flex w-full justify-between gap-2 md:col-span-full md:row-span-full">
             <span
               className="flex w-full flex-row items-center gap-2 text-ellipsis whitespace-nowrap font-display 
@@ -433,7 +446,9 @@ export default function Item({ itemData, userOffer, fromUser }) {
               <p>&#62;</p>
               <p className="text-black-light">{itemData.name}</p>
             </span>
-            {fromUser && <EditDeleteButtons />}
+            {fromUser && (
+              <EditDeleteButtons editLink={`/items/${itemData._id}/edit`} />
+            )}
           </div>
           <div className="flex flex-col gap-4 md:col-start-2 md:row-start-2">
             <div className="flex flex-col gap-1 border-b border-b-gray-100 pb-6">
@@ -515,7 +530,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
       </div>
       {/* Description and Barterer*/}
       <div className="border-t border-gray-100">
-        <div className="container mx-auto flex max-w-[1100px] flex-col gap-4 pt-6 md:flex-row md:gap-6">
+        <div className="container mx-auto flex flex-col gap-4 pt-6 md:flex-row md:gap-6 lg:max-w-[1100px]">
           <div className="flex flex-col gap-3 pb-6 md:w-full md:border-0">
             <h2 className="text-xl font-medium">Description</h2>
             <p>{itemData.description}</p>
@@ -591,7 +606,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
         pb-6 sm:pt-6"
         id="offers"
       >
-        <Tabs className="container mx-auto grid max-w-[1100px] grid-cols-1 items-start gap-6 sm:grid-cols-[auto_2fr]">
+        <Tabs className="container mx-auto grid grid-cols-1 items-start gap-6 sm:grid-cols-[auto_2fr] lg:max-w-[1100px]">
           <TabList className="flex w-full items-start gap-4 sm:h-full sm:w-[200px] sm:flex-col sm:gap-6">
             <Tab className="tab-varying" selectedClassName="tab-active">
               <p>Offers</p>
@@ -646,9 +661,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
               ) : null} */}
             {itemOffers?.length || userOffer || offer ? (
               <div className="flex flex-col gap-2 pb-4">
-                <p className="font-display text-lg font-semibold">
-                  Other Offers
-                </p>
+                <p className="font-display text-lg font-semibold">Offers</p>
                 <OfferList>{itemOffers}</OfferList>
               </div>
             ) : !isEndReached ? (

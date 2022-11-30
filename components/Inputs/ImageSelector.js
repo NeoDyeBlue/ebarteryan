@@ -6,7 +6,7 @@ import { Information } from "@carbon/icons-react";
 import { memo } from "react";
 import { useField } from "formik";
 
-const MemoizedImageSelectorItem = memo(ImageSelectorItem, () => true);
+// const MemoizedImageSelectorItem = memo(ImageSelectorItem, () => true);
 
 export default function ImageSelector({ label, infoMessage, max, ...props }) {
   const [field, meta, helpers] = useField(props);
@@ -32,7 +32,7 @@ export default function ImageSelector({ label, infoMessage, max, ...props }) {
   }, [filesContent]);
 
   const selectedImages = meta.value.map((file, index) => (
-    <MemoizedImageSelectorItem
+    <ImageSelectorItem
       key={index}
       src={file.content || file.url}
       onRemove={() => removeImage(file)}

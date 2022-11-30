@@ -7,7 +7,7 @@ export default function ImageSelectorItem({ src, onRemove }) {
       <button
         onClick={onRemove}
         type="button"
-        className="absolute top-[4px] right-[4px] z-10 flex h-[20px] w-[20px] rotate-[135deg] items-center justify-center rounded-full bg-white shadow-md"
+        className="absolute top-[4px] right-[4px] z-10 flex h-[26px] w-[26px] rotate-[135deg] items-center justify-center rounded-full border border-gray-100 bg-white shadow-md"
       >
         <Add size={24} />
       </button>

@@ -1,13 +1,19 @@
 import Image from "next/image";
 import { Rating } from "react-simple-star-rating";
 import { CircleButton } from "../Buttons";
-import { OverflowMenuVertical, Add } from "@carbon/icons-react";
+import {
+  OverflowMenuVertical,
+  Add,
+  Chat,
+  Checkmark,
+} from "@carbon/icons-react";
 import { ConditionBadge } from "../Misc";
 import { useState, useCallback } from "react";
 import ImageViewer from "react-simple-image-viewer";
 import format from "date-fns/format";
+import { Button } from "../Buttons";
 
-export default function OfferListItem({ offer }) {
+export default function OfferListItem({ offer, withButtons }) {
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const itemImages = offer?.images?.map((image, index) => (
@@ -39,7 +45,7 @@ export default function OfferListItem({ offer }) {
 
   return (
     <li
-      className={`relative flex flex-col-reverse gap-3 overflow-hidden
+      className={`relative flex flex-col gap-3 overflow-hidden
      border-b border-gray-100 bg-white pb-4 md:gap-6
      `}
     >
@@ -58,38 +64,6 @@ export default function OfferListItem({ offer }) {
           onClose={closeImageViewer}
         />
       )}
-      <div className={`flex w-full items-center gap-4 self-start`}>
-        <div className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
-          <Image
-            src={offer?.user?.image?.url}
-            layout="fill"
-            alt="user image"
-            // objectFit="cover"
-          />
-        </div>
-        <div className="flex w-full items-center justify-between">
-          <div className="flex flex-col">
-            <p className="min-w-[150px] font-display text-sm md:mt-[0.1rem]">
-              {offer?.user?.fullName}
-            </p>
-            <div className="flex gap-1">
-              <span className="-ml-[2px] flex w-full items-center justify-start gap-1">
-                <Rating
-                  className="align-middle"
-                  transition
-                  allowHalfIcon
-                  fillColor="#85CB33"
-                  emptyColor="#D2D2D2"
-                  initialValue={4.5}
-                  readonly
-                  size={18}
-                />
-                <span className="mt-[0.2rem] text-xs">• 10</span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
       <div className="flex w-full flex-col gap-3">
         <div className="flex w-full items-center justify-between">
           <div className="flex flex-col">
@@ -110,6 +84,52 @@ export default function OfferListItem({ offer }) {
         <div className="grid max-w-[calc((0.25rem*2+300px))] grid-cols-[repeat(auto-fill,_minmax(100px,_100px))] gap-1 overflow-hidden">
           {itemImages}
         </div>
+      </div>
+      <div className="flex w-full flex-col items-start gap-2 self-start md:flex-row md:items-center">
+        <div className="flex w-full items-center gap-4">
+          <div className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
+            <Image
+              src={offer?.user?.image?.url}
+              layout="fill"
+              alt="user image"
+              // objectFit="cover"
+            />
+          </div>
+          <div className="flex w-full items-center justify-between">
+            <div className="flex flex-col">
+              <p className="min-w-[150px] font-display text-sm md:mt-[0.1rem]">
+                {offer?.user?.fullName}
+              </p>
+              <div className="flex gap-1">
+                <span className="-ml-[2px] flex w-full items-center justify-start gap-1">
+                  <Rating
+                    className="align-middle"
+                    transition
+                    allowHalfIcon
+                    fillColor="#85CB33"
+                    emptyColor="#D2D2D2"
+                    initialValue={4.5}
+                    readonly
+                    size={18}
+                  />
+                  <span className="mt-[0.2rem] text-xs">• 10</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        {withButtons && (
+          <div className="flex w-full justify-end gap-2">
+            <Button underlined autoWidth small>
+              <Chat size={20} />
+              <p className="hidden md:block">Ask about the offer</p>
+            </Button>
+            <Button autoWidth small>
+              <Checkmark size={20} />
+              <p className="hidden lg:block">Accept</p>
+            </Button>
+          </div>
+        )}
       </div>
     </li>
   );
