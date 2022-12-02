@@ -47,6 +47,7 @@ import { UserOfferCard } from "../../../components/Cards";
 import { PopupLoader } from "../../../components/Loaders";
 import { toast } from "react-hot-toast";
 import dynamic from "next/dynamic";
+import { FormikProvider, Form, useFormik } from "formik";
 const InlineDropdownSelect = dynamic(
   () => import("../../../components/Inputs/InlineDropdownSelect"),
   {
@@ -99,15 +100,28 @@ export default function Item({ itemData, userOffer, fromUser }) {
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [activeTab, setActiveTab] = useState(0);
   const {
     data: offers,
-    totalDocs,
-    isEndReached,
-    isLoading,
-    size,
-    setSize,
-    mutate,
+    totalDocs: totalOfferDocs,
+    isEndReached: offersEndReached,
+    isLoading: offersLoading,
+    size: offersSize,
+    setSize: setOffersSize,
+    mutate: mutateOffers,
   } = usePaginate(`/api/offers/${itemData._id}`, 10);
+
+  const {
+    data: questions,
+    totalDocs: totalQuestionDocs,
+    isEndReached: questionsEndReached,
+    isLoading: questionsLoading,
+    size: questionsSize,
+    setSize: setQuestionsSize,
+    mutate: mutateQuestions,
+  } = usePaginate(activeTab == 1 ? `/api/questions/${itemData._id}` : null, 10);
+
+  console.log("questions", activeTab, questions);
 
   const itemImages =
     itemData?.images?.length &&
@@ -155,6 +169,15 @@ export default function Item({ itemData, userOffer, fromUser }) {
         <OfferListItem key={offer._id} offer={offer} withButtons={fromUser} />
       ));
 
+  const questionFormik = useFormik({
+    initialValues: {
+      question: "",
+    },
+    onSubmit: (values) => {
+      alert(JSON.stringify(values, null, 2));
+    },
+  });
+
   //useCallbacks
   const updateOfferStore = useCallback(() => {
     setItem(itemData?._id);
@@ -165,14 +188,14 @@ export default function Item({ itemData, userOffer, fromUser }) {
 
   //     socket.on("another-offer", (offer) => {
   //       console.log(offer);
-  //       if (isEndReached || !offers || !itemOffers.length) {
-  //         mutate(offers && offers.length ? [...offers, offer] : [offer]);
+  //       if (offersEndReached || !offers || !itemOffers.length) {
+  //         mutateOffers(offers && offers.length ? [...offers, offer] : [offer]);
   //       }
   //     });
 
   //     return () => socket.emit("leave-item-room", itemData?._id);
   //   }
-  // }, [socket, isEndReached, itemOffers?.length, itemData?._id, mutate, offers]);
+  // }, [socket, offersEndReached, itemOffers?.length, itemData?._id, mutateOffers, offers]);
 
   const openImageViewer = useCallback((index) => {
     setCurrentImage(index);
@@ -208,14 +231,21 @@ export default function Item({ itemData, userOffer, fromUser }) {
       socket.emit("join-item-room", itemData?._id);
 
       socket.on("another-offer", (offer) => {
-        if (isEndReached || !offers || !itemOffers.length) {
-          mutate(offers && offers.length ? [...offers, offer] : [offer]);
+        if (offersEndReached || !offers || !itemOffers.length) {
+          mutateOffers(offers && offers.length ? [...offers, offer] : [offer]);
         }
       });
 
       return () => socket.emit("leave-item-room", itemData?._id);
     }
-  }, [socket, isEndReached, itemOffers?.length, itemData?._id, mutate, offers]);
+  }, [
+    socket,
+    offersEndReached,
+    itemOffers?.length,
+    itemData?._id,
+    mutateOffers,
+    offers,
+  ]);
 
   useEffect(() => {
     const availabilityCheck = async () => {
@@ -294,7 +324,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
             backgroundColor: "rgba(0,0,0,0.75)",
             padding: "1.5rem",
           }}
-          closeComponent={<Add className="rotate-[135deg]" size={48} />}
+          closeComponent={<Add className="rotate-[135deg]" offersSize={48} />}
           src={itemData?.images.map((image) => image.url)}
           currentIndex={currentImage}
           disableScroll={true}
@@ -325,7 +355,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
           >
             <div className="container mx-auto flex items-center justify-between gap-4 md:gap-6">
               <div className="flex w-full items-center gap-3 overflow-hidden md:gap-4">
-                <div className="relative hidden h-[60px] w-[60px] flex-shrink-0 overflow-hidden rounded-[5px] xs:block">
+                <div className="relative h-[60px] w-[60px] flex-shrink-0 overflow-hidden rounded-[5px]">
                   <Image
                     src={itemData.images[0].url}
                     layout="fill"
@@ -395,7 +425,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
                   ) : null}
                   <div className="hidden md:block">
                     <Button secondary={true}>
-                      <Bookmark size={20} /> Save
+                      <Bookmark offersSize={20} /> Save
                     </Button>
                   </div>
                 </div>
@@ -407,7 +437,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
         )}
       </AnimatePresence>
       {/* Item Info */}
-      <div className="container mx-auto flex flex-col gap-4 md:gap-6 lg:max-w-[1100px]">
+      <div className="container mx-auto flex flex-col gap-4 md:gap-6 lg:max-w-[1200px]">
         {/* Carousel and other info */}
         <motion.div
           className="flex flex-col gap-6 pt-4 md:grid md:grid-cols-2 md:gap-8 md:pt-8"
@@ -530,7 +560,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
       </div>
       {/* Description and Barterer*/}
       <div className="border-t border-gray-100">
-        <div className="container mx-auto flex flex-col gap-4 pt-6 md:flex-row md:gap-6 lg:max-w-[1100px]">
+        <div className="container mx-auto flex flex-col gap-4 pt-6 md:flex-row md:gap-6 lg:max-w-[1200px]">
           <div className="flex flex-col gap-3 pb-6 md:w-full md:border-0">
             <h2 className="text-xl font-medium">Description</h2>
             <p>{itemData.description}</p>
@@ -606,12 +636,16 @@ export default function Item({ itemData, userOffer, fromUser }) {
         pb-6 sm:pt-6"
         id="offers"
       >
-        <Tabs className="container mx-auto grid grid-cols-1 items-start gap-6 sm:grid-cols-[auto_2fr] lg:max-w-[1100px]">
+        <Tabs
+          defaultIndex={0}
+          onSelect={(index) => setActiveTab(index)}
+          className="container mx-auto grid grid-cols-1 items-start gap-6 sm:grid-cols-[auto_2fr] lg:max-w-[1200px]"
+        >
           <TabList className="flex w-full items-start gap-4 sm:h-full sm:w-[200px] sm:flex-col sm:gap-6">
             <Tab className="tab-varying" selectedClassName="tab-active">
               <p>Offers</p>
               <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
-                {totalDocs}
+                {totalOfferDocs}
               </span>
             </Tab>
             <Tab className="tab-varying" selectedClassName="tab-active">
@@ -621,33 +655,19 @@ export default function Item({ itemData, userOffer, fromUser }) {
               </span>
             </Tab>
           </TabList>
-          <TabPanel className="flex flex-col gap-10">
-            {offer || userOffer ? (
-              <div
-                // id="offers"
-                className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
-              >
-                <p className="font-display text-lg font-semibold">Your Offer</p>
-                <UserOfferCard
-                  offer={offer}
-                  isLoading={
-                    userOffer
-                      ? false
-                      : isSubmitting && !isSubmitSuccess
-                      ? true
-                      : false
-                  }
-                  isSubmitSuccess={userOffer ? true : isSubmitSuccess}
-                  retryHandler={resubmit}
-                />
-              </div>
-            ) : null}
-            {/* {offer || userOffer ? (
-                <div className="border-b border-gray-100 pb-4">
-                  <OfferListItem
-                    fromUser={true}
+          <div>
+            <TabPanel className="flex flex-col gap-10">
+              {offer || userOffer ? (
+                <div
+                  // id="offers"
+                  className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
+                >
+                  <p className="font-display text-lg font-semibold">
+                    Your Offer
+                  </p>
+                  <UserOfferCard
                     offer={offer}
-                    isLoading={
+                    offersLoading={
                       userOffer
                         ? false
                         : isSubmitting && !isSubmitSuccess
@@ -658,51 +678,65 @@ export default function Item({ itemData, userOffer, fromUser }) {
                     retryHandler={resubmit}
                   />
                 </div>
-              ) : null} */}
-            {itemOffers?.length || userOffer || offer ? (
-              <div className="flex flex-col gap-2 pb-4">
-                <p className="font-display text-lg font-semibold">Offers</p>
-                <OfferList>{itemOffers}</OfferList>
-              </div>
-            ) : !isEndReached ? (
-              <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
-                <DotLoader color="#C7EF83" size={32} />
-              </div>
-            ) : (
-              <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
-                No Offers
-              </p>
-            )}
-            {isLoading && (
-              <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
-                <DotLoader color="#C7EF83" size={32} />
-              </div>
-            )}
-            {(!isEndReached || !offers) && !isLoading ? (
-              <div className="mx-auto mb-8 w-full max-w-[200px]">
-                <Button secondary={true} onClick={() => setSize(size + 1)}>
-                  Load More
-                </Button>
-              </div>
-            ) : null}
-          </TabPanel>
-          <TabPanel>
-            <div className="flex flex-col gap-8">
-              <form className="flex flex-col gap-4">
-                <p className="font-display text-2xl font-semibold">
-                  Ask a question
-                </p>
-                <div className="flex flex-col items-end gap-4 md:flex-row">
-                  <Textarea placeholder="Type here..." />
-                  <Button autoWidth={true}>Ask</Button>
+              ) : null}
+              {itemOffers?.length || userOffer || offer ? (
+                <div className="flex flex-col gap-2 pb-4">
+                  <p className="font-display text-lg font-semibold">Offers</p>
+                  <OfferList>{itemOffers}</OfferList>
                 </div>
-              </form>
-              <QuestionAnswerList>
-                <QuestionAnswerListItem />
-                <QuestionAnswerListItem />
-              </QuestionAnswerList>
-            </div>
-          </TabPanel>
+              ) : !offersEndReached ? (
+                <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+                  <DotLoader color="#C7EF83" offersSize={32} />
+                </div>
+              ) : (
+                <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                  No Offers
+                </p>
+              )}
+              {offersLoading && (
+                <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+                  <DotLoader color="#C7EF83" offersSize={32} />
+                </div>
+              )}
+              {(!offersEndReached || !offers) && !offersLoading ? (
+                <div className="mx-auto mb-8 w-full max-w-[200px]">
+                  <Button
+                    secondary={true}
+                    onClick={() => setOffersSize(offersSize + 1)}
+                  >
+                    Load More
+                  </Button>
+                </div>
+              ) : null}
+            </TabPanel>
+            <TabPanel className="flex flex-col gap-10">
+              <div className="flex flex-col gap-8">
+                {!fromUser && (
+                  <FormikProvider value={questionFormik}>
+                    <Form className="flex flex-col gap-4">
+                      <p className="font-display text-lg font-semibold">
+                        Ask a Question
+                      </p>
+                      <div className="flex flex-row items-end gap-2">
+                        <Textarea
+                          placeholder="Type here..."
+                          name="question"
+                          value={questionFormik.values.question}
+                        />
+                        <Button autoWidth={true} type="submit">
+                          Ask
+                        </Button>
+                      </div>
+                    </Form>
+                  </FormikProvider>
+                )}
+                <QuestionAnswerList>
+                  <QuestionAnswerListItem withInput={fromUser} />
+                  <QuestionAnswerListItem withInput={fromUser} />
+                </QuestionAnswerList>
+              </div>
+            </TabPanel>
+          </div>
         </Tabs>
       </div>
     </div>

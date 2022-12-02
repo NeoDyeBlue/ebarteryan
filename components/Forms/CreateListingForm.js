@@ -79,8 +79,8 @@ export default function CreateListingForm() {
   }
 
   async function handleFormSubmit(values) {
-    console.log(values);
-    return;
+    // console.log(values);
+    // return;
     try {
       setIsLoading(true);
       const res = await fetch("/api/items", {
