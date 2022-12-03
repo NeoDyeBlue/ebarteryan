@@ -57,6 +57,26 @@ const InlineDropdownSelect = dynamic(
 
 const MemoizedInlineDropdownSelect = memo(InlineDropdownSelect);
 
+/**
+ *
+ * @param {*} obj
+ * @param {*} key
+ * @param {*} value
+ * @returns Object result
+ * @see {@link https://stackoverflow.com/questions/15523514/find-by-key-deep-in-a-nested-array}
+ */
+
+function findNestedObj(obj, key, value) {
+  try {
+    JSON.stringify(obj, (_, nestedValue, o) => {
+      if (nestedValue && nestedValue[key] === value) throw nestedValue;
+      return nestedValue;
+    });
+  } catch (result) {
+    return result;
+  }
+}
+
 export async function getServerSideProps(context) {
   const { params } = context;
   try {
@@ -86,21 +106,24 @@ export async function getServerSideProps(context) {
 }
 
 export default function Item({ itemData, userOffer, fromUser }) {
+  //----------states----------
   const [offerModalOpen, setOfferModalOpen] = useState(false);
   const [availabilityConfirmationOpen, setAvailabilityConfirmationOpen] =
     useState(false);
   const [showMinifiedBar, setShowMinifiedBar] = useState(false);
-  const { data: session, status } = useSession();
-  const router = useRouter();
-  const { socket } = useSocketStore();
-  const { offer, setOffer, setItem, isSubmitting, isSubmitSuccess, resubmit } =
-    useUserOfferStore();
   const [available, setAvailable] = useState(itemData.available);
   const [prevAvailability, setPrevAvailbility] = useState(itemData.available);
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [activeTab, setActiveTab] = useState(0);
+  const [isQuestionSubmitting, setIsQuestionSubmitting] = useState(false);
+
+  //others
+  const { data: session, status } = useSession();
+  const router = useRouter();
+  const { socket } = useSocketStore();
+  const { offer, setOffer, setItem, isSubmitting, isSubmitSuccess, resubmit } =
+    useUserOfferStore();
   const {
     data: offers,
     totalDocs: totalOfferDocs,
@@ -119,9 +142,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
     size: questionsSize,
     setSize: setQuestionsSize,
     mutate: mutateQuestions,
-  } = usePaginate(activeTab == 1 ? `/api/questions/${itemData._id}` : null, 10);
-
-  console.log("questions", activeTab, questions);
+  } = usePaginate(`/api/questions/${itemData._id}`, 2);
 
   const itemImages =
     itemData?.images?.length &&
@@ -160,6 +181,19 @@ export default function Item({ itemData, userOffer, fromUser }) {
     );
   });
 
+  const itemQuestions =
+    questions &&
+    questions
+      .map((page) => page.data.docs)
+      .flat()
+      .map((question) => (
+        <QuestionAnswerListItem
+          key={question._id}
+          data={question}
+          withInput={fromUser}
+        />
+      ));
+
   const itemOffers =
     offers &&
     offers
@@ -173,29 +207,15 @@ export default function Item({ itemData, userOffer, fromUser }) {
     initialValues: {
       question: "",
     },
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-    },
+    // validationSchema: questionSchema,
+    onSubmit: handleQuestionSubmit,
   });
 
-  //useCallbacks
+  //----------useCallbacks----------
   const updateOfferStore = useCallback(() => {
     setItem(itemData?._id);
     setOffer(userOffer);
   }, [itemData, userOffer, setItem, setOffer]);
-  //   if (socket) {
-  //     socket.emit("join-item-room", itemData?._id);
-
-  //     socket.on("another-offer", (offer) => {
-  //       console.log(offer);
-  //       if (offersEndReached || !offers || !itemOffers.length) {
-  //         mutateOffers(offers && offers.length ? [...offers, offer] : [offer]);
-  //       }
-  //     });
-
-  //     return () => socket.emit("leave-item-room", itemData?._id);
-  //   }
-  // }, [socket, offersEndReached, itemOffers?.length, itemData?._id, mutateOffers, offers]);
 
   const openImageViewer = useCallback((index) => {
     setCurrentImage(index);
@@ -217,11 +237,10 @@ export default function Item({ itemData, userOffer, fromUser }) {
     } else {
       setIsUpdating(false);
       toast.error("Can't update availability");
-      //   }
     }
   }, [available, itemData._id]);
 
-  //useEffects
+  //----------useEffects----------
   useEffect(() => {
     updateOfferStore();
   }, [updateOfferStore]);
@@ -236,6 +255,38 @@ export default function Item({ itemData, userOffer, fromUser }) {
         }
       });
 
+      socket.on("new-question", (question) => {
+        console.log(question);
+        if (questionsEndReached || !questions || !itemQuestions.length) {
+          mutateQuestions(
+            questions && questions.length
+              ? [...questions, question]
+              : [question]
+          );
+        }
+      });
+
+      socket.on("answered-question", (answeredQuestion) => {
+        const questionExists = findNestedObj(
+          questions,
+          "_id",
+          answeredQuestion._id
+        );
+        console.log(answeredQuestion);
+        if (questionExists) {
+          const updatedQuestions = JSON.parse(
+            JSON.stringify(questions, (_, nestedValue) => {
+              if (nestedValue && nestedValue["_id"] == answeredQuestion._id) {
+                return answeredQuestion;
+              }
+              return nestedValue;
+            })
+          );
+
+          mutateQuestions(updatedQuestions);
+        }
+      });
+
       return () => socket.emit("leave-item-room", itemData?._id);
     }
   }, [
@@ -245,6 +296,10 @@ export default function Item({ itemData, userOffer, fromUser }) {
     itemData?._id,
     mutateOffers,
     offers,
+    itemQuestions?.length,
+    questionsEndReached,
+    questions,
+    mutateQuestions,
   ]);
 
   useEffect(() => {
@@ -262,6 +317,28 @@ export default function Item({ itemData, userOffer, fromUser }) {
   }, [available, fromUser, prevAvailability, updateAvailability]);
 
   //other functions
+  async function handleQuestionSubmit(values) {
+    if (values.question) {
+      setIsQuestionSubmitting(true);
+      const res = await fetch(`/api/questions/${itemData._id}`, {
+        method: "POST",
+        body: JSON.stringify(values),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (result && result.success) {
+        socket.emit("question", {
+          question: result,
+          room: result.data.docs[0].item,
+        });
+        questionFormik.setFieldValue("question", "");
+        toast.success("Question asked");
+      } else {
+        toast.error("Can't post question");
+      }
+      setIsQuestionSubmitting(false);
+    }
+  }
   function openOfferModal() {
     if (session && session.user.verified && status == "authenticated") {
       setOfferModalOpen(true);
@@ -278,24 +355,6 @@ export default function Item({ itemData, userOffer, fromUser }) {
     setAvailabilityConfirmationOpen(false);
   }
 
-  // async function updateAvailability() {
-  //   setIsUpdating(true);
-  //   const res = await fetch(`/api/items/${itemData?._id}`, {
-  //     method: "PATCH",
-  //     body: JSON.stringify({ available }),
-  //     headers: { "Content-Type": "application/json" },
-  //   });
-  //   const data = await res.json();
-  //   if (data && data.success) {
-  //     toast.success("Availability changed");
-  //     setIsUpdating(false);
-  //     setPrevAvailbility(available);
-  //   } else {
-  //     setIsUpdating(false);
-  //     toast.error("Can't update availability");
-  //   }
-  // }
-
   async function handleAvailabilityConfirmChange() {
     await updateAvailability();
   }
@@ -308,6 +367,8 @@ export default function Item({ itemData, userOffer, fromUser }) {
     setCurrentImage(0);
     setIsViewerOpen(false);
   }
+
+  console.log(questions);
 
   return (
     <div className="flex flex-col gap-6">
@@ -425,7 +486,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
                   ) : null}
                   <div className="hidden md:block">
                     <Button secondary={true}>
-                      <Bookmark offersSize={20} /> Save
+                      <Bookmark size={20} /> Save
                     </Button>
                   </div>
                 </div>
@@ -454,15 +515,6 @@ export default function Item({ itemData, userOffer, fromUser }) {
               {itemImages}
             </Carousel>
           </div>
-          {/* <Carousel
-            showThumbs={false}
-            showStatus={false}
-            infiniteLoop
-            className="-mx-6 -mt-4 w-auto md:col-start-1 md:row-start-2 md:m-0
-            "
-          >
-            {itemImages}
-          </Carousel> */}
           <div className="item-center flex w-full justify-between gap-2 md:col-span-full md:row-span-full">
             <span
               className="flex w-full flex-row items-center gap-2 text-ellipsis whitespace-nowrap font-display 
@@ -638,7 +690,6 @@ export default function Item({ itemData, userOffer, fromUser }) {
       >
         <Tabs
           defaultIndex={0}
-          onSelect={(index) => setActiveTab(index)}
           className="container mx-auto grid grid-cols-1 items-start gap-6 sm:grid-cols-[auto_2fr] lg:max-w-[1200px]"
         >
           <TabList className="flex w-full items-start gap-4 sm:h-full sm:w-[200px] sm:flex-col sm:gap-6">
@@ -651,7 +702,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
             <Tab className="tab-varying" selectedClassName="tab-active">
               <p>Questions</p>
               <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
-                0
+                {totalQuestionDocs}
               </span>
             </Tab>
           </TabList>
@@ -679,14 +730,14 @@ export default function Item({ itemData, userOffer, fromUser }) {
                   />
                 </div>
               ) : null}
-              {itemOffers?.length || userOffer || offer ? (
+              {itemOffers?.length ? (
                 <div className="flex flex-col gap-2 pb-4">
                   <p className="font-display text-lg font-semibold">Offers</p>
                   <OfferList>{itemOffers}</OfferList>
                 </div>
               ) : !offersEndReached ? (
                 <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
-                  <DotLoader color="#C7EF83" offersSize={32} />
+                  <DotLoader color="#C7EF83" size={32} />
                 </div>
               ) : (
                 <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
@@ -695,7 +746,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
               )}
               {offersLoading && (
                 <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
-                  <DotLoader color="#C7EF83" offersSize={32} />
+                  <DotLoader color="#C7EF83" size={32} />
                 </div>
               )}
               {(!offersEndReached || !offers) && !offersLoading ? (
@@ -723,17 +774,50 @@ export default function Item({ itemData, userOffer, fromUser }) {
                           name="question"
                           value={questionFormik.values.question}
                         />
-                        <Button autoWidth={true} type="submit">
-                          Ask
+                        <Button
+                          autoWidth={true}
+                          type="submit"
+                          disabled={isQuestionSubmitting}
+                        >
+                          {isQuestionSubmitting ? (
+                            <DotLoader color="#fff" size={24} />
+                          ) : (
+                            <p>Ask</p>
+                          )}
                         </Button>
                       </div>
                     </Form>
                   </FormikProvider>
                 )}
-                <QuestionAnswerList>
-                  <QuestionAnswerListItem withInput={fromUser} />
-                  <QuestionAnswerListItem withInput={fromUser} />
-                </QuestionAnswerList>
+                {itemQuestions?.length ? (
+                  <div className="flex flex-col gap-2 pb-4">
+                    <p className="font-display text-lg font-semibold">Offers</p>
+                    <QuestionAnswerList>{itemQuestions}</QuestionAnswerList>
+                  </div>
+                ) : !questionsEndReached ? (
+                  <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+                    <DotLoader color="#C7EF83" size={32} />
+                  </div>
+                ) : (
+                  <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                    No Questions
+                  </p>
+                )}
+                {questionsLoading && (
+                  <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+                    <DotLoader color="#C7EF83" size={32} />
+                  </div>
+                )}
+                {(!questionsEndReached || !questions) && !questionsLoading ? (
+                  <div className="mx-auto mb-8 w-full max-w-[200px]">
+                    <Button
+                      secondary={true}
+                      onClick={() => setQuestionsSize(questionsSize + 1)}
+                    >
+                      Load More
+                    </Button>
+                  </div>
+                ) : null}
               </div>
             </TabPanel>
           </div>

@@ -36,6 +36,7 @@ export default function MyApp({
         setSocket(socket);
       });
     }
+    console.log(socket);
     // return () => {
     //   socket.disconnect();
     // };

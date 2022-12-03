@@ -15,6 +15,8 @@ export default async function handler(req, res) {
       return successResponse(req, res, questions);
     }
     if (req.method == "POST") {
+      console.log(item);
+      const token = await getToken({ req });
       if (token && token.verified) {
         const { question } = req.body;
         const data = await askQuestion(item, token?.sub, question);
@@ -23,7 +25,9 @@ export default async function handler(req, res) {
       return errorResponse(req, res, "unauthorized request", 401);
     }
     if (req.method == "PATCH") {
+      const token = await getToken({ req });
       if (token && token.verified) {
+        console.log("answer");
         const { questionId, answer } = req.body;
         const data = await answerQuestion(item, token?.sub, questionId, answer);
         return successResponse(req, res, data);

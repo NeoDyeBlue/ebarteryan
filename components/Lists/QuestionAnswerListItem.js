@@ -1,25 +1,57 @@
 import { Form, FormikProvider, useFormik } from "formik";
+import { DotLoader } from "react-spinners";
 import { Button } from "../Buttons";
 import { Textarea } from "../Inputs";
+import { useState } from "react";
+import { toast } from "react-hot-toast";
+import useSocketStore from "../../store/useSocketStore";
+import format from "date-fns/format";
 
-export default function QuestionAnswerListItem({
-  withInput,
-  question,
-  answer,
-}) {
+export default function QuestionAnswerListItem({ withInput, data }) {
+  const [isAnswerSubmitting, setIsAnswerSubmitting] = useState(false);
+  const [answered, setAnswered] = useState(data?.answer ? true : false);
   const answerFormik = useFormik({
     initialValues: {
+      questionId: data?._id,
       answer: "",
     },
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-    },
+    onSubmit: handleAnswerSubmit,
   });
+  const { socket } = useSocketStore();
+
+  async function handleAnswerSubmit(values) {
+    if (values.answer) {
+      setIsAnswerSubmitting(true);
+      console.log(data);
+      const res = await fetch(`/api/questions/${data?.item}`, {
+        method: "PATCH",
+        body: JSON.stringify(values),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (result && result.success) {
+        setAnswered(true);
+        console.log(result);
+        socket.emit("answer", {
+          answeredQuestion: result.data,
+          room: result.data.item,
+        });
+        toast.success("Question answered");
+      } else {
+        toast.error("Can't answer question");
+      }
+      setIsAnswerSubmitting(false);
+    }
+  }
   return (
     <li className="flex flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
-        <p className="font-display font-medium">User Name</p>
-        <p className="text-sm text-gray-300">1h ago</p>
+        <p className="font-display font-medium">
+          {data?.user?.firstName} {data?.user?.lastName}
+        </p>
+        <p className="text-sm text-gray-300">
+          {format(new Date(data?.createdAt), "PPp")}
+        </p>
       </div>
       <div className="flex flex-col gap-2">
         <div className="flex items-start gap-4">
@@ -29,12 +61,9 @@ export default function QuestionAnswerListItem({
           >
             Q
           </span>
-          <p className="w-full rounded-[10px]">
-            Laborum nulla consectetur id sit cupidatat reprehenderit ex minim
-            nulla pariatur non?
-          </p>
+          <p className="w-full rounded-[10px]">{data?.question}</p>
         </div>
-        {(withInput || answer) && (
+        {(withInput || data?.answer) && (
           <div className="flex items-start gap-4">
             <span
               className="flex h-[24px] w-[24px] items-center justify-center 
@@ -42,28 +71,33 @@ export default function QuestionAnswerListItem({
             >
               A
             </span>
-            {withInput && !answer && (
+            {withInput && !answered && (
               <FormikProvider value={answerFormik}>
                 <Form className="flex w-full flex-col gap-4">
-                  <div className="flex flex-col items-end gap-4 md:flex-row">
+                  <div className="flex items-end gap-2">
                     <Textarea
                       className="border-gray-100"
                       placeholder="Type here..."
                       name="answer"
+                      size="small"
                     />
-                    <Button autoWidth={true} type="submit">
-                      Answer
+                    <Button
+                      autoWidth={true}
+                      type="submit"
+                      disabled={isAnswerSubmitting}
+                      small
+                    >
+                      {isAnswerSubmitting ? (
+                        <DotLoader color="#fff" size={24} />
+                      ) : (
+                        <p>Answer</p>
+                      )}
                     </Button>
                   </div>
                 </Form>
               </FormikProvider>
             )}
-            {answer && (
-              <p className="w-full rounded-[10px] border border-gray-100 p-4">
-                Laborum nulla consectetur id sit cupidatat reprehenderit ex
-                minim nulla pariatur non
-              </p>
-            )}
+            {answered && <p className="w-full">{data?.answer}</p>}
           </div>
         )}
       </div>
