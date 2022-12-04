@@ -9,7 +9,7 @@ import format from "date-fns/format";
 
 export default function QuestionAnswerListItem({ withInput, data }) {
   const [isAnswerSubmitting, setIsAnswerSubmitting] = useState(false);
-  const [answered, setAnswered] = useState(data?.answer ? true : false);
+  // const [answered, setAnswered] = useState(data?.answer ? true : false);
   const answerFormik = useFormik({
     initialValues: {
       questionId: data?._id,
@@ -18,6 +18,8 @@ export default function QuestionAnswerListItem({ withInput, data }) {
     onSubmit: handleAnswerSubmit,
   });
   const { socket } = useSocketStore();
+
+  // console.log(data?.answer, answered);
 
   async function handleAnswerSubmit(values) {
     if (values.answer) {
@@ -30,8 +32,8 @@ export default function QuestionAnswerListItem({ withInput, data }) {
       });
       const result = await res.json();
       if (result && result.success) {
-        setAnswered(true);
-        console.log(result);
+        data.answer = result.data.answer;
+        // console.log(result);
         socket.emit("answer", {
           answeredQuestion: result.data,
           room: result.data.item,
@@ -71,7 +73,7 @@ export default function QuestionAnswerListItem({ withInput, data }) {
             >
               A
             </span>
-            {withInput && !answered && (
+            {withInput && !data?.answer && (
               <FormikProvider value={answerFormik}>
                 <Form className="flex w-full flex-col gap-4">
                   <div className="flex items-end gap-2">
@@ -97,7 +99,7 @@ export default function QuestionAnswerListItem({ withInput, data }) {
                 </Form>
               </FormikProvider>
             )}
-            {answered && <p className="w-full">{data?.answer}</p>}
+            {data?.answer && <p className="w-full">{data?.answer}</p>}
           </div>
         )}
       </div>

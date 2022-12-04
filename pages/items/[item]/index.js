@@ -47,6 +47,7 @@ import { UserOfferCard } from "../../../components/Cards";
 import { PopupLoader } from "../../../components/Loaders";
 import { toast } from "react-hot-toast";
 import dynamic from "next/dynamic";
+import useQuestionAnswerStore from "../../../store/useQuestionAnswerStore";
 import { FormikProvider, Form, useFormik } from "formik";
 const InlineDropdownSelect = dynamic(
   () => import("../../../components/Inputs/InlineDropdownSelect"),
@@ -54,6 +55,11 @@ const InlineDropdownSelect = dynamic(
     ssr: false,
   }
 );
+
+/**
+ * added temporary store solution for fixing q&a mutations gets refetched
+ * and new data are removed
+ */
 
 const MemoizedInlineDropdownSelect = memo(InlineDropdownSelect);
 
@@ -68,7 +74,7 @@ const MemoizedInlineDropdownSelect = memo(InlineDropdownSelect);
 
 function findNestedObj(obj, key, value) {
   try {
-    JSON.stringify(obj, (_, nestedValue, o) => {
+    JSON.stringify(obj, (_, nestedValue) => {
       if (nestedValue && nestedValue[key] === value) throw nestedValue;
       return nestedValue;
     });
@@ -121,6 +127,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
   //others
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { questions: storedQuestions, setQuestions } = useQuestionAnswerStore();
   const { socket } = useSocketStore();
   const { offer, setOffer, setItem, isSubmitting, isSubmitSuccess, resubmit } =
     useUserOfferStore();
@@ -142,7 +149,16 @@ export default function Item({ itemData, userOffer, fromUser }) {
     size: questionsSize,
     setSize: setQuestionsSize,
     mutate: mutateQuestions,
-  } = usePaginate(`/api/questions/${itemData._id}`, 2);
+  } = usePaginate(
+    `/api/questions/${itemData._id}`,
+    2,
+    {},
+    {
+      revalidateIfStale: false,
+      revalidateOnFocus: false,
+      revalidateOnReconnect: false,
+    }
+  );
 
   const itemImages =
     itemData?.images?.length &&
@@ -181,18 +197,28 @@ export default function Item({ itemData, userOffer, fromUser }) {
     );
   });
 
-  const itemQuestions =
-    questions &&
-    questions
-      .map((page) => page.data.docs)
-      .flat()
-      .map((question) => (
-        <QuestionAnswerListItem
-          key={question._id}
-          data={question}
-          withInput={fromUser}
-        />
-      ));
+  const itemQuestions = storedQuestions.length
+    ? storedQuestions
+        .map((page) => page.data.docs)
+        .flat()
+        .map((question) => (
+          <QuestionAnswerListItem
+            key={question._id}
+            data={question}
+            withInput={fromUser}
+          />
+        ))
+    : questions &&
+      questions
+        .map((page) => page.data.docs)
+        .flat()
+        .map((question) => (
+          <QuestionAnswerListItem
+            key={question._id}
+            data={question}
+            withInput={fromUser}
+          />
+        ));
 
   const itemOffers =
     offers &&
@@ -258,11 +284,25 @@ export default function Item({ itemData, userOffer, fromUser }) {
       socket.on("new-question", (question) => {
         console.log(question);
         if (questionsEndReached || !questions || !itemQuestions.length) {
-          mutateQuestions(
+          const updatedQuestions =
             questions && questions.length
               ? [...questions, question]
-              : [question]
-          );
+              : [question];
+          setQuestions(updatedQuestions);
+          mutateQuestions(updatedQuestions, {
+            // optimisticData: updatedQuestions,
+            revalidate: false,
+            populateCache: true,
+            // populateCache: (newQuestions, oldQuestions) => {
+            //   const updatedQuestions =
+            //     oldQuestions && oldQuestions.length
+            //       ? [...oldQuestions, ...newQuestions]
+            //       : [...newQuestions];
+
+            //   return updatedQuestions;
+            // },
+            // rollbackOnError: false,
+          });
         }
       });
 
@@ -282,8 +322,13 @@ export default function Item({ itemData, userOffer, fromUser }) {
               return nestedValue;
             })
           );
-
-          mutateQuestions(updatedQuestions);
+          setQuestions(updatedQuestions);
+          mutateQuestions(updatedQuestions, {
+            optimisticData: updatedQuestions,
+            revalidate: false,
+            populateCache: true,
+            // rollbackOnError: false,
+          });
         }
       });
 
@@ -300,6 +345,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
     questionsEndReached,
     questions,
     mutateQuestions,
+    setQuestions,
   ]);
 
   useEffect(() => {
@@ -368,7 +414,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
     setIsViewerOpen(false);
   }
 
-  console.log(questions);
+  console.log(storedQuestions);
 
   return (
     <div className="flex flex-col gap-6">
@@ -702,7 +748,9 @@ export default function Item({ itemData, userOffer, fromUser }) {
             <Tab className="tab-varying" selectedClassName="tab-active">
               <p>Questions</p>
               <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
-                {totalQuestionDocs}
+                {storedQuestions.length
+                  ? itemQuestions.length
+                  : totalQuestionDocs}
               </span>
             </Tab>
           </TabList>
@@ -803,12 +851,14 @@ export default function Item({ itemData, userOffer, fromUser }) {
                     No Questions
                   </p>
                 )}
-                {questionsLoading && (
+                {questionsLoading && !storedQuestions.length && (
                   <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
                     <DotLoader color="#C7EF83" size={32} />
                   </div>
                 )}
-                {(!questionsEndReached || !questions) && !questionsLoading ? (
+                {(!questionsEndReached || !questions) &&
+                !questionsLoading &&
+                !storedQuestions.length ? (
                   <div className="mx-auto mb-8 w-full max-w-[200px]">
                     <Button
                       secondary={true}
