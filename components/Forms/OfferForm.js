@@ -5,7 +5,7 @@ import {
   RadioSelect,
   RadioSelectItem,
 } from "../Inputs";
-import { Location, Router } from "@carbon/icons-react";
+import { Location } from "@carbon/icons-react";
 import { Button } from "../Buttons";
 import { memo } from "react";
 import { Formik, Form } from "formik";
@@ -13,11 +13,12 @@ import { offerSchema } from "../../lib/validators/item-validator";
 import { LocationModal } from "../Modals";
 import ReactModal from "react-modal";
 import useMapStore from "../../store/useMapStore";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useUserOfferStore from "../../store/useUserOfferStore";
 import { toast } from "react-hot-toast";
 import useSocketStore from "../../store/useSocketStore";
 import { useRouter } from "next/router";
+import { stall } from "../../utils/test-utils";
 
 const MemoizedImageSelector = memo(ImageSelector);
 
@@ -50,6 +51,12 @@ export default function OfferForm({ onClose }) {
     setOffer(values);
     try {
       setIsSubmitting(true);
+      await stall(5000);
+      setIsSubmitting(false);
+      setIsSubmitSuccess(false);
+      // toast.success("Offer Added");
+      toast.error("Can't add offer");
+      return;
       const res = await fetch(`/api/offers/${item}`, {
         method: "POST",
         body: JSON.stringify(values),

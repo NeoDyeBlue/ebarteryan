@@ -20,16 +20,8 @@ import {
 } from "../../../components/Buttons";
 import { IconLabel } from "../../../components/Icons";
 import { Rating } from "react-simple-star-rating";
-import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import {
-  OfferList,
-  OfferListItem,
-  QuestionAnswerList,
-  QuestionAnswerListItem,
-} from "../../../components/Lists";
 import { OfferModal, ConfirmationModal } from "../../../components/Modals";
 import { useState, useEffect, useCallback, memo } from "react";
-import { Textarea } from "../../../components/Inputs";
 import { motion, AnimatePresence } from "framer-motion";
 import { getItem } from "../../../lib/controllers/item-controller";
 import Link from "next/link";
@@ -40,15 +32,12 @@ import { ConditionBadge } from "../../../components/Misc";
 import useUserOfferStore from "../../../store/useUserOfferStore";
 import { getUserOffer } from "../../../lib/controllers/offer-controller";
 import usePaginate from "../../../lib/hooks/usePaginate";
-import { DotLoader } from "react-spinners";
 import useSocketStore from "../../../store/useSocketStore";
 import ImageViewer from "react-simple-image-viewer";
-import { UserOfferCard } from "../../../components/Cards";
 import { PopupLoader } from "../../../components/Loaders";
 import { toast } from "react-hot-toast";
 import dynamic from "next/dynamic";
-import useQuestionAnswerStore from "../../../store/useQuestionAnswerStore";
-import { FormikProvider, Form, useFormik } from "formik";
+import { ItemPageTabs } from "../../../components/Tabs";
 const InlineDropdownSelect = dynamic(
   () => import("../../../components/Inputs/InlineDropdownSelect"),
   {
@@ -59,29 +48,12 @@ const InlineDropdownSelect = dynamic(
 /**
  * added temporary store solution for fixing q&a mutations gets refetched
  * and new data are removed
+ *
+ * todo
+ * 1. try using
  */
 
 const MemoizedInlineDropdownSelect = memo(InlineDropdownSelect);
-
-/**
- *
- * @param {*} obj
- * @param {*} key
- * @param {*} value
- * @returns Object result
- * @see {@link https://stackoverflow.com/questions/15523514/find-by-key-deep-in-a-nested-array}
- */
-
-function findNestedObj(obj, key, value) {
-  try {
-    JSON.stringify(obj, (_, nestedValue) => {
-      if (nestedValue && nestedValue[key] === value) throw nestedValue;
-      return nestedValue;
-    });
-  } catch (result) {
-    return result;
-  }
-}
 
 export async function getServerSideProps(context) {
   const { params } = context;
@@ -122,34 +94,17 @@ export default function Item({ itemData, userOffer, fromUser }) {
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [isQuestionSubmitting, setIsQuestionSubmitting] = useState(false);
+  const [shouldFetch, setShouldFetch] = useState(true);
 
   //others
   const { data: session, status } = useSession();
   const router = useRouter();
-  const { questions: storedQuestions, setQuestions } = useQuestionAnswerStore();
   const { socket } = useSocketStore();
-  const { offer, setOffer, setItem, isSubmitting, isSubmitSuccess, resubmit } =
-    useUserOfferStore();
-  const {
-    data: offers,
-    totalDocs: totalOfferDocs,
-    isEndReached: offersEndReached,
-    isLoading: offersLoading,
-    size: offersSize,
-    setSize: setOffersSize,
-    mutate: mutateOffers,
-  } = usePaginate(`/api/offers/${itemData._id}`, 10);
+  const { offer, setOffer, setItem } = useUserOfferStore();
 
-  const {
-    data: questions,
-    totalDocs: totalQuestionDocs,
-    isEndReached: questionsEndReached,
-    isLoading: questionsLoading,
-    size: questionsSize,
-    setSize: setQuestionsSize,
-    mutate: mutateQuestions,
-  } = usePaginate(
+  const offers = usePaginate(`/api/offers/${itemData._id}`, 10);
+
+  const questions = usePaginate(
     `/api/questions/${itemData._id}`,
     2,
     {},
@@ -197,46 +152,6 @@ export default function Item({ itemData, userOffer, fromUser }) {
     );
   });
 
-  const itemQuestions = storedQuestions.length
-    ? storedQuestions
-        .map((page) => page.data.docs)
-        .flat()
-        .map((question) => (
-          <QuestionAnswerListItem
-            key={question._id}
-            data={question}
-            withInput={fromUser}
-          />
-        ))
-    : questions &&
-      questions
-        .map((page) => page.data.docs)
-        .flat()
-        .map((question) => (
-          <QuestionAnswerListItem
-            key={question._id}
-            data={question}
-            withInput={fromUser}
-          />
-        ));
-
-  const itemOffers =
-    offers &&
-    offers
-      .map((page) => page.data.docs)
-      .flat()
-      .map((offer) => (
-        <OfferListItem key={offer._id} offer={offer} withButtons={fromUser} />
-      ));
-
-  const questionFormik = useFormik({
-    initialValues: {
-      question: "",
-    },
-    // validationSchema: questionSchema,
-    onSubmit: handleQuestionSubmit,
-  });
-
   //----------useCallbacks----------
   const updateOfferStore = useCallback(() => {
     setItem(itemData?._id);
@@ -268,6 +183,12 @@ export default function Item({ itemData, userOffer, fromUser }) {
 
   //----------useEffects----------
   useEffect(() => {
+    if (questions.isEndReached) {
+      setShouldFetch(false);
+    }
+  }, [questions?.isEndReached]);
+
+  useEffect(() => {
     updateOfferStore();
   }, [updateOfferStore]);
 
@@ -275,78 +196,9 @@ export default function Item({ itemData, userOffer, fromUser }) {
     if (socket) {
       socket.emit("join-item-room", itemData?._id);
 
-      socket.on("another-offer", (offer) => {
-        if (offersEndReached || !offers || !itemOffers.length) {
-          mutateOffers(offers && offers.length ? [...offers, offer] : [offer]);
-        }
-      });
-
-      socket.on("new-question", (question) => {
-        console.log(question);
-        if (questionsEndReached || !questions || !itemQuestions.length) {
-          const updatedQuestions =
-            questions && questions.length
-              ? [...questions, question]
-              : [question];
-          setQuestions(updatedQuestions);
-          mutateQuestions(updatedQuestions, {
-            // optimisticData: updatedQuestions,
-            revalidate: false,
-            populateCache: true,
-            // populateCache: (newQuestions, oldQuestions) => {
-            //   const updatedQuestions =
-            //     oldQuestions && oldQuestions.length
-            //       ? [...oldQuestions, ...newQuestions]
-            //       : [...newQuestions];
-
-            //   return updatedQuestions;
-            // },
-            // rollbackOnError: false,
-          });
-        }
-      });
-
-      socket.on("answered-question", (answeredQuestion) => {
-        const questionExists = findNestedObj(
-          questions,
-          "_id",
-          answeredQuestion._id
-        );
-        console.log(answeredQuestion);
-        if (questionExists) {
-          const updatedQuestions = JSON.parse(
-            JSON.stringify(questions, (_, nestedValue) => {
-              if (nestedValue && nestedValue["_id"] == answeredQuestion._id) {
-                return answeredQuestion;
-              }
-              return nestedValue;
-            })
-          );
-          setQuestions(updatedQuestions);
-          mutateQuestions(updatedQuestions, {
-            optimisticData: updatedQuestions,
-            revalidate: false,
-            populateCache: true,
-            // rollbackOnError: false,
-          });
-        }
-      });
-
       return () => socket.emit("leave-item-room", itemData?._id);
     }
-  }, [
-    socket,
-    offersEndReached,
-    itemOffers?.length,
-    itemData?._id,
-    mutateOffers,
-    offers,
-    itemQuestions?.length,
-    questionsEndReached,
-    questions,
-    mutateQuestions,
-    setQuestions,
-  ]);
+  }, [socket, itemData?._id]);
 
   useEffect(() => {
     const availabilityCheck = async () => {
@@ -363,28 +215,6 @@ export default function Item({ itemData, userOffer, fromUser }) {
   }, [available, fromUser, prevAvailability, updateAvailability]);
 
   //other functions
-  async function handleQuestionSubmit(values) {
-    if (values.question) {
-      setIsQuestionSubmitting(true);
-      const res = await fetch(`/api/questions/${itemData._id}`, {
-        method: "POST",
-        body: JSON.stringify(values),
-        headers: { "Content-Type": "application/json" },
-      });
-      const result = await res.json();
-      if (result && result.success) {
-        socket.emit("question", {
-          question: result,
-          room: result.data.docs[0].item,
-        });
-        questionFormik.setFieldValue("question", "");
-        toast.success("Question asked");
-      } else {
-        toast.error("Can't post question");
-      }
-      setIsQuestionSubmitting(false);
-    }
-  }
   function openOfferModal() {
     if (session && session.user.verified && status == "authenticated") {
       setOfferModalOpen(true);
@@ -413,8 +243,6 @@ export default function Item({ itemData, userOffer, fromUser }) {
     setCurrentImage(0);
     setIsViewerOpen(false);
   }
-
-  console.log(storedQuestions);
 
   return (
     <div className="flex flex-col gap-6">
@@ -734,144 +562,13 @@ export default function Item({ itemData, userOffer, fromUser }) {
         pb-6 sm:pt-6"
         id="offers"
       >
-        <Tabs
-          defaultIndex={0}
-          className="container mx-auto grid grid-cols-1 items-start gap-6 sm:grid-cols-[auto_2fr] lg:max-w-[1200px]"
-        >
-          <TabList className="flex w-full items-start gap-4 sm:h-full sm:w-[200px] sm:flex-col sm:gap-6">
-            <Tab className="tab-varying" selectedClassName="tab-active">
-              <p>Offers</p>
-              <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
-                {totalOfferDocs}
-              </span>
-            </Tab>
-            <Tab className="tab-varying" selectedClassName="tab-active">
-              <p>Questions</p>
-              <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
-                {storedQuestions.length
-                  ? itemQuestions.length
-                  : totalQuestionDocs}
-              </span>
-            </Tab>
-          </TabList>
-          <div>
-            <TabPanel className="flex flex-col gap-10">
-              {offer || userOffer ? (
-                <div
-                  // id="offers"
-                  className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
-                >
-                  <p className="font-display text-lg font-semibold">
-                    Your Offer
-                  </p>
-                  <UserOfferCard
-                    offer={offer}
-                    offersLoading={
-                      userOffer
-                        ? false
-                        : isSubmitting && !isSubmitSuccess
-                        ? true
-                        : false
-                    }
-                    isSubmitSuccess={userOffer ? true : isSubmitSuccess}
-                    retryHandler={resubmit}
-                  />
-                </div>
-              ) : null}
-              {itemOffers?.length ? (
-                <div className="flex flex-col gap-2 pb-4">
-                  <p className="font-display text-lg font-semibold">Offers</p>
-                  <OfferList>{itemOffers}</OfferList>
-                </div>
-              ) : !offersEndReached ? (
-                <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
-                  <DotLoader color="#C7EF83" size={32} />
-                </div>
-              ) : (
-                <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
-                  No Offers
-                </p>
-              )}
-              {offersLoading && (
-                <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
-                  <DotLoader color="#C7EF83" size={32} />
-                </div>
-              )}
-              {(!offersEndReached || !offers) && !offersLoading ? (
-                <div className="mx-auto mb-8 w-full max-w-[200px]">
-                  <Button
-                    secondary={true}
-                    onClick={() => setOffersSize(offersSize + 1)}
-                  >
-                    Load More
-                  </Button>
-                </div>
-              ) : null}
-            </TabPanel>
-            <TabPanel className="flex flex-col gap-10">
-              <div className="flex flex-col gap-8">
-                {!fromUser && (
-                  <FormikProvider value={questionFormik}>
-                    <Form className="flex flex-col gap-4">
-                      <p className="font-display text-lg font-semibold">
-                        Ask a Question
-                      </p>
-                      <div className="flex flex-row items-end gap-2">
-                        <Textarea
-                          placeholder="Type here..."
-                          name="question"
-                          value={questionFormik.values.question}
-                        />
-                        <Button
-                          autoWidth={true}
-                          type="submit"
-                          disabled={isQuestionSubmitting}
-                        >
-                          {isQuestionSubmitting ? (
-                            <DotLoader color="#fff" size={24} />
-                          ) : (
-                            <p>Ask</p>
-                          )}
-                        </Button>
-                      </div>
-                    </Form>
-                  </FormikProvider>
-                )}
-                {itemQuestions?.length ? (
-                  <div className="flex flex-col gap-2 pb-4">
-                    <p className="font-display text-lg font-semibold">Offers</p>
-                    <QuestionAnswerList>{itemQuestions}</QuestionAnswerList>
-                  </div>
-                ) : !questionsEndReached ? (
-                  <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
-                    <DotLoader color="#C7EF83" size={32} />
-                  </div>
-                ) : (
-                  <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
-                    No Questions
-                  </p>
-                )}
-                {questionsLoading && !storedQuestions.length && (
-                  <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
-                    <DotLoader color="#C7EF83" size={32} />
-                  </div>
-                )}
-                {(!questionsEndReached || !questions) &&
-                !questionsLoading &&
-                !storedQuestions.length ? (
-                  <div className="mx-auto mb-8 w-full max-w-[200px]">
-                    <Button
-                      secondary={true}
-                      onClick={() => setQuestionsSize(questionsSize + 1)}
-                    >
-                      Load More
-                    </Button>
-                  </div>
-                ) : null}
-              </div>
-            </TabPanel>
-          </div>
-        </Tabs>
+        <ItemPageTabs
+          itemId={itemData?._id}
+          offersPaginate={offers}
+          questionsPaginate={questions}
+          showUserControls={fromUser}
+          hasUserOffer={userOffer ? true : false}
+        />
       </div>
     </div>
   );

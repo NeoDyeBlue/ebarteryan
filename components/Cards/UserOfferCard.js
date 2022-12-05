@@ -9,6 +9,7 @@ import { useSession } from "next-auth/react";
 import { useState, useCallback } from "react";
 import ImageViewer from "react-simple-image-viewer";
 import format from "date-fns/format";
+import useUserOfferStore from "../../store/useUserOfferStore";
 
 export default function UserOfferCard({
   offer,
@@ -17,6 +18,7 @@ export default function UserOfferCard({
   retryHandler,
 }) {
   const { data: session, status } = useSession();
+  const { setOffer } = useUserOfferStore();
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const itemImages = offer?.images?.map((image, index) => (
@@ -52,13 +54,25 @@ export default function UserOfferCard({
 
   return (
     <li
-      className={`relative mb-1 flex flex-col-reverse gap-3
+      className={`relative mb-1 flex flex-col gap-3
      overflow-hidden md:gap-6 ${
        isLoading || !isSubmitSuccess
          ? "before:absolute before:z-10 before:h-full before:w-full before:bg-white/50"
          : ""
      }`}
     >
+      {isLoading ? (
+        <BarLoader
+          color="#85CB33"
+          cssOverride={{
+            width: "100%",
+            marginBottom: "0.25rem",
+            display: "block",
+          }}
+          // size={14}
+          // width={200}
+        />
+      ) : null}
       {isViewerOpen && (
         <ImageViewer
           backgroundStyle={{
@@ -78,18 +92,33 @@ export default function UserOfferCard({
         <div className="absolute top-0 left-0 z-20 flex h-full w-full items-center justify-center bg-white/50 p-4">
           <div className="flex w-full max-w-[200px] flex-col gap-3 drop-shadow-md md:flex-row">
             <Button onClick={resubmit}>Retry</Button>
-            <Button underlined={true}>Cancel</Button>
+            <Button underlined={true} onClick={() => setOffer(null)}>
+              Cancel
+            </Button>
           </div>
         </div>
       ) : null}
-      {isLoading ? (
-        <BarLoader
-          color="#85CB33"
-          cssOverride={{ width: "100%", position: "absolute", top: 0, left: 0 }}
-          // size={14}
-          // width={200}
-        />
-      ) : null}
+      <div className="flex w-full flex-col gap-3">
+        <div className="flex w-full items-center justify-between">
+          <div className="flex flex-col">
+            <p className="font-display font-medium">
+              {offer?.name || "Item Name"}
+            </p>
+            <p className="mt-[0.05rem] flex flex-col gap-2 text-sm text-gray-300 sm:flex-row">
+              <span>
+                {offer?.region || offer?.location?.region} •{" "}
+                {offer?.createdAt && format(new Date(offer?.createdAt), "PP")}{" "}
+              </span>
+              <ConditionBadge condition={offer?.condition} />
+            </p>
+          </div>
+          <CircleButton icon={<OverflowMenuVertical size={24} />} />
+        </div>
+        <p>{offer?.description || "Description"}</p>
+        <div className="grid max-w-[calc((0.25rem*2+300px))] grid-cols-[repeat(auto-fill,_minmax(100px,_100px))] gap-1 overflow-hidden">
+          {itemImages}
+        </div>
+      </div>
       <div className={`flex w-full items-center gap-4 self-start`}>
         <div className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
           <Image
@@ -125,27 +154,6 @@ export default function UserOfferCard({
               </span>
             </div>
           </div>
-        </div>
-      </div>
-      <div className="flex w-full flex-col gap-3">
-        <div className="flex w-full items-center justify-between">
-          <div className="flex flex-col">
-            <p className="font-display font-medium">
-              {offer?.name || "Item Name"}
-            </p>
-            <p className="mt-[0.05rem] flex flex-col gap-2 text-sm text-gray-300 sm:flex-row">
-              <span>
-                {offer?.region || offer?.location?.region} •{" "}
-                {offer?.createdAt && format(new Date(offer?.createdAt), "PP")}{" "}
-              </span>
-              <ConditionBadge condition={offer?.condition} />
-            </p>
-          </div>
-          <CircleButton icon={<OverflowMenuVertical size={24} />} />
-        </div>
-        <p>{offer?.description || "Description"}</p>
-        <div className="grid max-w-[calc((0.25rem*2+300px))] grid-cols-[repeat(auto-fill,_minmax(100px,_100px))] gap-1 overflow-hidden">
-          {itemImages}
         </div>
       </div>
     </li>

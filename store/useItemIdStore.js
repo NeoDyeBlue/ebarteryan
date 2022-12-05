@@ -1,6 +1,6 @@
 import create from "zustand";
 
-const useUserItemStore = create((set) => ({
+const useItemIdStore = create((set) => ({
   item: null,
   setItem: (payload) =>
     set(() => ({
@@ -8,4 +8,4 @@ const useUserItemStore = create((set) => ({
     })),
 }));
 
-export default useUserItemStore;
+export default useItemIdStore;
