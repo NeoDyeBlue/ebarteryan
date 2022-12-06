@@ -171,7 +171,7 @@ export default function ItemPageTabs({
       socket.on("another-offer", (offer) => {
         if (offersEndReached || !offers || !itemOffers.length) {
           const updatedOffers = storedOffers.length
-            ? [storedOffers, offer]
+            ? [...storedOffers, offer]
             : [offer];
           setOffers(updatedOffers);
         }

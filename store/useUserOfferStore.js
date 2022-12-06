@@ -1,8 +1,11 @@
 import create from "zustand";
 import useSocketStore from "./useSocketStore";
+import useItemOffersStore from "./useItemOffersStore";
+// import { stall } from "../utils/test-utils";
 import { toast } from "react-hot-toast";
 
-const { socket } = useSocketStore.getState();
+// const { socket: socketStore } = useSocketStore.getState();
+// console.log(socket);
 
 const useUserOfferStore = create((set, get) => ({
   item: "",
@@ -34,11 +37,18 @@ const useUserOfferStore = create((set, get) => ({
         headers: { "Content-Type": "application/json" },
       });
       const result = await res.json();
+      console.log(result);
       if (result && result.success) {
         set({ isSubmitting: false });
-        socket.emit("offer", { offer: result, room: result.data.docs[0].item });
+        set({ isSubmitSuccess: true });
+        useSocketStore.getState().socket.emit("offer", {
+          offer: result,
+          room: result.data.docs[0].item,
+        });
+        useItemOffersStore.setState({ totalOffers: result.data.totalDocs });
         toast.success("Offer Added");
-        set({ offer: result.data });
+        // set({ offer: result.data });
+        set({ socket: null });
       } else {
         set({ isSubmitting: false });
         set({ isSubmitSuccess: false });

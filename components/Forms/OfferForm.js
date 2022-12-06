@@ -15,6 +15,7 @@ import ReactModal from "react-modal";
 import useMapStore from "../../store/useMapStore";
 import { useState } from "react";
 import useUserOfferStore from "../../store/useUserOfferStore";
+import useItemOffersStore from "../../store/useItemOffersStore";
 import { toast } from "react-hot-toast";
 import useSocketStore from "../../store/useSocketStore";
 import { useRouter } from "next/router";
@@ -34,6 +35,7 @@ export default function OfferForm({ onClose }) {
   } = useMapStore();
   const { item, setOffer, setIsSubmitting, setIsSubmitSuccess } =
     useUserOfferStore();
+  const { setTotalOffers } = useItemOffersStore();
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const { socket } = useSocketStore();
   function openLocationModal() {
@@ -70,6 +72,7 @@ export default function OfferForm({ onClose }) {
           offer: result,
           room: result.data.docs[0].item,
         });
+        setTotalOffers(result.data.totalDocs);
         toast.success("Offer Added");
       } else {
         setIsSubmitting(false);
