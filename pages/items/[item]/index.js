@@ -102,7 +102,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
   const { socket } = useSocketStore();
   const { offer, setOffer, setItem } = useUserOfferStore();
 
-  const offers = usePaginate(`/api/offers/${itemData._id}`, 10);
+  const offers = usePaginate(`/api/items/${itemData._id}/offers`, 10);
 
   const questions = usePaginate(
     `/api/questions/${itemData._id}`,
@@ -259,7 +259,7 @@ export default function Item({ itemData, userOffer, fromUser }) {
             backgroundColor: "rgba(0,0,0,0.75)",
             padding: "1.5rem",
           }}
-          closeComponent={<Add className="rotate-[135deg]" offersSize={48} />}
+          closeComponent={<Add className="rotate-[135deg]" size={48} />}
           src={itemData?.images.map((image) => image.url)}
           currentIndex={currentImage}
           disableScroll={true}
@@ -418,7 +418,8 @@ export default function Item({ itemData, userOffer, fromUser }) {
                 <span className="mt-[0.12rem]">
                   <p className="inline">{itemData.region}</p> •{" "}
                   {format(new Date(itemData.createdAt), "PP")}{" "}
-                  <ConditionBadge condition={itemData.condition} />
+                  <ConditionBadge condition={itemData.condition} />{" "}
+                  {itemData.edited ? "(edited)" : ""}
                 </span>
               </div>
             </div>

@@ -359,7 +359,7 @@ export default function ItemPageTabs({
             )}
             {itemQuestions?.length ? (
               <div className="flex flex-col gap-2 pb-4">
-                <p className="font-display text-lg font-semibold">Offers</p>
+                <p className="font-display text-lg font-semibold">Questions</p>
                 <QuestionAnswerList>{itemQuestions}</QuestionAnswerList>
               </div>
             ) : !questionsEndReached ? (

@@ -30,8 +30,6 @@ export default function Create({ path, host }) {
     setPath(path);
     setHost(host);
   }, [path, host, setPath, setHost]);
-
-  console.log("i rerender");
   return (
     <div className="w-full">
       <Head>

@@ -32,13 +32,11 @@ export default function UserOfferListItem({ offer, status }) {
     <li
       className="flex h-fit cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 bg-white p-3
     hover:shadow-md"
-      onClick={() =>
-        router.push(`/items/${offer?.item?.category?.name}/${offer?.item?._id}`)
-      }
+      onClick={() => router.push(`/items/${offer?.item?._id}`)}
     >
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <div className="relative h-[36px] w-[36px] overflow-hidden rounded-full">
+        <div className="flex max-w-full items-center gap-2 overflow-hidden">
+          <div className="relative h-[36px] w-[36px] flex-shrink-0 overflow-hidden rounded-full">
             <Image
               src={offer?.item?.user?.image?.url}
               layout="fill"
@@ -46,7 +44,7 @@ export default function UserOfferListItem({ offer, status }) {
               alt="user image"
             />
           </div>
-          <p className="overflow-ellipsis whitespace-nowrap font-display text-sm font-medium">
+          <p className="overflow-hidden overflow-ellipsis whitespace-nowrap font-display text-sm font-medium">
             {offer?.item?.user?.firstName} {offer?.item?.user?.lastName}
           </p>
           <StatusBadge status={status} statusText={status} />

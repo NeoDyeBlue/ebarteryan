@@ -12,10 +12,14 @@ import { useState, useCallback } from "react";
 import ImageViewer from "react-simple-image-viewer";
 import format from "date-fns/format";
 import { Button } from "../Buttons";
+import { toast } from "react-hot-toast";
+import { DotLoader } from "react-spinners";
+import { stall } from "../../utils/test-utils";
 
 export default function OfferListItem({ offer, withButtons }) {
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const itemImages = offer?.images?.map((image, index) => (
     <div
       key={index}
@@ -42,6 +46,17 @@ export default function OfferListItem({ offer, withButtons }) {
     setCurrentImage(0);
     setIsViewerOpen(false);
   };
+
+  async function acceptOffer() {
+    try {
+      setIsLoading(true);
+      await stall(3000);
+      setIsLoading(false);
+      toast.success("Offer accepted");
+    } catch (error) {
+      toast.error("Can't accept offer");
+    }
+  }
 
   return (
     <li
@@ -124,9 +139,18 @@ export default function OfferListItem({ offer, withButtons }) {
               <Chat size={20} />
               <p className="hidden md:block">Ask about the offer</p>
             </Button>
-            <Button autoWidth small>
-              <Checkmark size={20} />
-              <p className="hidden lg:block">Accept</p>
+            <Button autoWidth small onClick={acceptOffer} disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <DotLoader color="#fff" size={20} />
+                  <p>Accepting</p>
+                </>
+              ) : (
+                <>
+                  <Checkmark size={20} />
+                  <p>Accept</p>
+                </>
+              )}
             </Button>
           </div>
         )}

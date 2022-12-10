@@ -22,9 +22,9 @@ export default function Offers() {
   const userOffers =
     offers &&
     offers
-      .map((page, index) => page.data.docs)
+      .map((page) => page.data.docs)
       .flat()
-      .map((offer) => {
+      .map((offer, index) => {
         let status;
         if (offer.accepted) {
           status = "accepted";

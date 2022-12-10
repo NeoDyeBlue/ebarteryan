@@ -1,7 +1,7 @@
 import { useSelect } from "downshift";
 import { CaretDown, CaretUp, Information } from "@carbon/icons-react";
 import { useField } from "formik";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function DropdownSelect({
   items,
@@ -11,15 +11,17 @@ export default function DropdownSelect({
   name,
 }) {
   const [field, meta, helpers] = useField(name);
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(
+    items.find((item) => item?.value == meta.value || item == meta.value)
+  );
 
-  useEffect(() => {
-    if (items.length) {
-      setSelectedItem(
-        items.find((item) => item?.value == meta.value || item == meta.value)
-      );
-    }
-  }, [items, meta.value]);
+  // useEffect(() => {
+  //   if (items.length) {
+  //     setSelectedItem(
+  //       items.find((item) => item?.value == meta.value || item == meta.value)
+  //     );
+  //   }
+  // }, [items, meta.value]);
 
   const {
     isOpen,
@@ -35,11 +37,13 @@ export default function DropdownSelect({
     // defaultSelectedItem: initialSelected,
     onSelectedItemChange: ({ selectedItem: newSelectedItem }) => {
       setSelectedItem(newSelectedItem);
-      helpers.setValue(
-        newSelectedItem?.value ? newSelectedItem.value : newSelectedItem
-      );
     },
   });
+
+  useEffect(() => {
+    helpers.setValue(selectedItem?.value ? selectedItem.value : selectedItem);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedItem]);
 
   return (
     <div className="relative">

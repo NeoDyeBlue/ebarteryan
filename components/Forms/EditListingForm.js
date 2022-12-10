@@ -116,7 +116,8 @@ export default function EditListingForm({ item }) {
       const data = await res.json();
       if (data && data.success) {
         toast.success("Item Updated");
-        router.push(`/items/${item?._id}`);
+        setIsLoading(false);
+        // router.push(`/items/${item?._id}`);
       } else {
         setIsLoading(false);
         toast.error("Can't update item");
