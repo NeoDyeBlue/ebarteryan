@@ -3,7 +3,6 @@ import { Image as ImageIcon } from "@carbon/icons-react";
 import ImageSelectorItem from "./ImageSelectorItem";
 import { useEffect } from "react";
 import { Information } from "@carbon/icons-react";
-import { memo } from "react";
 import { useField } from "formik";
 
 // const MemoizedImageSelectorItem = memo(ImageSelectorItem, () => true);

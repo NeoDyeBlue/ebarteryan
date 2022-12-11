@@ -15,11 +15,16 @@ import { Button } from "../Buttons";
 import { toast } from "react-hot-toast";
 import { DotLoader } from "react-spinners";
 import { stall } from "../../utils/test-utils";
+import { ConfirmationModal } from "../Modals";
 
 export default function OfferListItem({ offer, withButtons }) {
+  //states
   const [currentImage, setCurrentImage] = useState(0);
+  const [acceptConfirmationOpen, setAcceptConfirmationOpen] = useState(false);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  //elements
   const itemImages = offer?.images?.map((image, index) => (
     <div
       key={index}
@@ -37,11 +42,13 @@ export default function OfferListItem({ offer, withButtons }) {
     </div>
   ));
 
+  //callbacks
   const openImageViewer = useCallback((index) => {
     setCurrentImage(index);
     setIsViewerOpen(true);
   }, []);
 
+  //functions
   const closeImageViewer = () => {
     setCurrentImage(0);
     setIsViewerOpen(false);
@@ -49,10 +56,11 @@ export default function OfferListItem({ offer, withButtons }) {
 
   async function acceptOffer() {
     try {
-      setIsLoading(true);
-      await stall(3000);
-      setIsLoading(false);
-      toast.success("Offer accepted");
+      setAcceptConfirmationOpen(true);
+      // setIsLoading(true);
+      // await stall(3000);
+      // setIsLoading(false);
+      // toast.success("Offer accepted");
     } catch (error) {
       toast.error("Can't accept offer");
     }
@@ -64,6 +72,12 @@ export default function OfferListItem({ offer, withButtons }) {
      border-b border-gray-100 bg-white pb-4 md:gap-6
      `}
     >
+      <ConfirmationModal
+        isOpen={acceptConfirmationOpen}
+        label="Accept Offer?"
+        onClose={() => setAcceptConfirmationOpen(false)}
+        message="Once the offer was accepted, your item will not accept any more offers"
+      />
       {isViewerOpen && (
         <ImageViewer
           backgroundStyle={{
@@ -137,7 +151,7 @@ export default function OfferListItem({ offer, withButtons }) {
           <div className="flex w-full justify-end gap-2">
             <Button underlined autoWidth small>
               <Chat size={20} />
-              <p className="hidden md:block">Ask about the offer</p>
+              <p className="hidden lg:block">Ask about the offer</p>
             </Button>
             <Button autoWidth small onClick={acceptOffer} disabled={isLoading}>
               {isLoading ? (

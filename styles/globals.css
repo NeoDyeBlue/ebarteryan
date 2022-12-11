@@ -82,8 +82,8 @@
     @apply rounded-[10px] bg-gray-100;
   }
 
-  .modal-open-body {
-    @apply h-full overflow-hidden;
+  .scroll-disabled {
+    @apply fixed w-full overflow-y-scroll;
   }
 }
 

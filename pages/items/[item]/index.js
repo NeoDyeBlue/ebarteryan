@@ -30,7 +30,10 @@ import { useRouter } from "next/router";
 import { format } from "date-fns";
 import { ConditionBadge } from "../../../components/Misc";
 import useUserOfferStore from "../../../store/useUserOfferStore";
-import { getUserOffer } from "../../../lib/controllers/offer-controller";
+import {
+  getUserOffer,
+  getAcceptedOffer,
+} from "../../../lib/controllers/offer-controller";
 import usePaginate from "../../../lib/hooks/usePaginate";
 import useSocketStore from "../../../store/useSocketStore";
 import ImageViewer from "react-simple-image-viewer";
@@ -38,6 +41,7 @@ import { PopupLoader } from "../../../components/Loaders";
 import { toast } from "react-hot-toast";
 import dynamic from "next/dynamic";
 import { ItemPageTabs } from "../../../components/Tabs";
+import useItemOffersStore from "../../../store/useItemOffersStore";
 const InlineDropdownSelect = dynamic(
   () => import("../../../components/Inputs/InlineDropdownSelect"),
   {
@@ -61,11 +65,14 @@ export async function getServerSideProps(context) {
     const item = await getItem(params.item);
     const session = await getSession(context);
     let userOffer = null;
+    let acceptedOffer = null;
     let fromUser = false;
 
     if (!item) {
       return { notFound: true };
     }
+
+    acceptedOffer = await getAcceptedOffer(item._id);
 
     if (session && session?.user?.verified) {
       userOffer = await getUserOffer(item._id, session?.user?.id);
@@ -75,6 +82,7 @@ export async function getServerSideProps(context) {
       props: {
         itemData: JSON.parse(JSON.stringify(item)),
         userOffer: JSON.parse(JSON.stringify(userOffer)),
+        acceptedOffer: JSON.parse(JSON.stringify(acceptedOffer)),
         fromUser,
       },
     };
@@ -83,7 +91,7 @@ export async function getServerSideProps(context) {
   }
 }
 
-export default function Item({ itemData, userOffer, fromUser }) {
+export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
   //----------states----------
   const [offerModalOpen, setOfferModalOpen] = useState(false);
   const [availabilityConfirmationOpen, setAvailabilityConfirmationOpen] =
@@ -94,13 +102,14 @@ export default function Item({ itemData, userOffer, fromUser }) {
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
-  const [shouldFetch, setShouldFetch] = useState(true);
 
   //others
   const { data: session, status } = useSession();
   const router = useRouter();
   const { socket } = useSocketStore();
   const { offer, setOffer, setItem } = useUserOfferStore();
+  const { setAcceptedOffer, acceptedOffer: itemAcceptedOffer } =
+    useItemOffersStore();
 
   const offers = usePaginate(`/api/items/${itemData._id}/offers`, 10);
 
@@ -156,7 +165,8 @@ export default function Item({ itemData, userOffer, fromUser }) {
   const updateOfferStore = useCallback(() => {
     setItem(itemData?._id);
     setOffer(userOffer);
-  }, [itemData, userOffer, setItem, setOffer]);
+    setAcceptedOffer(acceptedOffer);
+  }, [itemData, userOffer, setItem, setOffer, acceptedOffer, setAcceptedOffer]);
 
   const openImageViewer = useCallback((index) => {
     setCurrentImage(index);
@@ -182,11 +192,6 @@ export default function Item({ itemData, userOffer, fromUser }) {
   }, [available, itemData._id]);
 
   //----------useEffects----------
-  useEffect(() => {
-    if (questions.isEndReached) {
-      setShouldFetch(false);
-    }
-  }, [questions?.isEndReached]);
 
   useEffect(() => {
     updateOfferStore();

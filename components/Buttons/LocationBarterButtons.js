@@ -1,15 +1,19 @@
 import Button from "./Button";
 import LinkButton from "./LinkButton";
 import { Pen, Location } from "@carbon/icons-react";
-import Link from "next/link";
 import LocationModal from "../Modals/LocationModal";
 import ReactModal from "react-modal";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import useMapStore from "../../store/useMapStore";
 import Marquee from "react-fast-marquee";
+import {
+  disableBodyScroll,
+  enableBodyScroll,
+  clearAllBodyScrollLocks,
+} from "body-scroll-lock";
 
 export default function LocationBarterButtons({ className }) {
-  ReactModal.setAppElement("#__next");
+  const modalRef = useRef(null);
   const {
     clearPositionRegion,
     listingRegion,
@@ -18,40 +22,27 @@ export default function LocationBarterButtons({ className }) {
   } = useMapStore();
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   function openLocationModal() {
+    disableBodyScroll(modalRef?.current, { reserveScrollBarGap: true });
     setLocationModalOpen(true);
   }
 
   function closeLocationModal() {
+    enableBodyScroll(modalRef?.current);
     clearPositionRegion();
     setLocationModalOpen(false);
   }
   return (
     <>
-      <ReactModal
-        contentLabel="Location Modal"
+      <LocationModal
+        ref={modalRef}
+        onClose={closeLocationModal}
+        applyInListing={true}
         isOpen={locationModalOpen}
-        // closeTimeoutMS={300}
-        overlayClassName={`bg-black/20 fixed top-0 z-50 flex h-full w-full items-end`}
-        preventScroll={true}
-        onRequestClose={closeLocationModal}
-        bodyOpenClassName="modal-open-body"
-        className={`relative h-[90vh] w-full overflow-hidden rounded-t-[10px] bg-white
-         py-6 shadow-lg md:m-auto md:max-w-[580px] md:rounded-[10px]`}
-      >
-        <div
-          className={`custom-scrollbar container flex max-h-full min-h-full overflow-y-auto md:px-6`}
-        >
-          <LocationModal
-            onClose={closeLocationModal}
-            applyInListing={true}
-            onApply={() => {
-              setListingLocation();
-              closeLocationModal();
-            }}
-          />
-          {/* <OfferModal onClose={closeOfferModal} /> */}
-        </div>
-      </ReactModal>
+        onApply={() => {
+          setListingLocation();
+          closeLocationModal();
+        }}
+      />
       <div
         className={
           className
