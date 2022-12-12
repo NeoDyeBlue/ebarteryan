@@ -49,14 +49,6 @@ const InlineDropdownSelect = dynamic(
   }
 );
 
-/**
- * added temporary store solution for fixing q&a mutations gets refetched
- * and new data are removed
- *
- * todo
- * 1. try using
- */
-
 const MemoizedInlineDropdownSelect = memo(InlineDropdownSelect);
 
 export async function getServerSideProps(context) {
@@ -98,6 +90,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
     useState(false);
   const [showMinifiedBar, setShowMinifiedBar] = useState(false);
   const [available, setAvailable] = useState(itemData.available);
+  const [ended, setEnded] = useState(itemData?.ended);
   const [prevAvailability, setPrevAvailbility] = useState(itemData.available);
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
@@ -115,7 +108,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
 
   const questions = usePaginate(
     `/api/questions/${itemData._id}`,
-    2,
+    10,
     {},
     {
       revalidateIfStale: false,
@@ -249,6 +242,10 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
     setIsViewerOpen(false);
   }
 
+  function handleEnded(value) {
+    setEnded(value);
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <Head>
@@ -328,35 +325,25 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                   </div>
                   <div
                     className={`flex w-auto items-center gap-1 self-start rounded-full py-1 px-2 md:my-auto
-                              ${
-                                itemData.ended
-                                  ? "bg-warning-500 text-black-light"
-                                  : ""
-                              }
-                              ${
-                                !available && available == prevAvailability
-                                  ? "bg-danger-500 text-white"
-                                  : ""
-                              }
-                              ${
-                                available && available == prevAvailability
-                                  ? "bg-success-500 text-white"
-                                  : ""
-                              }`}
+                    ${
+                      ended
+                        ? "bg-warning-500 text-black-light"
+                        : !available
+                        ? "bg-danger-500 text-white"
+                        : "bg-success-500 text-white"
+                    }`}
                   >
                     <p className="text-xs capitalize sm:text-sm">
-                      {itemData.ended ? "ended" : ""}
-                      {!available && available == prevAvailability
+                      {ended
+                        ? "ended"
+                        : !available
                         ? "unavailable"
-                        : ""}
-                      {available && available == prevAvailability
-                        ? "available"
-                        : ""}
+                        : "available"}
                     </p>
                   </div>
                 </div>
               </div>
-              {itemData.available && !itemData.ended && !fromUser ? (
+              {available && !ended && !fromUser ? (
                 <div className="flex max-w-[250px] gap-3">
                   {offer || userOffer ? (
                     <LinkButton link="#offers">See Your Offer</LinkButton>
@@ -435,7 +422,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
             <div className="flex flex-col gap-4 pb-6">
               <div className="flex items-center justify-between rounded-[10px] border border-gray-100 p-4">
                 <p className="font-display font-medium">Availability</p>
-                {fromUser ? (
+                {fromUser && !ended ? (
                   <MemoizedInlineDropdownSelect
                     name="availability"
                     items={[
@@ -451,17 +438,17 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                   <div
                     className={`flex items-center gap-2 rounded-full py-[0.2rem] px-3 
                   ${
-                    itemData.ended
+                    ended
                       ? "bg-warning-500 text-black-light"
-                      : !itemData.available
+                      : !available
                       ? "bg-danger-500 text-white"
                       : "bg-success-500 text-white"
                   }`}
                   >
                     <p className="text-md capitalize">
-                      {itemData.ended
+                      {ended
                         ? "ended"
-                        : !itemData.available
+                        : !available
                         ? "unavailable"
                         : "available"}
                     </p>
@@ -473,7 +460,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                 <div className="flex gap-3">{itemClaimingOptions}</div>
               </div>
             </div>
-            {itemData.available && !itemData.ended && !fromUser ? (
+            {available && !ended && !fromUser ? (
               <div className="flex flex-col gap-3 md:flex-row">
                 {offer || userOffer ? (
                   <LinkButton link="#offers">See Your Offer</LinkButton>
@@ -574,6 +561,8 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
           questionsPaginate={questions}
           showUserControls={fromUser}
           hasUserOffer={userOffer ? true : false}
+          available={available && !ended}
+          onOfferAccept={(value) => handleEnded(value)}
         />
       </div>
     </div>

@@ -44,6 +44,8 @@ export default function ItemPageTabs({
   questionsPaginate,
   showUserControls,
   hasUserOffer,
+  available,
+  onOfferAccept,
 }) {
   //swr
   const {
@@ -84,6 +86,8 @@ export default function ItemPageTabs({
     setOffers,
     totalOffers,
     setTotalOffers,
+    setAcceptedOffer,
+    acceptedOffer,
   } = useItemOffersStore();
   const { item, setItem } = useItemIdStore();
 
@@ -110,7 +114,8 @@ export default function ItemPageTabs({
         <OfferListItem
           key={offer._id}
           offer={offer}
-          withButtons={showUserControls}
+          onAccept={handleOfferAccept}
+          withButtons={showUserControls && available}
         />
       ));
 
@@ -195,7 +200,6 @@ export default function ItemPageTabs({
           "_id",
           answeredQuestion._id
         );
-        console.log(answeredQuestion);
         if (questionExists) {
           const updatedQuestions = JSON.parse(
             JSON.stringify(storedQuestions, (_, nestedValue) => {
@@ -257,6 +261,14 @@ export default function ItemPageTabs({
     }
   }
 
+  function handleOfferAccept(accepted, offer) {
+    onOfferAccept(accepted);
+    setAcceptedOffer(offer);
+    setOffers(
+      storedOffers.filter((storedOffer) => offer._id !== storedOffer._id)
+    );
+  }
+
   return (
     <Tabs
       defaultIndex={0}
@@ -295,6 +307,20 @@ export default function ItemPageTabs({
                 }
                 isSubmitSuccess={hasUserOffer ? true : isSubmitSuccess}
                 retryHandler={resubmit}
+              />
+            </div>
+          ) : null}
+          {acceptedOffer ? (
+            <div
+              // id="offers"
+              className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
+            >
+              <p className="font-display text-lg font-semibold">
+                Accepted Offer
+              </p>
+              <OfferListItem
+                offer={acceptedOffer}
+                withButtons={showUserControls && available}
               />
             </div>
           ) : null}

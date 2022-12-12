@@ -13,11 +13,11 @@ import ImageViewer from "react-simple-image-viewer";
 import format from "date-fns/format";
 import { Button } from "../Buttons";
 import { toast } from "react-hot-toast";
-import { DotLoader } from "react-spinners";
 import { stall } from "../../utils/test-utils";
+import { DotLoader } from "react-spinners";
 import { ConfirmationModal } from "../Modals";
 
-export default function OfferListItem({ offer, withButtons }) {
+export default function OfferListItem({ offer, withButtons, onAccept }) {
   //states
   const [currentImage, setCurrentImage] = useState(0);
   const [acceptConfirmationOpen, setAcceptConfirmationOpen] = useState(false);
@@ -54,16 +54,20 @@ export default function OfferListItem({ offer, withButtons }) {
     setIsViewerOpen(false);
   };
 
-  async function acceptOffer() {
-    try {
-      setAcceptConfirmationOpen(true);
-      // setIsLoading(true);
-      // await stall(3000);
-      // setIsLoading(false);
-      // toast.success("Offer accepted");
-    } catch (error) {
-      toast.error("Can't accept offer");
-    }
+  function showConfirmation() {
+    setAcceptConfirmationOpen(true);
+    // setIsLoading(true);
+    // await stall(3000);
+    // setIsLoading(false);
+    // toast.success("Offer accepted");
+  }
+
+  async function handleAcceptConfirm() {
+    setIsLoading(true);
+    await stall(3000);
+    onAccept(true, offer);
+    setIsLoading(false);
+    toast.success("Offer accepted");
   }
 
   return (
@@ -76,7 +80,8 @@ export default function OfferListItem({ offer, withButtons }) {
         isOpen={acceptConfirmationOpen}
         label="Accept Offer?"
         onClose={() => setAcceptConfirmationOpen(false)}
-        message="Once the offer was accepted, your item will not accept any more offers"
+        onConfirm={handleAcceptConfirm}
+        message="Once the offer was accepted your item will not accept any more offers"
       />
       {isViewerOpen && (
         <ImageViewer
@@ -153,7 +158,12 @@ export default function OfferListItem({ offer, withButtons }) {
               <Chat size={20} />
               <p className="hidden lg:block">Ask about the offer</p>
             </Button>
-            <Button autoWidth small onClick={acceptOffer} disabled={isLoading}>
+            <Button
+              autoWidth
+              small
+              onClick={showConfirmation}
+              disabled={isLoading}
+            >
               {isLoading ? (
                 <>
                   <DotLoader color="#fff" size={20} />
