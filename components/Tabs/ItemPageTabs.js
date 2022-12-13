@@ -94,81 +94,76 @@ export default function ItemPageTabs({
   //elements
   const itemQuestions =
     storedQuestions.length &&
-    storedQuestions
-      .map((page) => page.data.docs)
-      .flat()
-      .map((question) => (
-        <QuestionAnswerListItem
-          key={question._id}
-          data={question}
-          withInput={showUserControls}
-        />
-      ));
+    storedQuestions.map((question) => (
+      <QuestionAnswerListItem
+        key={question._id}
+        data={question}
+        withInput={showUserControls}
+      />
+    ));
 
   const itemOffers =
     storedOffers?.length &&
-    storedOffers
-      .map((page) => page.data.docs)
-      .flat()
-      .map((offer) => (
-        <OfferListItem
-          key={offer._id}
-          offer={offer}
-          onAccept={handleOfferAccept}
-          withButtons={showUserControls && available}
-        />
-      ));
-
-  //effects
-  //   useLayoutEffect(() => {
-  //     setItem(itemId);
-  //   }, [itemId, setItem]);
+    storedOffers.map((offer) => (
+      <OfferListItem
+        key={offer._id}
+        offer={offer}
+        onAccept={handleOfferAccept}
+        withButtons={showUserControls && available}
+      />
+    ));
 
   useEffect(() => {
-    if (
-      (questions && questions.length >= storedQuestions.length) ||
-      itemId !== item
-    ) {
-      setQuestions(questions || []);
-      if (totalQuestionDocs >= totalQuestions || itemId !== item) {
-        setTotalQuestions(totalQuestionDocs);
+    if ((questions && questions.length) || itemId !== item) {
+      const flattened =
+        questions && questions.map((page) => page.data.docs).flat();
+      if (flattened && flattened.length >= storedQuestions.length) {
+        setQuestions(flattened || []);
+        if (totalQuestionDocs >= totalQuestions || itemId !== item) {
+          setTotalQuestions(totalQuestionDocs);
+        }
       }
       if (itemId !== item) {
         setItem(itemId);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     questions,
-    setQuestions,
-    storedQuestions,
-    setTotalQuestions,
-    totalQuestionDocs,
-    totalQuestions,
-    itemId,
-    item,
-    setItem,
+    // setQuestions,
+    // storedQuestions,
+    // setTotalQuestions,
+    // totalQuestionDocs,
+    // totalQuestions,
+    // itemId,
+    // item,
+    // setItem,
   ]);
 
   useEffect(() => {
-    if ((offers && offers.length >= storedOffers.length) || itemId !== item) {
-      setOffers(offers || []);
-      if (totalOfferDocs >= totalOffers || itemId !== item) {
-        setTotalOffers(totalOfferDocs);
+    if ((offers && offers.length) || itemId !== item) {
+      const flattened = offers && offers.map((page) => page.data.docs).flat();
+      if (flattened && flattened.length >= storedOffers.length) {
+        setOffers(flattened || []);
+        if (totalOfferDocs >= totalOffers || itemId !== item) {
+          setTotalOffers(totalOfferDocs);
+        }
       }
       if (itemId !== item) {
         setItem(itemId);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     offers,
-    setOffers,
-    storedOffers,
-    setTotalOffers,
-    totalOfferDocs,
-    totalOffers,
-    itemId,
-    item,
-    setItem,
+    // setOffers,
+    // storedOffers,
+    // setTotalOffers,
+    // totalOfferDocs,
+    // totalOffers,
+    // itemId,
+    // item,
+    // setItem,
   ]);
 
   useEffect(() => {
@@ -176,7 +171,7 @@ export default function ItemPageTabs({
       socket.on("another-offer", (offer) => {
         if (offersEndReached || !offers || !itemOffers.length) {
           const updatedOffers = storedOffers.length
-            ? [...storedOffers, offer]
+            ? [...storedOffers, offer.data.docs[0]]
             : [offer];
           setOffers(updatedOffers);
         }
@@ -184,10 +179,9 @@ export default function ItemPageTabs({
       });
 
       socket.on("new-question", (question) => {
-        console.log(question);
         if (questionsEndReached || !questions || !itemQuestions.length) {
           const updatedQuestions = storedQuestions.length
-            ? [...storedQuestions, question]
+            ? [...storedQuestions, question.data.docs[0]]
             : [question];
           setQuestions(updatedQuestions);
         }
@@ -195,20 +189,29 @@ export default function ItemPageTabs({
       });
 
       socket.on("answered-question", (answeredQuestion) => {
-        const questionExists = findNestedObj(
-          storedQuestions,
-          "_id",
-          answeredQuestion._id
+        // const questionExists = findNestedObj(
+        //   storedQuestions,
+        //   "_id",
+        //   answeredQuestion._id
+        // );
+        const questionExists = storedQuestions.find(
+          (question) => question._id == answeredQuestion._id
         );
         if (questionExists) {
-          const updatedQuestions = JSON.parse(
-            JSON.stringify(storedQuestions, (_, nestedValue) => {
-              if (nestedValue && nestedValue["_id"] == answeredQuestion._id) {
-                return answeredQuestion;
-              }
-              return nestedValue;
-            })
-          );
+          // const updatedQuestions = JSON.parse(
+          //   JSON.stringify(storedQuestions, (_, nestedValue) => {
+          //     if (nestedValue && nestedValue["_id"] == answeredQuestion._id) {
+          //       return answeredQuestion;
+          //     }
+          //     return nestedValue;
+          //   })
+          // );
+          const updatedQuestions = storedQuestions.map((question) => {
+            if (question._id == answeredQuestion._id) {
+              return answeredQuestion;
+            }
+            return question;
+          });
           setQuestions(updatedQuestions);
         }
       });
@@ -264,9 +267,13 @@ export default function ItemPageTabs({
   function handleOfferAccept(accepted, offer) {
     onOfferAccept(accepted);
     setAcceptedOffer(offer);
-    setOffers(
-      storedOffers.filter((storedOffer) => offer._id !== storedOffer._id)
+    console.log(offer);
+    console.log(storedOffers);
+    const updatedOffers = storedOffers.filter(
+      (storedOffer) => storedOffer._id !== offer._id
     );
+    console.log(updatedOffers);
+    setOffers(updatedOffers);
   }
 
   return (
@@ -321,6 +328,7 @@ export default function ItemPageTabs({
               <OfferListItem
                 offer={acceptedOffer}
                 withButtons={showUserControls && available}
+                withoutBorder
               />
             </div>
           ) : null}

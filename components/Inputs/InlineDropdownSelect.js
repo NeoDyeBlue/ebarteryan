@@ -14,15 +14,17 @@ export default function DropdownSelect({
   //   (item) => item.value == selected || item == selected
   // );
 
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItem, setSelectedItem] = useState(
+    items.find((item) => item?.value == selected || item == selected)
+  );
 
-  useEffect(() => {
-    if (items.length) {
-      setSelectedItem(
-        items.find((item) => item?.value == selected || item == selected)
-      );
-    }
-  }, [items, selected]);
+  // useEffect(() => {
+  //   if (items.length) {
+  //     setSelectedItem(
+  //       items.find((item) => item?.value == selected || item == selected)
+  //     );
+  //   }
+  // }, [items, selected]);
 
   const {
     isOpen,
@@ -35,9 +37,14 @@ export default function DropdownSelect({
     selectedItem,
     onSelectedItemChange: ({ selectedItem: newSelectedItem }) => {
       setSelectedItem(newSelectedItem);
-      onChange(newSelectedItem ? newSelectedItem.value : newSelectedItem);
+      // onChange(newSelectedItem ? newSelectedItem.value : newSelectedItem);
     },
   });
+
+  useEffect(() => {
+    onChange(selectedItem?.value ? selectedItem.value : selectedItem);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedItem]);
 
   return (
     <div className="relative" id={name}>

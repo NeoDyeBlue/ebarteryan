@@ -17,7 +17,12 @@ import { stall } from "../../utils/test-utils";
 import { DotLoader } from "react-spinners";
 import { ConfirmationModal } from "../Modals";
 
-export default function OfferListItem({ offer, withButtons, onAccept }) {
+export default function OfferListItem({
+  offer,
+  withButtons,
+  onAccept,
+  withoutBorder,
+}) {
   //states
   const [currentImage, setCurrentImage] = useState(0);
   const [acceptConfirmationOpen, setAcceptConfirmationOpen] = useState(false);
@@ -73,7 +78,7 @@ export default function OfferListItem({ offer, withButtons, onAccept }) {
   return (
     <li
       className={`relative flex flex-col gap-3 overflow-hidden
-     border-b border-gray-100 bg-white pb-4 md:gap-6
+     ${withoutBorder ? "" : "border-b border-gray-100"} bg-white pb-4 md:gap-6
      `}
     >
       <ConfirmationModal
