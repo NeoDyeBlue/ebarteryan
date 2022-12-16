@@ -34,7 +34,7 @@ export default function UserOfferListItem({ offer, status }) {
     hover:shadow-md"
       onClick={() => router.push(`/items/${offer?.item?._id}`)}
     >
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-2">
         <div className="flex max-w-full items-center gap-2 overflow-hidden">
           <div className="relative h-[36px] w-[36px] flex-shrink-0 overflow-hidden rounded-full">
             <Image
@@ -62,7 +62,7 @@ export default function UserOfferListItem({ offer, status }) {
           image={offer?.image?.url}
           createdAt={offer?.createdAt}
         />
-        <div
+        {/* <div
           className={`absolute top-[50%] right-0 z-20 flex h-[36px] w-[36px] translate-y-[-50%] items-center
          justify-center rounded-full ${colors} shadow-lg`}
         >
@@ -70,7 +70,7 @@ export default function UserOfferListItem({ offer, status }) {
             size={24}
             className="flex-shrink-0 rotate-[90deg]"
           />
-        </div>
+        </div> */}
         {/* <p className="text-sm text-gray-200">Exchange for</p> */}
         <ItemMiniCard
           from={`${offer?.item?.user?.firstName}'s item`}

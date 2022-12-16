@@ -13,8 +13,7 @@ import ImageViewer from "react-simple-image-viewer";
 import format from "date-fns/format";
 import { Button } from "../Buttons";
 import { toast } from "react-hot-toast";
-import { stall } from "../../utils/test-utils";
-import { DotLoader } from "react-spinners";
+import { PopupLoader } from "../Loaders";
 import { ConfirmationModal } from "../Modals";
 
 export default function OfferListItem({
@@ -68,11 +67,26 @@ export default function OfferListItem({
   }
 
   async function handleAcceptConfirm() {
-    setIsLoading(true);
-    await stall(3000);
-    onAccept(true, offer);
-    setIsLoading(false);
-    toast.success("Offer accepted");
+    try {
+      setIsLoading(true);
+      const res = await fetch(`/api/items/${offer.item}/offers/${offer._id}`, {
+        method: "PATCH",
+        body: JSON.stringify({ accepted: true }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (result && result.success) {
+        onAccept(true, offer);
+        setIsLoading(false);
+        toast.success("Offer accepted");
+      } else if (!result.success) {
+        setIsLoading(false);
+        toast.error(result.errorMessage);
+      }
+    } catch (error) {
+      setIsLoading(false);
+      toast.error("Can't accept offer");
+    }
   }
 
   return (
@@ -81,6 +95,7 @@ export default function OfferListItem({
      ${withoutBorder ? "" : "border-b border-gray-100"} bg-white pb-4 md:gap-6
      `}
     >
+      <PopupLoader message="Accepting Offer" isOpen={isLoading} />
       <ConfirmationModal
         isOpen={acceptConfirmationOpen}
         label="Accept Offer?"
@@ -163,24 +178,17 @@ export default function OfferListItem({
               <Chat size={20} />
               <p className="hidden lg:block">Ask about the offer</p>
             </Button>
-            <Button
-              autoWidth
-              small
-              onClick={showConfirmation}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <DotLoader color="#fff" size={20} />
-                  <p>Accepting</p>
-                </>
-              ) : (
-                <>
-                  <Checkmark size={20} />
-                  <p>Accept</p>
-                </>
-              )}
-            </Button>
+            {!offer.accepted && (
+              <Button
+                autoWidth
+                small
+                onClick={showConfirmation}
+                disabled={isLoading}
+              >
+                <Checkmark size={20} />
+                <p>Accept</p>
+              </Button>
+            )}
           </div>
         )}
       </div>

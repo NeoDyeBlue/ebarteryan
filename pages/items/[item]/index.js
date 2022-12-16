@@ -343,7 +343,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                   </div>
                 </div>
               </div>
-              {available && !ended && !fromUser ? (
+              {available && !ended && !fromUser && (
                 <div className="flex max-w-[250px] gap-3">
                   {offer || userOffer ? (
                     <LinkButton link="#offers">See Your Offer</LinkButton>
@@ -356,7 +356,8 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                     </Button>
                   </div>
                 </div>
-              ) : (
+              )}
+              {fromUser && (
                 <EditDeleteButtons editLink={`/items/${itemData._id}/edit`} />
               )}
             </div>

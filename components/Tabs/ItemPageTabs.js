@@ -117,7 +117,10 @@ export default function ItemPageTabs({
     if ((questions && questions.length) || itemId !== item) {
       const flattened =
         questions && questions.map((page) => page.data.docs).flat();
-      if (flattened && flattened.length >= storedQuestions.length) {
+      if (
+        (flattened && flattened.length >= storedQuestions.length) ||
+        itemId !== item
+      ) {
         setQuestions(flattened || []);
         if (totalQuestionDocs >= totalQuestions || itemId !== item) {
           setTotalQuestions(totalQuestionDocs);
@@ -141,9 +144,13 @@ export default function ItemPageTabs({
   ]);
 
   useEffect(() => {
+    console.log(itemId !== item);
     if ((offers && offers.length) || itemId !== item) {
       const flattened = offers && offers.map((page) => page.data.docs).flat();
-      if (flattened && flattened.length >= storedOffers.length) {
+      if (
+        (flattened && flattened.length >= storedOffers.length) ||
+        itemId !== item
+      ) {
         setOffers(flattened || []);
         if (totalOfferDocs >= totalOffers || itemId !== item) {
           setTotalOffers(totalOfferDocs);
@@ -267,12 +274,9 @@ export default function ItemPageTabs({
   function handleOfferAccept(accepted, offer) {
     onOfferAccept(accepted);
     setAcceptedOffer(offer);
-    console.log(offer);
-    console.log(storedOffers);
     const updatedOffers = storedOffers.filter(
       (storedOffer) => storedOffer._id !== offer._id
     );
-    console.log(updatedOffers);
     setOffers(updatedOffers);
   }
 
@@ -297,7 +301,7 @@ export default function ItemPageTabs({
       </TabList>
       <div>
         <TabPanel className="flex flex-col gap-10">
-          {offer ? (
+          {offer && (
             <div
               // id="offers"
               className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
@@ -316,8 +320,8 @@ export default function ItemPageTabs({
                 retryHandler={resubmit}
               />
             </div>
-          ) : null}
-          {acceptedOffer ? (
+          )}
+          {acceptedOffer && (
             <div
               // id="offers"
               className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
@@ -327,21 +331,23 @@ export default function ItemPageTabs({
               </p>
               <OfferListItem
                 offer={acceptedOffer}
-                withButtons={showUserControls && available}
+                withButtons={showUserControls}
                 withoutBorder
               />
             </div>
-          ) : null}
-          {itemOffers?.length ? (
+          )}
+          {itemOffers?.length && (
             <div className="flex flex-col gap-2 pb-4">
               <p className="font-display text-lg font-semibold">Offers</p>
               <OfferList>{itemOffers}</OfferList>
             </div>
-          ) : !offersEndReached ? (
+          )}
+          {!offersEndReached && (
             <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
               <DotLoader color="#C7EF83" size={32} />
             </div>
-          ) : (
+          )}
+          {!itemOffers.length && !acceptedOffer && !offer && (
             <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
               No Offers
             </p>
