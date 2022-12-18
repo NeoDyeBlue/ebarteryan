@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Rating } from "react-simple-star-rating";
 import { CircleButton } from "../Buttons";
-import { OverflowMenuVertical, Add } from "@carbon/icons-react";
+import { OverflowMenuVertical, Add, Chat } from "@carbon/icons-react";
 import { BarLoader } from "react-spinners";
 import { Button } from "../Buttons";
 import { ConditionBadge } from "../Misc";
@@ -16,6 +16,8 @@ export default function UserOfferCard({
   isLoading = false,
   isSubmitSuccess = false,
   retryHandler,
+  itemLister,
+  isAccepted = false,
 }) {
   const { data: session, status } = useSession();
   const { setOffer } = useUserOfferStore();
@@ -119,7 +121,7 @@ export default function UserOfferCard({
           {itemImages}
         </div>
       </div>
-      <div className={`flex w-full items-center gap-4 self-start`}>
+      {/* <div className={`flex w-full items-center gap-4 self-start`}>
         <div className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
           <Image
             src={
@@ -155,6 +157,55 @@ export default function UserOfferCard({
             </div>
           </div>
         </div>
+      </div> */}
+      <div className="flex w-full flex-col items-start gap-2 self-start md:flex-row md:items-center">
+        <div className="flex w-full items-center gap-4">
+          <div className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
+            <Image
+              src={offer?.user?.image?.url}
+              layout="fill"
+              alt="user image"
+              // objectFit="cover"
+            />
+          </div>
+          <div className="flex w-full items-center justify-between">
+            <div className="flex flex-col">
+              <p className="min-w-[150px] font-display text-sm md:mt-[0.1rem]">
+                {offer?.user?.fullName}
+              </p>
+              <div className="flex gap-1">
+                <span className="-ml-[2px] flex w-full items-center justify-start gap-1">
+                  <Rating
+                    className="align-middle"
+                    transition
+                    allowHalfIcon
+                    fillColor="#85CB33"
+                    emptyColor="#D2D2D2"
+                    initialValue={4.5}
+                    readonly
+                    size={18}
+                  />
+                  <span className="mt-[0.2rem] text-xs">• 10</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        {isAccepted && (
+          <div className="flex w-full justify-end gap-2">
+            <Button underlined autoWidth small>
+              <div className="relative mr-1 h-[20px] w-[20px] overflow-hidden rounded-full">
+                <Image
+                  src={itemLister?.image?.url}
+                  alt="item lister image"
+                  layout="fill"
+                />
+              </div>
+              <Chat size={20} />
+              <p className="hidden lg:block">Chat {itemLister?.firstName}</p>
+            </Button>
+          </div>
+        )}
       </div>
     </li>
   );

@@ -12,6 +12,8 @@ import {
   Collaborate,
   Delivery,
   Chat,
+  Checkmark,
+  Error,
 } from "@carbon/icons-react";
 import {
   Button,
@@ -199,7 +201,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
   }, [socket, itemData?._id]);
 
   useEffect(() => {
-    const availabilityCheck = async () => {
+    const availabilityCheckmark = async () => {
       if (fromUser && available !== prevAvailability) {
         if (!available) {
           setAvailabilityConfirmationOpen(true);
@@ -209,7 +211,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
         }
       }
     };
-    availabilityCheck();
+    availabilityCheckmark();
   }, [available, fromUser, prevAvailability, updateAvailability]);
 
   //other functions
@@ -324,16 +326,15 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                     </div>
                   </div>
                   <div
-                    className={`flex w-auto items-center gap-1 self-start rounded-full py-1 px-2 md:my-auto
-                    ${
-                      ended
-                        ? "bg-warning-500 text-black-light"
-                        : !available
-                        ? "bg-danger-500 text-white"
-                        : "bg-success-500 text-white"
-                    }`}
+                    className={`flex h-fit w-auto items-center gap-2 self-start rounded-[5px] py-[0.2rem] 
+                    md:my-auto`}
                   >
-                    <p className="text-xs capitalize sm:text-sm">
+                    <p className="flex items-center gap-1 capitalize">
+                      {ended || !available ? (
+                        <Error size={16} />
+                      ) : (
+                        <Checkmark size={16} />
+                      )}
                       {ended
                         ? "ended"
                         : !available
@@ -437,16 +438,14 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                   />
                 ) : (
                   <div
-                    className={`flex items-center gap-2 rounded-full py-[0.2rem] px-3 
-                  ${
-                    ended
-                      ? "bg-warning-500 text-black-light"
-                      : !available
-                      ? "bg-danger-500 text-white"
-                      : "bg-success-500 text-white"
-                  }`}
+                    className={`flex items-center gap-2 rounded-[5px] py-[0.2rem] px-3`}
                   >
-                    <p className="text-md capitalize">
+                    <p className="flex items-center gap-1 capitalize">
+                      {ended || !available ? (
+                        <Error size={16} />
+                      ) : (
+                        <Checkmark size={16} />
+                      )}
                       {ended
                         ? "ended"
                         : !available
@@ -558,8 +557,9 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
       >
         <ItemPageTabs
           itemId={itemData?._id}
-          offersPaginate={offers}
-          questionsPaginate={questions}
+          itemLister={itemData?.user}
+          offersPaginated={offers}
+          questionsPaginated={questions}
           showUserControls={fromUser}
           hasUserOffer={userOffer ? true : false}
           available={available && !ended}

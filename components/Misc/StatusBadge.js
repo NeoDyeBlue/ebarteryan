@@ -7,7 +7,7 @@ export default function StatusBadge({ status, statusText, type }) {
     case "waiting":
       color = "bg-warning-500 text-black-light";
       break;
-    case "success":
+    case "accepted":
       color = "bg-success-500 text-white";
       break;
     case "failed":
@@ -16,7 +16,7 @@ export default function StatusBadge({ status, statusText, type }) {
   }
   return (
     <span
-      className={`text-center text-xs capitalize ${color} rounded-[10px] px-2 py-1 font-medium`}
+      className={`text-center text-xs capitalize leading-none ${color} rounded-[10px] px-2 py-1 font-medium`}
     >
       {statusText}
     </span>

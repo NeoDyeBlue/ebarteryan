@@ -40,8 +40,9 @@ function findNestedObj(obj, key, value) {
 
 export default function ItemPageTabs({
   itemId,
-  offersPaginate,
-  questionsPaginate,
+  itemLister,
+  offersPaginated,
+  questionsPaginated,
   showUserControls,
   hasUserOffer,
   available,
@@ -56,7 +57,7 @@ export default function ItemPageTabs({
     size: questionsSize,
     setSize: setQuestionsSize,
     mutate: mutateQuestions,
-  } = questionsPaginate;
+  } = questionsPaginated;
 
   const {
     data: offers,
@@ -66,7 +67,7 @@ export default function ItemPageTabs({
     size: offersSize,
     setSize: setOffersSize,
     mutate: mutateOffers,
-  } = offersPaginate;
+  } = offersPaginated;
 
   //states
   const [isQuestionSubmitting, setIsQuestionSubmitting] = useState(false);
@@ -93,7 +94,7 @@ export default function ItemPageTabs({
 
   //elements
   const itemQuestions =
-    storedQuestions.length &&
+    storedQuestions?.length &&
     storedQuestions.map((question) => (
       <QuestionAnswerListItem
         key={question._id}
@@ -114,48 +115,35 @@ export default function ItemPageTabs({
     ));
 
   useEffect(() => {
-    if ((questions && questions.length) || itemId !== item) {
-      const flattened =
-        questions && questions.map((page) => page.data.docs).flat();
-      if (
-        (flattened && flattened.length >= storedQuestions.length) ||
-        itemId !== item
-      ) {
-        setQuestions(flattened || []);
-        if (totalQuestionDocs >= totalQuestions || itemId !== item) {
-          setTotalQuestions(totalQuestionDocs);
-        }
-      }
+    if (questions.length >= storedQuestions.length || itemId !== item) {
+      setQuestions(questions);
+      setTotalQuestions(
+        totalQuestions >= totalQuestionDocs ? totalQuestions : totalQuestionDocs
+      );
       if (itemId !== item) {
         setItem(itemId);
       }
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     questions,
     // setQuestions,
-    // storedQuestions,
+    storedQuestions,
     // setTotalQuestions,
-    // totalQuestionDocs,
-    // totalQuestions,
-    // itemId,
-    // item,
+    totalQuestionDocs,
+    totalQuestions,
+    itemId,
+    item,
     // setItem,
   ]);
 
   useEffect(() => {
-    console.log(itemId !== item);
-    if ((offers && offers.length) || itemId !== item) {
-      const flattened = offers && offers.map((page) => page.data.docs).flat();
-      if (
-        (flattened && flattened.length >= storedOffers.length) ||
-        itemId !== item
-      ) {
-        setOffers(flattened || []);
-        if (totalOfferDocs >= totalOffers || itemId !== item) {
-          setTotalOffers(totalOfferDocs);
-        }
-      }
+    if (offers.length >= storedOffers.length || itemId !== item) {
+      setOffers(offers);
+      setTotalOffers(
+        totalOffers >= totalOfferDocs ? totalOffers : totalOfferDocs
+      );
       if (itemId !== item) {
         setItem(itemId);
       }
@@ -164,64 +152,66 @@ export default function ItemPageTabs({
   }, [
     offers,
     // setOffers,
-    // storedOffers,
+    storedOffers,
     // setTotalOffers,
-    // totalOfferDocs,
-    // totalOffers,
-    // itemId,
-    // item,
+    totalOfferDocs,
+    totalOffers,
+    itemId,
+    item,
     // setItem,
   ]);
 
   useEffect(() => {
     if (socket) {
       socket.on("another-offer", (offer) => {
-        if (offersEndReached || !offers || !itemOffers.length) {
+        if (offersEndReached || !offers.length) {
           const updatedOffers = storedOffers.length
             ? [...storedOffers, offer.data.docs[0]]
-            : [offer];
+            : [offer.data.docs[0]];
           setOffers(updatedOffers);
         }
         setTotalOffers(offer.data.totalDocs);
       });
 
       socket.on("new-question", (question) => {
-        if (questionsEndReached || !questions || !itemQuestions.length) {
+        console.log(question.data);
+        if (questionsEndReached || !questions.length || !itemQuestions.length) {
           const updatedQuestions = storedQuestions.length
             ? [...storedQuestions, question.data.docs[0]]
-            : [question];
+            : [question.data.docs[0]];
           setQuestions(updatedQuestions);
         }
         setTotalQuestions(question.data.totalDocs);
       });
 
-      socket.on("answered-question", (answeredQuestion) => {
-        // const questionExists = findNestedObj(
-        //   storedQuestions,
-        //   "_id",
-        //   answeredQuestion._id
-        // );
-        const questionExists = storedQuestions.find(
-          (question) => question._id == answeredQuestion._id
-        );
-        if (questionExists) {
-          // const updatedQuestions = JSON.parse(
-          //   JSON.stringify(storedQuestions, (_, nestedValue) => {
-          //     if (nestedValue && nestedValue["_id"] == answeredQuestion._id) {
-          //       return answeredQuestion;
-          //     }
-          //     return nestedValue;
-          //   })
-          // );
-          const updatedQuestions = storedQuestions.map((question) => {
-            if (question._id == answeredQuestion._id) {
-              return answeredQuestion;
-            }
-            return question;
-          });
-          setQuestions(updatedQuestions);
-        }
-      });
+      // socket.on("answered-question", (answeredQuestion) => {
+      //   // const questionExists = findNestedObj(
+      //   //   storedQuestions,
+      //   //   "_id",
+      //   //   answeredQuestion._id
+      //   // );
+      //   const questionExists = storedQuestions.find(
+      //     (question) => question._id == answeredQuestion._id
+      //   );
+      //   if (questionExists) {
+      //     // const updatedQuestions = JSON.parse(
+      //     //   JSON.stringify(storedQuestions, (_, nestedValue) => {
+      //     //     if (nestedValue && nestedValue["_id"] == answeredQuestion._id) {
+      //     //       return answeredQuestion;
+      //     //     }
+      //     //     return nestedValue;
+      //     //   })
+      //     // );
+      //     const updatedQuestions = storedQuestions.map((question) => {
+      //       if (question._id == answeredQuestion._id) {
+      //         return answeredQuestion;
+      //       }
+      //       return question;
+      //     });
+      //     console.log(questionExists, updatedQuestions);
+      //     setQuestions([...updatedQuestions]);
+      //   }
+      // });
     }
   }, [
     socket,
@@ -306,7 +296,11 @@ export default function ItemPageTabs({
               // id="offers"
               className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
             >
-              <p className="font-display text-lg font-semibold">Your Offer</p>
+              <p className="font-display text-lg font-semibold">
+                {offer && acceptedOffer && offer._id !== acceptedOffer._id
+                  ? "Your Offer"
+                  : "Yours & Accepted Offer"}
+              </p>
               <UserOfferCard
                 offer={offer}
                 isLoading={
@@ -318,10 +312,14 @@ export default function ItemPageTabs({
                 }
                 isSubmitSuccess={hasUserOffer ? true : isSubmitSuccess}
                 retryHandler={resubmit}
+                itemLister={itemLister}
+                isAccepted={
+                  offer && acceptedOffer && offer._id == acceptedOffer._id
+                }
               />
             </div>
           )}
-          {acceptedOffer && (
+          {acceptedOffer && !hasUserOffer && (
             <div
               // id="offers"
               className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
@@ -416,7 +414,8 @@ export default function ItemPageTabs({
                 <DotLoader color="#C7EF83" size={32} />
               </div>
             )}
-            {(!questionsEndReached || !questions) && !questionsLoading ? (
+            {(!questionsEndReached || !questions.length) &&
+            !questionsLoading ? (
               <div className="mx-auto mb-8 w-full max-w-[200px]">
                 <Button
                   secondary={true}

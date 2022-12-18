@@ -20,22 +20,19 @@ export default function Offers() {
   } = usePaginate("/api/offers/user", 8, { status: activeTab });
 
   const userOffers =
-    offers &&
-    offers
-      .map((page) => page.data.docs)
-      .flat()
-      .map((offer, index) => {
-        let status;
-        if (offer.accepted) {
-          status = "accepted";
-        } else if (!offer.item.ended && offer.item.available) {
-          status = "waiting";
-        } else if (offer.item.ended || !offer.item.available) {
-          status = "failed";
-        }
+    offers.length &&
+    offers.map((offer, index) => {
+      let status;
+      if (offer.accepted) {
+        status = "accepted";
+      } else if (!offer.item.ended && offer.item.available) {
+        status = "waiting";
+      } else if (offer.item.ended || !offer.item.available) {
+        status = "failed";
+      }
 
-        return <UserOfferListItem key={index} offer={offer} status={status} />;
-      });
+      return <UserOfferListItem key={index} offer={offer} status={status} />;
+    });
 
   return (
     <div className="container mx-auto w-full">
@@ -72,7 +69,7 @@ export default function Offers() {
           <div>
             <TabPanel className="flex flex-col gap-6">
               <UserOfferList>
-                {userOffers?.length ? (
+                {offers.length ? (
                   userOffers
                 ) : !isEndReached ? (
                   [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)
@@ -87,7 +84,7 @@ export default function Offers() {
                 {isLoading &&
                   [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)}
               </UserOfferList>
-              {(!isEndReached || !offers) && !isLoading ? (
+              {(!isEndReached || !offers.length) && !isLoading ? (
                 <div className="mx-auto mb-8 w-full max-w-[300px]">
                   <Button secondary={true} onClick={() => setSize(size + 1)}>
                     Load More
@@ -97,7 +94,7 @@ export default function Offers() {
             </TabPanel>
             <TabPanel className="flex flex-col gap-6">
               <UserOfferList>
-                {userOffers?.length ? (
+                {offers.length ? (
                   userOffers
                 ) : !isEndReached ? (
                   [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)
@@ -112,7 +109,7 @@ export default function Offers() {
                 {isLoading &&
                   [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)}
               </UserOfferList>
-              {(!isEndReached || !offers) && !isLoading ? (
+              {(!isEndReached || !offers.length) && !isLoading ? (
                 <div className="mx-auto mb-8 w-full max-w-[300px]">
                   <Button secondary={true} onClick={() => setSize(size + 1)}>
                     Load More
@@ -122,7 +119,7 @@ export default function Offers() {
             </TabPanel>
             <TabPanel className="flex flex-col gap-6">
               <UserOfferList>
-                {userOffers?.length ? (
+                {offers.length ? (
                   userOffers
                 ) : !isEndReached ? (
                   [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)
@@ -137,7 +134,7 @@ export default function Offers() {
                 {isLoading &&
                   [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)}
               </UserOfferList>
-              {(!isEndReached || !offers) && !isLoading ? (
+              {(!isEndReached || !offers.length) && !isLoading ? (
                 <div className="mx-auto mb-8 w-full max-w-[300px]">
                   <Button secondary={true} onClick={() => setSize(size + 1)}>
                     Load More
@@ -147,7 +144,7 @@ export default function Offers() {
             </TabPanel>
             <TabPanel className="flex flex-col gap-6">
               <UserOfferList>
-                {userOffers?.length ? (
+                {offers.length ? (
                   userOffers
                 ) : !isEndReached ? (
                   [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)
@@ -162,7 +159,7 @@ export default function Offers() {
                 {isLoading &&
                   [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)}
               </UserOfferList>
-              {(!isEndReached || !offers) && !isLoading ? (
+              {(!isEndReached || !offers.length) && !isLoading ? (
                 <div className="mx-auto mb-8 w-full max-w-[300px]">
                   <Button secondary={true} onClick={() => setSize(size + 1)}>
                     Load More

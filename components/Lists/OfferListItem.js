@@ -121,9 +121,7 @@ export default function OfferListItem({
       <div className="flex w-full flex-col gap-3">
         <div className="flex w-full items-center justify-between">
           <div className="flex flex-col">
-            <p className="font-display font-medium">
-              {offer?.name || "Item Name"}
-            </p>
+            <p className="font-display font-medium">{offer?.name}</p>
             <p className="mt-[0.05rem] flex flex-col gap-2 text-sm text-gray-300 sm:flex-row">
               <span>
                 {offer?.region || offer?.location?.region} •{" "}
