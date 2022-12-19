@@ -167,7 +167,7 @@ export default function Profile() {
                   {isLoading &&
                     [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
                 </div>
-                {(!isEndReached || !items) && !isLoading ? (
+                {!isEndReached && !isLoading ? (
                   <div className="mx-auto mb-8 w-full max-w-[300px]">
                     <Button secondary={true} onClick={() => setSize(size + 1)}>
                       Load More

@@ -183,35 +183,6 @@ export default function ItemPageTabs({
         }
         setTotalQuestions(question.data.totalDocs);
       });
-
-      // socket.on("answered-question", (answeredQuestion) => {
-      //   // const questionExists = findNestedObj(
-      //   //   storedQuestions,
-      //   //   "_id",
-      //   //   answeredQuestion._id
-      //   // );
-      //   const questionExists = storedQuestions.find(
-      //     (question) => question._id == answeredQuestion._id
-      //   );
-      //   if (questionExists) {
-      //     // const updatedQuestions = JSON.parse(
-      //     //   JSON.stringify(storedQuestions, (_, nestedValue) => {
-      //     //     if (nestedValue && nestedValue["_id"] == answeredQuestion._id) {
-      //     //       return answeredQuestion;
-      //     //     }
-      //     //     return nestedValue;
-      //     //   })
-      //     // );
-      //     const updatedQuestions = storedQuestions.map((question) => {
-      //       if (question._id == answeredQuestion._id) {
-      //         return answeredQuestion;
-      //       }
-      //       return question;
-      //     });
-      //     console.log(questionExists, updatedQuestions);
-      //     setQuestions([...updatedQuestions]);
-      //   }
-      // });
     }
   }, [
     socket,
@@ -355,7 +326,7 @@ export default function ItemPageTabs({
               <DotLoader color="#C7EF83" size={32} />
             </div>
           )}
-          {(!offersEndReached || !offers) && !offersLoading ? (
+          {!offersEndReached && !offersLoading ? (
             <div className="mx-auto mb-8 w-full max-w-[200px]">
               <Button
                 secondary={true}
@@ -414,8 +385,7 @@ export default function ItemPageTabs({
                 <DotLoader color="#C7EF83" size={32} />
               </div>
             )}
-            {(!questionsEndReached || !questions.length) &&
-            !questionsLoading ? (
+            {!questionsEndReached && !questionsLoading ? (
               <div className="mx-auto mb-8 w-full max-w-[200px]">
                 <Button
                   secondary={true}

@@ -39,6 +39,8 @@ export default function Home() {
         createdAt={item.createdAt}
       />
     ));
+
+  console.log(isEndReached, isLoading);
   return (
     <div className="flex w-full flex-col gap-4">
       <Head>
@@ -72,7 +74,7 @@ export default function Home() {
           {isLoading &&
             [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
         </div>
-        {(!isEndReached || !items) && !isLoading ? (
+        {!isEndReached && !isLoading ? (
           <div className="mx-auto mb-8 w-full max-w-[300px]">
             <Button secondary={true} onClick={() => setSize(size + 1)}>
               Load More

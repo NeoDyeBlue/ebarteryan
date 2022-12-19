@@ -15,6 +15,7 @@ import { Button } from "../Buttons";
 import { toast } from "react-hot-toast";
 import { PopupLoader } from "../Loaders";
 import { ConfirmationModal } from "../Modals";
+// import { KebabMenu, KebabMenuItem } from "../Navigation";
 
 export default function OfferListItem({
   offer,
@@ -91,7 +92,7 @@ export default function OfferListItem({
 
   return (
     <li
-      className={`relative flex flex-col gap-3 overflow-hidden
+      className={`relative flex flex-col gap-3
      ${withoutBorder ? "" : "border-b border-gray-100"} bg-white pb-4 md:gap-6
      `}
     >
@@ -130,7 +131,9 @@ export default function OfferListItem({
               <ConditionBadge condition={offer?.condition} />
             </p>
           </div>
-          <CircleButton icon={<OverflowMenuVertical size={24} />} />
+          {/* <KebabMenu>
+            <KebabMenuItem>Report</KebabMenuItem>
+          </KebabMenu> */}
         </div>
         <p>{offer?.description || "Description"}</p>
         <div className="grid max-w-[calc((0.25rem*2+300px))] grid-cols-[repeat(auto-fill,_minmax(100px,_100px))] gap-1 overflow-hidden">

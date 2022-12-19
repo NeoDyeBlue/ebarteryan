@@ -11,7 +11,7 @@ export default function Notifications() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <div className="container mx-auto flex h-screen w-full max-w-[520px] flex-col py-6">
-        <h1 className="text-2xl font-semibold md:text-3xl">Notifications</h1>
+        <h1 className="text-2xl font-semibold">Notifications</h1>
         <NotificationTabs />
       </div>
     </div>

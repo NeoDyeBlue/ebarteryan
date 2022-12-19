@@ -1,7 +1,13 @@
 import Image from "next/image";
 import { Rating } from "react-simple-star-rating";
 import { CircleButton } from "../Buttons";
-import { OverflowMenuVertical, Add, Chat } from "@carbon/icons-react";
+import {
+  OverflowMenuVertical,
+  Add,
+  Chat,
+  Edit,
+  TrashCan,
+} from "@carbon/icons-react";
 import { BarLoader } from "react-spinners";
 import { Button } from "../Buttons";
 import { ConditionBadge } from "../Misc";
@@ -10,6 +16,7 @@ import { useState, useCallback } from "react";
 import ImageViewer from "react-simple-image-viewer";
 import format from "date-fns/format";
 import useUserOfferStore from "../../store/useUserOfferStore";
+import { KebabMenu, KebabMenuItem } from "../Navigation";
 
 export default function UserOfferCard({
   offer,
@@ -57,7 +64,7 @@ export default function UserOfferCard({
   return (
     <li
       className={`relative mb-1 flex flex-col gap-3
-     overflow-hidden md:gap-6 ${
+     md:gap-6 ${
        isLoading || !isSubmitSuccess
          ? "before:absolute before:z-10 before:h-full before:w-full before:bg-white/50"
          : ""
@@ -114,7 +121,15 @@ export default function UserOfferCard({
               <ConditionBadge condition={offer?.condition} />
             </p>
           </div>
-          <CircleButton icon={<OverflowMenuVertical size={24} />} />
+          {/* <CircleButton icon={<OverflowMenuVertical size={24} />} /> */}
+          <KebabMenu>
+            <KebabMenuItem>
+              <Edit size={24} /> Edit Offer
+            </KebabMenuItem>
+            <KebabMenuItem>
+              <TrashCan size={24} /> Delete Offer
+            </KebabMenuItem>
+          </KebabMenu>
         </div>
         <p>{offer?.description || "Description"}</p>
         <div className="grid max-w-[calc((0.25rem*2+300px))] grid-cols-[repeat(auto-fill,_minmax(100px,_100px))] gap-1 overflow-hidden">

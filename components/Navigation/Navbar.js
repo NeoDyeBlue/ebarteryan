@@ -18,6 +18,8 @@ import useUiSizesStore from "../../store/useUiSizesStore";
 import { useSession } from "next-auth/react";
 import ProfileMenu from "./ProfileMenu";
 import IconLink from "./IconLink";
+import { Tooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
 
 export default function Navbar({ sticky }) {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -80,16 +82,23 @@ export default function Navbar({ sticky }) {
         <div className="relative flex items-center gap-3">
           <ul className="hidden items-center gap-2 md:flex">
             <li>
-              <IconLink to="/" aka={["/items"]}>
+              <IconLink to="/" tooltipMessage="Home" id="home">
                 <Home size={24} />
               </IconLink>
             </li>
             {session && session.user.verified && status == "authenticated" ? (
               <>
                 <li>
-                  <IconLink to="/offers">
-                    <BadgedIcon hasBadge={true}>
+                  <IconLink to="/offers" tooltipMessage="Offers" id="offers">
+                    <BadgedIcon hasBadge={false}>
                       <ArrowsHorizontal size={24} />
+                    </BadgedIcon>
+                  </IconLink>
+                </li>
+                <li>
+                  <IconLink to="/saved" tooltipMessage="Saved" id="saved">
+                    <BadgedIcon hasBadge={false}>
+                      <Bookmark size={24} />
                     </BadgedIcon>
                   </IconLink>
                 </li>
@@ -104,19 +113,19 @@ export default function Navbar({ sticky }) {
                         ? "bg-gray-100/30"
                         : "hover:bg-gray-100/30"
                     }`}
+                    id="notifications"
+                    data-tooltip-content="Notifications"
                   >
-                    <BadgedIcon hasBadge={true}>
+                    <BadgedIcon
+                      hasBadge
+                      tooltipMessage="Notifications"
+                      id="notifications"
+                    >
                       <Notification size={24} />
                     </BadgedIcon>
                   </button>
+                  <Tooltip anchorId="notifications" />
                   {showNotifications && <NotificationsPopup />}
-                </li>
-                <li>
-                  <IconLink to="/saved">
-                    <BadgedIcon hasBadge={true}>
-                      <Bookmark size={24} />
-                    </BadgedIcon>
-                  </IconLink>
                 </li>
               </>
             ) : null}

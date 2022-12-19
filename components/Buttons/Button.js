@@ -28,7 +28,7 @@ export default function Button({
       } ${
         small ? "px-3 py-2" : "px-4 py-3"
       } flex w-full items-center justify-center gap-1 overflow-hidden text-ellipsis
-        whitespace-nowrap rounded-[10px] text-center font-display font-medium
+        whitespace-nowrap rounded-full text-center font-display font-medium
         disabled:cursor-not-allowed disabled:opacity-50
     `}
     >

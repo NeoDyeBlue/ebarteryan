@@ -1,9 +1,7 @@
 import Link from "next/link";
-import { LinkButton } from "../Buttons";
 import { signOut, useSession } from "next-auth/react";
 import Marquee from "react-fast-marquee";
 import { useRef, useState, useCallback } from "react";
-import useMapStore from "../../store/useMapStore";
 
 export default function ProfileMenu() {
   const { data: session, status } = useSession();

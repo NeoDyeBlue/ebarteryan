@@ -26,28 +26,28 @@ export default function MobileNavbar({ className }) {
           <>
             <li>
               <IconLink to="/offers">
-                <BadgedIcon hasBadge={true}>
+                <BadgedIcon hasBadge={false}>
                   <ArrowsHorizontal size={24} />
                 </BadgedIcon>
               </IconLink>
             </li>
             <li>
-              <IconLink to="/notifications">
-                <BadgedIcon hasBadge={true}>
-                  <Notification size={24} />
-                </BadgedIcon>
-              </IconLink>
-            </li>
-            <li>
               <IconLink to="/saved">
-                <BadgedIcon hasBadge={true}>
+                <BadgedIcon hasBadge={false}>
                   <Bookmark size={24} />
                 </BadgedIcon>
               </IconLink>
             </li>
             <li>
+              <IconLink to="/notifications">
+                <BadgedIcon hasBadge>
+                  <Notification size={24} />
+                </BadgedIcon>
+              </IconLink>
+            </li>
+            <li>
               <IconLink to="/messages">
-                <BadgedIcon hasBadge={true}>
+                <BadgedIcon hasBadge>
                   <Chat size={24} />
                 </BadgedIcon>
               </IconLink>

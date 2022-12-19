@@ -1,10 +1,11 @@
 import Image from "next/image";
-import { ArrowsHorizontal } from "@carbon/icons-react";
+// import { ArrowsHorizontal } from "@carbon/icons-react";
 import { StatusBadge } from "../Misc";
 import { ItemMiniCard } from "../Cards";
-import { OverflowMenuVertical } from "@carbon/icons-react";
-import { CircleButton } from "../Buttons";
+import { Checkmark, TrashCan } from "@carbon/icons-react";
+// import { CircleButton } from "../Buttons";
 import { useRouter } from "next/router";
+import { KebabMenu, KebabMenuItem } from "../Navigation";
 
 export default function UserOfferListItem({ offer, status }) {
   const router = useRouter();
@@ -35,7 +36,7 @@ export default function UserOfferListItem({ offer, status }) {
       onClick={() => router.push(`/items/${offer?.item?._id}`)}
     >
       <div className="flex items-center justify-between gap-2">
-        <div className="flex max-w-full items-center gap-2 overflow-hidden">
+        <div className="flex w-full items-center gap-2 overflow-hidden">
           <div className="relative h-[36px] w-[36px] flex-shrink-0 overflow-hidden rounded-full">
             <Image
               src={offer?.item?.user?.image?.url}
@@ -49,10 +50,20 @@ export default function UserOfferListItem({ offer, status }) {
           </p>
           <StatusBadge status={status} statusText={status} />
         </div>
-        <CircleButton
+        <KebabMenu>
+          {offer?.accepted && (
+            <KebabMenuItem>
+              <Checkmark size={24} /> Set as Received
+            </KebabMenuItem>
+          )}
+          <KebabMenuItem>
+            <TrashCan size={24} /> Delete Offer
+          </KebabMenuItem>
+        </KebabMenu>
+        {/* <CircleButton
           icon={<OverflowMenuVertical size={24} />}
           onClick={menuClickHandler}
-        />
+        /> */}
       </div>
       {/* items */}
       <div className="relative flex flex-col items-center gap-2">
