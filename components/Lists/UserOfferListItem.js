@@ -6,6 +6,8 @@ import { Checkmark, TrashCan } from "@carbon/icons-react";
 // import { CircleButton } from "../Buttons";
 import { useRouter } from "next/router";
 import { KebabMenu, KebabMenuItem } from "../Navigation";
+import { useState } from "react";
+import { ReviewModal } from "../Modals";
 
 export default function UserOfferListItem({ offer, status }) {
   const router = useRouter();
@@ -25,16 +27,25 @@ export default function UserOfferListItem({ offer, status }) {
       break;
   }
 
-  function menuClickHandler(event) {
-    event.stopPropagation();
-    console.log("clicked");
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+
+  function showReviewModal() {
+    setIsReviewModalOpen(true);
   }
+
+  function hideReviewModal() {
+    setIsReviewModalOpen(false);
+  }
+
   return (
     <li
       className="flex h-fit cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 bg-white p-3
     hover:shadow-md"
       onClick={() => router.push(`/items/${offer?.item?._id}`)}
     >
+      <div onClick={(e) => e.stopPropagation()}>
+        <ReviewModal isOpen={isReviewModalOpen} onClose={hideReviewModal} />
+      </div>
       <div className="flex items-center justify-between gap-2">
         <div className="flex w-full items-center gap-2 overflow-hidden">
           <div className="relative h-[36px] w-[36px] flex-shrink-0 overflow-hidden rounded-full">
@@ -52,7 +63,7 @@ export default function UserOfferListItem({ offer, status }) {
         </div>
         <KebabMenu>
           {offer?.accepted && (
-            <KebabMenuItem>
+            <KebabMenuItem onClick={showReviewModal}>
               <Checkmark size={24} /> Set as Received
             </KebabMenuItem>
           )}

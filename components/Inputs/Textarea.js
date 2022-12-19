@@ -12,8 +12,8 @@ export default function Textarea({ label, infoMessage, size, ...props }) {
       <TextareaAutosize
         {...field}
         {...props}
-        className={`w-full resize-none rounded-[10px] border bg-white
-         font-body placeholder-gray-300 focus:outline-none focus:ring-1
+        className={`custom-scrollbar max-h-[150px] w-full resize-none rounded-[10px] border
+         bg-white font-body placeholder-gray-300 focus:outline-none focus:ring-1
         ${
           meta.error && meta.touched
             ? "border-danger-500 focus:ring-danger-500"

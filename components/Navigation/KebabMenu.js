@@ -12,6 +12,7 @@ export default function KebabMenu({ children }) {
   useOnClickOutside(menuRef, () => setIsOpen(false));
   function showMenu(event) {
     event.stopPropagation();
+    event.nativeEvent.stopImmediatePropagation();
     setIsOpen((prev) => !prev);
   }
   return (
