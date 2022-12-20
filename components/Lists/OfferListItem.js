@@ -6,6 +6,7 @@ import {
   Add,
   Chat,
   Checkmark,
+  StarFilled,
 } from "@carbon/icons-react";
 import { ConditionBadge } from "../Misc";
 import { useState, useCallback } from "react";
@@ -102,7 +103,7 @@ export default function OfferListItem({
         label="Accept Offer?"
         onClose={() => setAcceptConfirmationOpen(false)}
         onConfirm={handleAcceptConfirm}
-        message="Once the offer was accepted your item will not accept any more offers"
+        message="Once the offer was accepted your item will not accept any more offers unless the offer was removed or deleted"
       />
       {isViewerOpen && (
         <ImageViewer
@@ -119,7 +120,7 @@ export default function OfferListItem({
           onClose={closeImageViewer}
         />
       )}
-      <div className="flex w-full flex-col gap-3">
+      <div className="flex w-full flex-col gap-4">
         <div className="flex w-full items-center justify-between">
           <div className="flex flex-col">
             <p className="font-display font-medium">{offer?.name}</p>
@@ -152,22 +153,24 @@ export default function OfferListItem({
           </div>
           <div className="flex w-full items-center justify-between">
             <div className="flex flex-col">
-              <p className="min-w-[150px] font-display text-sm md:mt-[0.1rem]">
+              <p className="min-w-[150px] font-display">
                 {offer?.user?.fullName}
               </p>
               <div className="flex gap-1">
-                <span className="-ml-[2px] flex w-full items-center justify-start gap-1">
-                  <Rating
+                <span className="flex w-full items-center justify-start gap-1">
+                  {/* <Rating
                     className="align-middle"
                     transition
                     allowHalfIcon
-                    fillColor="#85CB33"
+                    fillColor="#100B00"
                     emptyColor="#D2D2D2"
                     initialValue={4.5}
                     readonly
                     size={18}
-                  />
-                  <span className="mt-[0.2rem] text-xs">• 10</span>
+                  /> */}
+                  <StarFilled size={18} />
+                  <span>5</span>
+                  <span className="text-gray-200">{"(10)"}</span>
                 </span>
               </div>
             </div>

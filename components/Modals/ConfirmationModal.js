@@ -79,6 +79,7 @@ export default function ConfirmationModal({
               autoWidth={true}
               secondary={true}
               onClick={() => {
+                onCancel && onCancel();
                 onClose();
               }}
             >

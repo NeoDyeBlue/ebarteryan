@@ -13,6 +13,7 @@ import {
   Delivery,
   Chat,
   Checkmark,
+  StarFilled,
   Error,
 } from "@carbon/icons-react";
 import {
@@ -201,7 +202,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
   }, [socket, itemData?._id]);
 
   useEffect(() => {
-    const availabilityCheckmark = async () => {
+    const availabilityCheck = async () => {
       if (fromUser && available !== prevAvailability) {
         if (!available) {
           setAvailabilityConfirmationOpen(true);
@@ -211,7 +212,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
         }
       }
     };
-    availabilityCheckmark();
+    availabilityCheck();
   }, [available, fromUser, prevAvailability, updateAvailability]);
 
   //other functions
@@ -244,7 +245,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
     setIsViewerOpen(false);
   }
 
-  function handleEnded(value) {
+  function handleOfferAccept(value) {
     setEnded(value);
   }
 
@@ -433,6 +434,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                     ]}
                     selected={available}
                     onChange={(value) => {
+                      // console.log(value);
                       setAvailable(value);
                     }}
                   />
@@ -502,17 +504,15 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                 <p className="font-display font-medium">
                   {itemData.user.firstName} {itemData.user.lastName}
                 </p>
-                <p className="text-xs">
+                <p className="text-sm">
                   Joined in {new Date(itemData.user.createdAt).getFullYear()}
                 </p>
               </div>
             </div>
             <div className="flex flex-col items-center justify-center gap-2 rounded-[10px] border border-gray-100 p-4">
-              <p className="font-display text-sm font-medium">
-                Barterer Rating
-              </p>
-              <div className="flex w-full items-end justify-center gap-2">
-                <Rating
+              <p className="font-display text-sm">Barterer Rating</p>
+              <div className="flex w-full items-center justify-center gap-1 font-medium">
+                {/* <Rating
                   className="align-middle"
                   transition
                   allowHalfIcon
@@ -523,7 +523,11 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                   size={24}
                 />
                 <p>•</p>
-                <p className="text-[15px]">10</p>
+                <p className="text-[15px]">10</p> */}
+                <StarFilled size={20} />
+                <span className="text-lg">5</span>
+                <p>•</p>
+                <span className="text-lg">{"10 reviews"}</span>
               </div>
             </div>
             <div className="flex gap-4">
@@ -532,7 +536,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                   <ArrowsHorizontal size={32} />
                   <p className="text-2xl">8</p>
                 </div>
-                <p className="text-center font-display text-sm font-medium">
+                <p className="text-center font-display text-sm">
                   Bartered Items
                 </p>
               </div>
@@ -541,7 +545,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                   <Need size={32} />
                   <p className="text-2xl">10</p>
                 </div>
-                <p className="text-center font-display text-sm font-medium">
+                <p className="text-center font-display text-sm">
                   Offered Items
                 </p>
               </div>
@@ -563,7 +567,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
           showUserControls={fromUser}
           hasUserOffer={userOffer ? true : false}
           available={available && !ended}
-          onOfferAccept={(value) => handleEnded(value)}
+          onOfferAccept={(value) => handleOfferAccept(value)}
         />
       </div>
     </div>

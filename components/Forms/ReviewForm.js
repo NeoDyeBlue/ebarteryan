@@ -2,29 +2,21 @@ import { Textarea } from "../Inputs";
 import { Button } from "../Buttons";
 import { Form, FormikProvider, useFormik } from "formik";
 import { useState } from "react";
-import useUserOfferStore from "../../store/useUserOfferStore";
-import useItemOffersStore from "../../store/useItemOffersStore";
 import { toast } from "react-hot-toast";
 import { stall } from "../../utils/test-utils";
 import { Rating } from "react-simple-star-rating";
+import useReviewStore from "../../store/useReviewStore";
+import { PopupLoader } from "../Loaders";
 
 export default function ReviewForm({ onClose }) {
-  const { item, setOffer, setIsSubmitting, setIsSubmitSuccess } =
-    useUserOfferStore();
-  const { setTotalOffers } = useItemOffersStore();
-
+  const { reviewee, item } = useReviewStore();
+  const [isSubmitting, setIsSubmitting] = useState(false);
   async function handleReviewSubmit(values) {
-    onClose();
     try {
-      //   setIsSubmitting(true);
-      //   await stall(5000);
-      //   setIsSubmitting(false);
-      //   setIsSubmitSuccess(false);
-      //   // toast.success("Offer Added");
-      //   toast.error("Can't add offer");
-      console.log(values);
-      return;
-      const res = await fetch(`/api/offers/${item}`, {
+      values.reviewee = reviewee;
+      values.item = item;
+      setIsSubmitting(true);
+      const res = await fetch(`/api/reviews`, {
         method: "POST",
         body: JSON.stringify(values),
         headers: { "Content-Type": "application/json" },
@@ -32,30 +24,22 @@ export default function ReviewForm({ onClose }) {
       const result = await res.json();
       if (result && result.success) {
         setIsSubmitting(false);
-        setIsSubmitSuccess(true);
-        socket.emit("offer", {
-          offer: result,
-          room: result.data.docs[0].item,
-        });
-        setTotalOffers(result.data.totalDocs);
-        toast.success("Offer Added");
+        toast.success("Review submitted!");
+        onClose();
       } else {
         setIsSubmitting(false);
-        setIsSubmitSuccess(false);
         // setOffer(null);
-        toast.error("Can't add offer");
+        toast.error("Can't submit review");
       }
     } catch (error) {
-      //   setIsSubmitting(false);
-      //   setIsSubmitSuccess(false);
-      //   // setOffer(null);
-      toast.error("Can't add offer");
+      setIsSubmitSuccess(false);
+      toast.error("Can't submit review");
     }
   }
 
   const reviewFormik = useFormik({
     initialValues: {
-      rating: 0.5,
+      rate: 1,
       review: "",
     },
     // validationSchema: questionSchema,
@@ -67,11 +51,12 @@ export default function ReviewForm({ onClose }) {
   }
 
   function check(index) {
-    reviewFormik.setFieldValue("rating", scale(index, 0, 100, 0, 5));
+    reviewFormik.setFieldValue("rate", scale(index, 0, 100, 0, 5));
     // console.log(scale(index, 0, 100, 0, 5));
   }
   return (
     <FormikProvider value={reviewFormik}>
+      <PopupLoader isOpen={isSubmitting} message="Submitting review" />
       <Form className="flex flex-col gap-4">
         <p>
           Rate your experience with the barterer before setting the item as
@@ -85,7 +70,7 @@ export default function ReviewForm({ onClose }) {
             }}
             onClick={check}
             transition
-            allowHalfIcon
+            // allowHalfIcon
             fillColor="#85CB33"
             emptyColor="#D2D2D2"
             initialValue={reviewFormik.values.rating}
@@ -101,15 +86,15 @@ export default function ReviewForm({ onClose }) {
             }}
             tooltipArray={[
               "Terrible",
-              "Terrible+",
+              // "Terrible+",
               "Bad",
-              "Bad+",
+              // "Bad+",
               "Average",
-              "Average+",
+              // "Average+",
               "Great",
-              "Great+",
+              // "Great+",
               "Awesome",
-              "Awesome+",
+              // "Awesome+",
             ]}
             // readonly
             size={48}

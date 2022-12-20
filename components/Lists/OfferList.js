@@ -1,3 +1,10 @@
-export default function OfferList({ children }) {
-  return <ul className="grid grid-cols-1 gap-5">{children}</ul>;
+export default function OfferList({ children, grid = false }) {
+  return (
+    <ul
+      className={`
+  ${grid ? "grid gap-5 md:grid-cols-2" : "flex flex-col gap-5"}`}
+    >
+      {children}
+    </ul>
+  );
 }

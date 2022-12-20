@@ -246,7 +246,7 @@ export default function ItemPageTabs({
       defaultIndex={0}
       className="container mx-auto grid grid-cols-1 items-start gap-6 sm:grid-cols-[auto_2fr] lg:max-w-[1200px]"
     >
-      <TabList className="flex w-full items-start gap-4 sm:h-full sm:w-[200px] sm:flex-col sm:gap-6">
+      <TabList className="flex w-full items-start gap-4 sm:h-full sm:w-[180px] sm:flex-col sm:gap-6">
         <Tab className="tab-varying" selectedClassName="tab-active">
           <p>Offers</p>
           <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
@@ -267,7 +267,7 @@ export default function ItemPageTabs({
               // id="offers"
               className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
             >
-              <p className="font-display text-lg font-semibold">
+              <p className="font-display text-xl font-semibold">
                 {offer && acceptedOffer && offer._id !== acceptedOffer._id
                   ? "Your Offer"
                   : "Yours & Accepted Offer"}
@@ -295,7 +295,7 @@ export default function ItemPageTabs({
               // id="offers"
               className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
             >
-              <p className="font-display text-lg font-semibold">
+              <p className="font-display text-xl font-semibold">
                 Accepted Offer
               </p>
               <OfferListItem
@@ -307,7 +307,7 @@ export default function ItemPageTabs({
           )}
           {itemOffers?.length && (
             <div className="flex flex-col gap-2 pb-4">
-              <p className="font-display text-lg font-semibold">Offers</p>
+              <p className="font-display text-xl font-semibold">Offers</p>
               <OfferList>{itemOffers}</OfferList>
             </div>
           )}
@@ -342,7 +342,7 @@ export default function ItemPageTabs({
             {!showUserControls && (
               <FormikProvider value={questionFormik}>
                 <Form className="flex flex-col gap-4">
-                  <p className="font-display text-lg font-semibold">
+                  <p className="font-display text-xl font-semibold">
                     Ask a Question
                   </p>
                   <div className="flex flex-row items-end gap-2">
@@ -368,7 +368,7 @@ export default function ItemPageTabs({
             )}
             {itemQuestions?.length ? (
               <div className="flex flex-col gap-2 pb-4">
-                <p className="font-display text-lg font-semibold">Questions</p>
+                <p className="font-display text-xl font-semibold">Questions</p>
                 <QuestionAnswerList>{itemQuestions}</QuestionAnswerList>
               </div>
             ) : !questionsEndReached ? (

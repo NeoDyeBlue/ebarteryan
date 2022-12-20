@@ -23,8 +23,10 @@ export default function Offers() {
     offers.length &&
     offers.map((offer, index) => {
       let status;
-      if (offer.accepted) {
+      if (offer.accepted && !offer.received) {
         status = "accepted";
+      } else if (offer.accepted && offer.received) {
+        status = "received";
       } else if (!offer.item.ended && offer.item.available) {
         status = "waiting";
       } else if (offer.item.ended || !offer.item.available) {
@@ -64,6 +66,9 @@ export default function Offers() {
             </Tab>
             <Tab className="tab-varying" selectedClassName="tab-active">
               <p>Failed</p>
+            </Tab>
+            <Tab className="tab-varying" selectedClassName="tab-active">
+              <p>Received</p>
             </Tab>
           </TabList>
           <div>
@@ -146,6 +151,32 @@ export default function Offers() {
               ) : null}
             </TabPanel>
             {/* Failed */}
+            <TabPanel className="flex flex-col gap-6">
+              <UserOfferList>
+                {offers.length ? (
+                  userOffers
+                ) : !isEndReached ? (
+                  [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)
+                ) : (
+                  <li className="col-span-full row-span-full flex items-center justify-center">
+                    <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                      <FacePendingFilled size={100} />
+                      Nothing to show
+                    </p>
+                  </li>
+                )}
+                {isLoading &&
+                  [...Array(8)].map((_, i) => <OfferCardSkeleton key={i} />)}
+              </UserOfferList>
+              {!isEndReached && !isLoading ? (
+                <div className="mx-auto mb-8 w-full max-w-[300px]">
+                  <Button secondary={true} onClick={() => setSize(size + 1)}>
+                    Load More
+                  </Button>
+                </div>
+              ) : null}
+            </TabPanel>
+            {/* Received */}
             <TabPanel className="flex flex-col gap-6">
               <UserOfferList>
                 {offers.length ? (

@@ -8,6 +8,7 @@ import { useRouter } from "next/router";
 import { KebabMenu, KebabMenuItem } from "../Navigation";
 import { useState } from "react";
 import { ReviewModal } from "../Modals";
+import useReviewStore from "../../store/useReviewStore";
 
 export default function UserOfferListItem({ offer, status }) {
   const router = useRouter();
@@ -22,14 +23,20 @@ export default function UserOfferListItem({ offer, status }) {
     case "accepted":
       colors = "bg-success-500 text-white";
       break;
+    case "received":
+      colors = "bg-info-500 text-white";
+      break;
     case "failed":
       colors = "bg-danger-500 text-white";
       break;
   }
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const { setReviewee, setItem } = useReviewStore();
 
   function showReviewModal() {
+    setReviewee(offer?.item?.user?._id);
+    setItem(offer?.item?._id);
     setIsReviewModalOpen(true);
   }
 
@@ -39,11 +46,11 @@ export default function UserOfferListItem({ offer, status }) {
 
   return (
     <li
-      className="flex h-fit cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 bg-white p-3
-    hover:shadow-md"
+      className="relative flex h-fit cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 bg-white
+    p-3 hover:shadow-md"
       onClick={() => router.push(`/items/${offer?.item?._id}`)}
     >
-      <div onClick={(e) => e.stopPropagation()}>
+      <div onClick={(e) => e.stopPropagation()} className="absolute">
         <ReviewModal isOpen={isReviewModalOpen} onClose={hideReviewModal} />
       </div>
       <div className="flex items-center justify-between gap-2">
@@ -62,7 +69,7 @@ export default function UserOfferListItem({ offer, status }) {
           <StatusBadge status={status} statusText={status} />
         </div>
         <KebabMenu>
-          {offer?.accepted && (
+          {offer?.accepted && !offer?.received && (
             <KebabMenuItem onClick={showReviewModal}>
               <Checkmark size={24} /> Set as Received
             </KebabMenuItem>
