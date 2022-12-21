@@ -19,6 +19,7 @@ import usePaginate from "../../lib/hooks/usePaginate";
 import { getSession } from "next-auth/react";
 import { getUserInfo } from "../../lib/controllers/user-controller";
 import useSWR from "swr";
+import { DotLoader } from "react-spinners";
 
 export async function getServerSideProps(context) {
   const { params } = context;
@@ -63,9 +64,25 @@ export default function OtherProfile({ userInfo }) {
     error,
   } = usePaginate(`/api/items/user/${userInfo?._id}`, 8);
 
+  const {
+    data: reviews,
+    isEndReached: reviewsEndReached,
+    isLoading: reviewsLoading,
+    size: reviewsSize,
+    totalDocs: reviewstotalDocs,
+    setSize: setReviewsSize,
+    error: reviewsError,
+  } = usePaginate(`/api/reviews/${userInfo._id}`, 10);
+
   const { data: reviewStats, error: reviewStatsError } = useSWR(
     `/api/reviews/${userInfo._id}/info`
   );
+
+  const userReviews =
+    reviews.length &&
+    reviews.map((review) => (
+      <ReviewListItem key={review?._id} review={review} />
+    ));
 
   const itemCards =
     items.length &&
@@ -214,17 +231,17 @@ export default function OtherProfile({ userInfo }) {
             <div className="flex items-center gap-4">
               <p className="flex items-center gap-2 font-display text-2xl font-semibold">
                 <StarFilled size={24} className="align-middle" />
-                {reviewStats?.data?.weightedAverage}
+                {reviewStats?.data?.weightedAverage || 0}
               </p>
               <p className="text-2xl text-gray-300">
-                {reviewStats?.data?.totalReviews} {"review(s)"}
+                {reviewStats?.data?.totalReviews || 0} {"review(s)"}
               </p>
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">5</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["5"]?.percentage}
+                  completed={reviewStats?.data?.rates["5"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -234,7 +251,7 @@ export default function OtherProfile({ userInfo }) {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">4</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["4"]?.percentage}
+                  completed={reviewStats?.data?.rates["4"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -244,7 +261,7 @@ export default function OtherProfile({ userInfo }) {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">3</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["3"]?.percentage}
+                  completed={reviewStats?.data?.rates["3"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -254,7 +271,7 @@ export default function OtherProfile({ userInfo }) {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">2</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["2"]?.percentage}
+                  completed={reviewStats?.data?.rates["2"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -264,7 +281,7 @@ export default function OtherProfile({ userInfo }) {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">1</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["1"]?.percentage}
+                  completed={reviewStats?.data?.rates["1"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -274,11 +291,32 @@ export default function OtherProfile({ userInfo }) {
             </div>
           </div>
           <div className="w-full md:w-[65%]">
-            <ReviewList>
-              <ReviewListItem />
-              <ReviewListItem />
-              <ReviewListItem />
-            </ReviewList>
+            {reviews?.length && <ReviewList>{userReviews}</ReviewList>}
+            {!reviewsEndReached && (
+              <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+                <DotLoader color="#C7EF83" size={32} />
+              </div>
+            )}
+            {!reviews.length && (
+              <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                No Offers
+              </p>
+            )}
+            {reviewsLoading && (
+              <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+                <DotLoader color="#C7EF83" size={32} />
+              </div>
+            )}
+            {!reviewsEndReached && !reviewsLoading ? (
+              <div className="mx-auto mb-8 w-full max-w-[200px]">
+                <Button
+                  secondary={true}
+                  onClick={() => setReviewsSize(reviewsSize + 1)}
+                >
+                  Load More
+                </Button>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>

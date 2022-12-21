@@ -18,25 +18,40 @@ import { Button } from "../../components/Buttons";
 import { ItemCardSkeleton } from "../../components/Loaders";
 import usePaginate from "../../lib/hooks/usePaginate";
 import { useSession } from "next-auth/react";
+import { DotLoader } from "react-spinners";
 import useSWR from "swr";
 
 export default function Profile() {
   const { data: session, status } = useSession();
   const {
     data: items,
-    isEndReached,
-    isLoading,
-    size,
-    totalDocs,
-    setSize,
-    error,
+    isEndReached: itemsEndReached,
+    isLoading: itemsLoading,
+    size: itemsSize,
+    totalDocs: itemstotalDocs,
+    setSize: setItemsSize,
+    error: itemsError,
   } = usePaginate(`/api/items/user/${session?.user?.id}`, 8);
+
+  const {
+    data: reviews,
+    isEndReached: reviewsEndReached,
+    isLoading: reviewsLoading,
+    size: reviewsSize,
+    totalDocs: reviewstotalDocs,
+    setSize: setReviewsSize,
+    error: reviewsError,
+  } = usePaginate(`/api/reviews/${session?.user?.id}`, 10);
 
   const { data: reviewStats, error: reviewStatsError } = useSWR(
     `/api/reviews/${session?.user?.id}/info`
   );
 
-  console.log(reviewStats);
+  const userReviews =
+    reviews.length &&
+    reviews.map((review) => (
+      <ReviewListItem key={review?._id} review={review} />
+    ));
 
   const itemCards =
     items.length &&
@@ -87,7 +102,7 @@ export default function Profile() {
                   emptyColor="#D2D2D2"
                   initialValue={4.5}
                   readonly
-                  size={24}
+                  itemsSize={24}
                 />
                 <p>•</p>
                 <p className="text-[15px]">10</p>
@@ -103,14 +118,14 @@ export default function Profile() {
                 className="flex items-center justify-center gap-1 overflow-hidden text-ellipsis whitespace-nowrap rounded-[10px]
         bg-green-500 px-4 py-3 text-center font-display text-[15px] font-medium text-white disabled:opacity-50"
               >
-                <Settings size={20} />
+                <Settings itemsSize={20} />
                 Profile & Account
               </a>
             </Link>
             <div className="flex w-full gap-4 md:w-auto md:gap-8">
               <div className="flex w-full flex-col items-center gap-2 md:justify-center">
                 <div className="flex items-center gap-2">
-                  <ArrowsHorizontal size={32} />
+                  <ArrowsHorizontal itemsSize={32} />
                   <p className="text-2xl">8</p>
                 </div>
                 <p className="text-center font-display text-sm md:whitespace-nowrap">
@@ -120,7 +135,7 @@ export default function Profile() {
               <div className="w-[1px] bg-gray-100"></div>
               <div className="flex w-full flex-col items-center justify-center gap-2">
                 <div className="flex items-center gap-2">
-                  <Need size={32} />
+                  <Need itemsSize={32} />
                   <p className="text-2xl">10</p>
                 </div>
                 <p className="text-center font-display text-sm md:whitespace-nowrap">
@@ -136,14 +151,14 @@ export default function Profile() {
             <div className="border-t border-t-gray-100">
               <TabList className="flex gap-4 md:gap-8">
                 <Tab className="tab" selectedClassName="tab-active">
-                  {/* <Thumbnail_2 size={24} /> */}
+                  {/* <Thumbnail_2 itemsSize={24} /> */}
                   <p>Listings</p>
                   <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
-                    {totalDocs}
+                    {itemstotalDocs}
                   </span>
                 </Tab>
                 <Tab className="tab" selectedClassName="tab-active">
-                  {/* <LicenseDraft size={24} /> */}
+                  {/* <LicenseDraft itemsSize={24} /> */}
                   <p>Drafts</p>
                   <span className="rounded-[10px] bg-gray-100 px-2 py-1 text-sm">
                     0
@@ -156,27 +171,30 @@ export default function Profile() {
                 <div
                   className={`grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
            lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:pb-6 ${
-             !items.length && isEndReached
+             !items.length && itemsEndReached
                ? "min-h-[80vh] grid-cols-1 lg:grid-cols-1"
                : ""
            }`}
                 >
                   {items?.length ? (
                     itemCards
-                  ) : !isEndReached || !error ? (
+                  ) : !itemsEndReached || !itemsError ? (
                     [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
                   ) : (
                     <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
-                      <FacePendingFilled size={100} />
+                      <FacePendingFilled itemsSize={100} />
                       Nothing to show
                     </p>
                   )}
-                  {isLoading &&
+                  {itemsLoading &&
                     [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
                 </div>
-                {!isEndReached && !isLoading ? (
+                {!itemsEndReached && !itemsLoading ? (
                   <div className="mx-auto mb-8 w-full max-w-[300px]">
-                    <Button secondary={true} onClick={() => setSize(size + 1)}>
+                    <Button
+                      secondary={true}
+                      onClick={() => setItemsSize(itemsSize + 1)}
+                    >
                       Load More
                     </Button>
                   </div>
@@ -196,18 +214,18 @@ export default function Profile() {
           <div className="flex flex-col gap-4 md:w-[35%]">
             <div className="flex items-center gap-4">
               <p className="flex items-center gap-2 font-display text-2xl font-semibold">
-                <StarFilled size={24} className="align-middle" />
-                {reviewStats?.data?.weightedAverage}
+                <StarFilled itemsSize={24} className="align-middle" />
+                {reviewStats?.data?.weightedAverage || 0}
               </p>
               <p className="text-2xl text-gray-300">
-                {reviewStats?.data?.totalReviews} {"review(s)"}
+                {reviewStats?.data?.totalReviews || 0} {"review(s)"}
               </p>
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">5</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["5"]?.percentage}
+                  completed={reviewStats?.data?.rates["5"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -217,7 +235,7 @@ export default function Profile() {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">4</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["4"]?.percentage}
+                  completed={reviewStats?.data?.rates["4"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -227,7 +245,7 @@ export default function Profile() {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">3</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["3"]?.percentage}
+                  completed={reviewStats?.data?.rates["3"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -237,7 +255,7 @@ export default function Profile() {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">2</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["2"]?.percentage}
+                  completed={reviewStats?.data?.rates["2"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -247,7 +265,7 @@ export default function Profile() {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">1</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["1"]?.percentage}
+                  completed={reviewStats?.data?.rates["1"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -257,11 +275,32 @@ export default function Profile() {
             </div>
           </div>
           <div className="w-full md:w-[65%]">
-            <ReviewList>
-              <ReviewListItem />
-              <ReviewListItem />
-              <ReviewListItem />
-            </ReviewList>
+            {reviews?.length && <ReviewList>{userReviews}</ReviewList>}
+            {!reviewsEndReached && (
+              <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+                <DotLoader color="#C7EF83" size={32} />
+              </div>
+            )}
+            {!reviews.length && (
+              <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                No Offers
+              </p>
+            )}
+            {reviewsLoading && (
+              <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+                <DotLoader color="#C7EF83" size={32} />
+              </div>
+            )}
+            {!reviewsEndReached && !reviewsLoading ? (
+              <div className="mx-auto mb-8 w-full max-w-[200px]">
+                <Button
+                  secondary={true}
+                  onClick={() => setReviewsSize(reviewsSize + 1)}
+                >
+                  Load More
+                </Button>
+              </div>
+            ) : null}
           </div>
         </div>
       </div>
