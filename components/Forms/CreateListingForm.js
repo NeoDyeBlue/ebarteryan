@@ -64,8 +64,6 @@ export default function CreateListingForm() {
       }))
     : [];
 
-  console.log(categories);
-
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -212,45 +210,27 @@ export default function CreateListingForm() {
                 </RadioSelect>
               </div>
               <div className="flex flex-col gap-4">
-                <ReactModal
-                  contentLabel="Location Modal"
+                <LocationModal
                   isOpen={locationModalOpen}
-                  // closeTimeoutMS={300}
-                  overlayClassName={`bg-black/20 fixed top-0 z-50 flex h-full w-full items-end`}
-                  preventScroll={true}
-                  onRequestClose={() => {
+                  onClose={() => {
                     closeLocationModal();
                     props.setFieldTouched("location", true, true);
                   }}
-                  bodyOpenClassName="modal-open-body"
-                  className={`relative h-[90vh] w-full overflow-hidden rounded-t-[10px] bg-white
-         py-6 shadow-lg md:m-auto md:max-w-[580px] md:rounded-[10px]`}
-                >
-                  <div
-                    className={`custom-scrollbar container flex max-h-full min-h-full overflow-y-auto md:px-6`}
-                  >
-                    <LocationModal
-                      onClose={() => {
-                        closeLocationModal();
-                        props.setFieldTouched("location", true, true);
-                      }}
-                      onApply={() => {
-                        setCreationLocation();
-                        props.setFieldValue(
-                          "location",
-                          {
-                            region: region,
-                            lat: position.lat,
-                            lng: position.lng,
-                          },
-                          true
-                        );
-                        closeLocationModal();
-                        // handleLocationChange();
-                      }}
-                    />
-                  </div>
-                </ReactModal>
+                  onApply={() => {
+                    setCreationLocation();
+                    props.setFieldValue(
+                      "location",
+                      {
+                        region: region,
+                        lat: position.lat,
+                        lng: position.lng,
+                      },
+                      true
+                    );
+                    closeLocationModal();
+                    // handleLocationChange();
+                  }}
+                />
                 <p className="border-b border-gray-100 pb-2 text-sm text-gray-300">
                   Location
                 </p>

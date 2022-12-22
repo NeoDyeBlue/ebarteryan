@@ -30,6 +30,7 @@ const useUserOfferStore = create((set, get) => ({
     })),
   resubmit: async () => {
     try {
+      console.log(get().item);
       set({ isSubmitting: true });
       const res = await fetch(`/api/offers/${get().item}`, {
         method: "POST",
@@ -37,7 +38,6 @@ const useUserOfferStore = create((set, get) => ({
         headers: { "Content-Type": "application/json" },
       });
       const result = await res.json();
-      console.log(result);
       if (result && result.success) {
         set({ isSubmitting: false });
         set({ isSubmitSuccess: true });

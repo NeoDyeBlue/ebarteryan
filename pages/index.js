@@ -25,6 +25,8 @@ export default function Home() {
       : {}),
   });
 
+  console.log(isEndReached, isLoading);
+
   const itemCards =
     items.length &&
     items.map((item) => (
@@ -40,7 +42,6 @@ export default function Home() {
       />
     ));
 
-  console.log(isEndReached, isLoading);
   return (
     <div className="flex w-full flex-col gap-4">
       <Head>
@@ -58,11 +59,10 @@ export default function Home() {
                : ""
            }`}
         >
-          {items?.length ? (
-            itemCards
-          ) : !isEndReached ? (
-            [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
-          ) : (
+          {items?.length ? itemCards : null}
+          {isLoading &&
+            [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
+          {!items.length && isEndReached && !isLoading ? (
             <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
               <FacePendingFilled size={100} />
               Nothing to show{" "}
@@ -70,9 +70,7 @@ export default function Home() {
                 {listingRegion ? `${listingRegion} - ${listingRadius}km` : ""}
               </span>
             </p>
-          )}
-          {isLoading &&
-            [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
+          ) : null}
         </div>
         {!isEndReached && !isLoading ? (
           <div className="mx-auto mb-8 w-full max-w-[300px]">

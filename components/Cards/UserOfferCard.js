@@ -62,6 +62,8 @@ export default function UserOfferCard({
     await retryHandler();
   }
 
+  console.log(offer);
+
   return (
     <li
       className={`relative mb-1 flex flex-col gap-3
@@ -178,7 +180,7 @@ export default function UserOfferCard({
         <div className="flex w-full items-center gap-4">
           <div className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
             <Image
-              src={offer?.user?.image?.url}
+              src={offer?.user?.image?.url || session?.user?.image}
               layout="fill"
               alt="user image"
               // objectFit="cover"
@@ -187,7 +189,8 @@ export default function UserOfferCard({
           <div className="flex w-full items-center justify-between">
             <div className="flex flex-col">
               <p className="min-w-[150px] font-display">
-                {offer?.user?.fullName}
+                {offer?.user?.fullName ||
+                  `${session?.user?.firstName} ${session?.user?.lastName}`}
               </p>
               <div className="flex gap-1">
                 <span className="flex w-full items-center justify-start gap-1">

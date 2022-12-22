@@ -118,7 +118,9 @@ export default function ItemPageTabs({
     if (questions.length >= storedQuestions.length || itemId !== item) {
       setQuestions(questions);
       setTotalQuestions(
-        totalQuestions >= totalQuestionDocs ? totalQuestions : totalQuestionDocs
+        totalQuestionDocs >= totalQuestions || itemId == item
+          ? totalQuestionDocs
+          : totalQuestions
       );
       if (itemId !== item) {
         setItem(itemId);
@@ -142,7 +144,9 @@ export default function ItemPageTabs({
     if (offers.length >= storedOffers.length || itemId !== item) {
       setOffers(offers);
       setTotalOffers(
-        totalOffers >= totalOfferDocs ? totalOffers : totalOfferDocs
+        totalOfferDocs >= totalOffers || itemId == item
+          ? totalOfferDocs
+          : totalOffers
       );
       if (itemId !== item) {
         setItem(itemId);
@@ -268,9 +272,9 @@ export default function ItemPageTabs({
               className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
             >
               <p className="font-display text-xl font-semibold">
-                {offer && acceptedOffer && offer._id !== acceptedOffer._id
-                  ? "Your Offer"
-                  : "Yours & Accepted Offer"}
+                {offer && acceptedOffer && offer._id == acceptedOffer._id
+                  ? "Yours & Accepted Offer"
+                  : "Your Offer"}
               </p>
               <UserOfferCard
                 offer={offer}

@@ -8,14 +8,29 @@ import { getToken } from "next-auth/jwt";
 export default async function handler(req, res) {
   try {
     if (req.method == "GET") {
-      let { user, drafts, page, limit } = req.query;
+      let { user, status, page, limit } = req.query;
+      let drafts = status == "drafts" ? true : false;
+      let unavailable = status == "unavailable" ? true : false;
+      let ended = status == "ended" ? true : false;
       if (drafts) {
         const token = await getToken({ req });
-        if (token && token.sub !== user && drafts) {
+        if (
+          token &&
+          token.sub !== user &&
+          (status == "drafts" || status == "unavailable")
+        ) {
           drafts = false;
+          unavailable = false;
         }
       }
-      const items = await getUserItems(user, drafts, page, limit);
+      const items = await getUserItems(
+        user,
+        drafts,
+        unavailable,
+        ended,
+        page,
+        limit
+      );
       return successResponse(req, res, items);
     }
     return errorResponse(req, res, "method not allowed", 405);

@@ -11,6 +11,7 @@ import { ReviewModal } from "../Modals";
 import useReviewStore from "../../store/useReviewStore";
 
 export default function UserOfferListItem({ offer, status }) {
+  const { setReviewee, setItem, isReviewDone } = useReviewStore();
   const router = useRouter();
   let colors = "";
   switch (status) {
@@ -23,7 +24,7 @@ export default function UserOfferListItem({ offer, status }) {
     case "accepted":
       colors = "bg-success-500 text-white";
       break;
-    case "received":
+    case "received" || isReviewDone:
       colors = "bg-info-500 text-white";
       break;
     case "failed":
@@ -32,7 +33,6 @@ export default function UserOfferListItem({ offer, status }) {
   }
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
-  const { setReviewee, setItem } = useReviewStore();
 
   function showReviewModal() {
     setReviewee(offer?.item?.user?._id);

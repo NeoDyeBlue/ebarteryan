@@ -33,7 +33,7 @@ export default function OfferModal({ onClose, isOpen }) {
      py-6 shadow-lg md:m-auto md:h-[90vh] md:max-w-[480px] md:rounded-[10px]`}
     >
       <div
-        className={`custom-scrollbar container max-h-full overflow-y-auto md:px-6`}
+        className={`custom-scrollbar container mx-auto max-h-full overflow-y-auto md:px-6`}
       >
         <div className="flex flex-col gap-4">
           <div className="flex flex-shrink-0 items-center justify-between">
