@@ -16,6 +16,9 @@ import { Button } from "../Buttons";
 import { toast } from "react-hot-toast";
 import { PopupLoader } from "../Loaders";
 import { ConfirmationModal } from "../Modals";
+import useSocketStore from "../../store/useSocketStore";
+import useMessagesStore from "../../store/useMessagesStore";
+import { useSession } from "next-auth/react";
 // import { KebabMenu, KebabMenuItem } from "../Navigation";
 
 export default function OfferListItem({
@@ -29,6 +32,10 @@ export default function OfferListItem({
   const [acceptConfirmationOpen, setAcceptConfirmationOpen] = useState(false);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  //stores
+  const { socket } = useSocketStore();
+  const { setIsMessagesOpen, setConversation } = useMessagesStore();
 
   //elements
   const itemImages = offer?.images?.map((image, index) => (
@@ -66,6 +73,23 @@ export default function OfferListItem({
     // await stall(3000);
     // setIsLoading(false);
     // toast.success("Offer accepted");
+  }
+
+  async function openChat() {
+    if (offer?.conversation) {
+      socket.emit("join-conversation", offer?.conversation?._id);
+      setConversation(offer?.conversation);
+    } else {
+      const res = await fetch("/api/messages", {
+        method: "POST",
+        body: JSON.stringify({
+          receiver: offer?.user,
+          item: offer?.item,
+          offer: offer?._id,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+    }
   }
 
   async function handleAcceptConfirm() {

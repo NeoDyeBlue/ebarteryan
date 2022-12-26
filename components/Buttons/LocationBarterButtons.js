@@ -2,18 +2,11 @@ import Button from "./Button";
 import LinkButton from "./LinkButton";
 import { Pen, Location } from "@carbon/icons-react";
 import LocationModal from "../Modals/LocationModal";
-import ReactModal from "react-modal";
-import { useState, useRef } from "react";
+import { useState } from "react";
 import useMapStore from "../../store/useMapStore";
 import Marquee from "react-fast-marquee";
-import {
-  disableBodyScroll,
-  enableBodyScroll,
-  clearAllBodyScrollLocks,
-} from "body-scroll-lock";
 
 export default function LocationBarterButtons({ className }) {
-  const modalRef = useRef(null);
   const {
     clearPositionRegion,
     listingRegion,
@@ -22,19 +15,16 @@ export default function LocationBarterButtons({ className }) {
   } = useMapStore();
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   function openLocationModal() {
-    disableBodyScroll(modalRef?.current, { reserveScrollBarGap: true });
     setLocationModalOpen(true);
   }
 
   function closeLocationModal() {
-    enableBodyScroll(modalRef?.current);
     clearPositionRegion();
     setLocationModalOpen(false);
   }
   return (
     <>
       <LocationModal
-        ref={modalRef}
         onClose={closeLocationModal}
         applyInListing={true}
         isOpen={locationModalOpen}
