@@ -1,8 +1,16 @@
 import { ArrowLeft, Add } from "@carbon/icons-react";
 import { CircleButton } from "../Buttons";
 import Image from "next/image";
+import useMessagesStore from "../../store/useMessagesStore";
+import { useSession } from "next-auth/react";
 
 export default function ChatHeader({ showClose, onClose }) {
+  const { conversation } = useMessagesStore();
+  const { data: session } = useSession();
+
+  const receiver = conversation?.members?.find(
+    (member) => member._id !== (session && session.user.id)
+  );
   return (
     <div
       className={`flex items-center gap-4 py-3 ${
@@ -17,7 +25,7 @@ export default function ChatHeader({ showClose, onClose }) {
       <div className="flex items-center gap-3">
         <div className="relative h-[36px] w-[36px] flex-shrink-0">
           <Image
-            src="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
+            src={receiver?.image?.url}
             layout="fill"
             className="rounded-full"
             alt="user image"
@@ -27,7 +35,7 @@ export default function ChatHeader({ showClose, onClose }) {
     rounded-full border-[2px] border-white bg-green-400"
           ></span>
         </div>
-        <p className="font-display font-medium">Other User</p>
+        <p className="font-display font-medium">{receiver?.fullName}</p>
       </div>
       {showClose && (
         <CircleButton

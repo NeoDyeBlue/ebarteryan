@@ -30,6 +30,7 @@ export default function OfferListItem({
   //states
   const [currentImage, setCurrentImage] = useState(0);
   const [acceptConfirmationOpen, setAcceptConfirmationOpen] = useState(false);
+  const [convo, setConvo] = useState(offer?.conversation);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -76,19 +77,27 @@ export default function OfferListItem({
   }
 
   async function openChat() {
-    if (offer?.conversation) {
-      socket.emit("join-conversation", offer?.conversation?._id);
-      setConversation(offer?.conversation);
+    setIsMessagesOpen(true);
+    if (convo) {
+      socket.emit("join-conversation", convo?._id);
+      setConversation(convo);
     } else {
       const res = await fetch("/api/messages", {
         method: "POST",
         body: JSON.stringify({
-          receiver: offer?.user,
+          receiver: offer?.user?._id,
           item: offer?.item,
           offer: offer?._id,
         }),
         headers: { "Content-Type": "application/json" },
       });
+      const result = await res.json();
+      if (result && result.success) {
+        setConversation(result.data);
+        setConvo(result.data);
+      } else if (!result.success) {
+        toast.error("Can't chat user");
+      }
     }
   }
 
@@ -202,7 +211,7 @@ export default function OfferListItem({
         </div>
         {withButtons && (
           <div className="flex w-full justify-end gap-2">
-            <Button underlined autoWidth small>
+            <Button underlined autoWidth small onClick={openChat}>
               <Chat size={20} />
               <p className="hidden lg:block">Ask about the offer</p>
             </Button>

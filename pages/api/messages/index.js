@@ -1,5 +1,6 @@
 import { successResponse, errorResponse } from "../../../utils/response-utils";
 import { createConversation } from "../../../lib/controllers/message-controller";
+import { getToken } from "next-auth/jwt";
 
 export default async function handler(req, res) {
   try {

@@ -390,11 +390,11 @@ export default function Profile() {
           </div>
           <div className="w-full md:w-[65%]">
             {reviews?.length ? <ReviewList>{userReviews}</ReviewList> : null}
-            {!reviewsEndReached && (
+            {/* {!reviewsEndReached && (
               <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
                 <DotLoader color="#C7EF83" size={32} />
               </div>
-            )}
+            )} */}
             {!reviews.length && !reviewsLoading && reviewsEndReached && (
               <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
                 No Reviews

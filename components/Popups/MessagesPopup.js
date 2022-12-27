@@ -10,12 +10,16 @@ import {
   MessageListItem,
   MessageSearchBox,
 } from "../Messages";
+import useMessagesStore from "../../store/useMessagesStore";
 
 import { OverflowMenuVertical } from "@carbon/icons-react";
 import { CircleButton } from "../Buttons/";
 
 export default function MessagesPopup({ className, hasBadge }) {
   const userId = 1;
+
+  //stores
+  const { isMessagesOpen, setIsMessagesOpen } = useMessagesStore();
   const chats = [
     {
       id: 1,
@@ -95,20 +99,22 @@ export default function MessagesPopup({ className, hasBadge }) {
     }
   });
 
-  const [isOpen, setIsOpen] = useState(false);
+  // const [isMessagesOpen, setIsOpen] = useState(false);
 
   return (
     <div className={className}>
       <div
         className={`container mx-auto flex justify-end transition-transform duration-500 ${
-          isOpen ? "translate-y-0" : "translate-y-[calc(70vh-0.75rem*-1)]"
+          isMessagesOpen
+            ? "translate-y-0"
+            : "translate-y-[calc(70vh-0.75rem*-1)]"
         }`}
       >
         <div className="pointer-events-none flex flex-col items-end">
           <div style={{ perspective: "100px" }} className="pointer-events-auto">
             <button
               style={{
-                ...(isOpen
+                ...(isMessagesOpen
                   ? {
                       transform:
                         "rotateX(180deg) translateX(-1rem) translateY(-1px)",
@@ -116,7 +122,7 @@ export default function MessagesPopup({ className, hasBadge }) {
                     }
                   : {}),
               }}
-              onClick={() => setIsOpen(true)}
+              onClick={() => setIsMessagesOpen(true)}
               className="relative flex origin-bottom cursor-pointer 
         items-center gap-3 rounded-t-[10px] border border-b-0 border-gray-100 bg-white px-4 py-3
         font-display font-medium text-black-light shadow-lg transition-all delay-300 duration-300
@@ -176,7 +182,10 @@ export default function MessagesPopup({ className, hasBadge }) {
             grid-rows-[auto_1fr_auto] overflow-hidden"
             >
               <div className="w-full border-b border-gray-100 px-4">
-                <ChatHeader showClose={true} onClose={() => setIsOpen(false)} />
+                <ChatHeader
+                  showClose={true}
+                  onClose={() => setIsMessagesOpen(false)}
+                />
               </div>
               <div className="custom-scrollbar min-h-full overflow-y-auto px-4">
                 <ChatContainer>{chatBubbles}</ChatContainer>

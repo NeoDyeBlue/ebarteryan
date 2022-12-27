@@ -3,6 +3,7 @@ import create from "zustand";
 const useMessagesStore = create((set) => ({
   isMessagesOpen: false,
   conversation: null,
+  messageList: [],
   setIsMessagesOpen: (payload) =>
     set(() => ({
       isMessagesOpen: payload,
@@ -10,6 +11,10 @@ const useMessagesStore = create((set) => ({
   setConversation: (payload) =>
     set(() => ({
       conversation: payload,
+    })),
+    setMessageList: (payload) =>
+    set(() => ({
+      messageList: payload,
     })),
 }));
 
