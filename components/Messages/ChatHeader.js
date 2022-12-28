@@ -8,6 +8,8 @@ export default function ChatHeader({ showClose, onClose }) {
   const { conversation } = useMessagesStore();
   const { data: session } = useSession();
 
+  console.log(conversation);
+
   const receiver = conversation?.members?.find(
     (member) => member._id !== (session && session.user.id)
   );

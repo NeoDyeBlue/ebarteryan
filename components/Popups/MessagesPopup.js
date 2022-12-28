@@ -188,7 +188,7 @@ export default function MessagesPopup({ className, hasBadge }) {
                 />
               </div>
               <div className="custom-scrollbar min-h-full overflow-y-auto px-4">
-                <ChatContainer>{chatBubbles}</ChatContainer>
+                <ChatContainer />
               </div>
               <div className="w-full border-t border-gray-100 px-4">
                 <ChatInput />

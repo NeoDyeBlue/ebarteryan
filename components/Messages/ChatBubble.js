@@ -1,11 +1,14 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function ChatBubble({
   isFromUser,
   consecutive,
   type,
   userPic,
-  content,
+  images,
+  offer,
+  text,
 }) {
   //   const timestamp = new Date(props.createdAt);
   return (
@@ -28,7 +31,7 @@ export default function ChatBubble({
           )}
         </div>
       )}
-      <div
+      {/* <div
         className={`whitespace-pre-wrap break-all rounded-t-[10px] p-3 ${
           isFromUser
             ? "rounded-bl-[10px] bg-green-500 text-white"
@@ -36,7 +39,39 @@ export default function ChatBubble({
         }`}
       >
         {type == "text" && <p>{content}</p>}
-      </div>
+      </div> */}
+      {type == "text" && (
+        <div
+          className={`whitespace-pre-wrap break-all rounded-t-[10px] p-3 ${
+            isFromUser
+              ? "rounded-bl-[10px] bg-green-500 text-white"
+              : "rounded-br-[10px] bg-gray-100/30"
+          }`}
+        >
+          <p>{text}</p>
+        </div>
+      )}
+      {type == "offer" && offer && (
+        <div
+          className={`flex flex-col overflow-hidden whitespace-pre-wrap break-all rounded-t-[10px] ${
+            isFromUser
+              ? "rounded-bl-[10px] bg-green-500 text-white"
+              : "rounded-br-[10px] bg-gray-100/30"
+          }`}
+        >
+          <Link href={`/items/${offer?.item}`}>
+            <a className="relative h-[120px] w-full">
+              <Image
+                src={offer?.images[0]?.url}
+                objectFit="cover"
+                alt="offer image"
+                layout="fill"
+              />
+            </a>
+          </Link>
+          <p className="p-3">{text}</p>
+        </div>
+      )}
       {/* <div
         className={`${styles["c-chat__timestamp-wrap"]} ${
           props.isFromUser ? styles["c-chat__timestamp-wrap--right"] : ""

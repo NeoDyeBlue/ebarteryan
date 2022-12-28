@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Rating } from "react-simple-star-rating";
 import { CircleButton } from "../Buttons";
 import {
   OverflowMenuVertical,
@@ -18,7 +17,6 @@ import { PopupLoader } from "../Loaders";
 import { ConfirmationModal } from "../Modals";
 import useSocketStore from "../../store/useSocketStore";
 import useMessagesStore from "../../store/useMessagesStore";
-import { useSession } from "next-auth/react";
 // import { KebabMenu, KebabMenuItem } from "../Navigation";
 
 export default function OfferListItem({

@@ -1,13 +1,6 @@
 import Image from "next/image";
 
-export default function MessageListItem({
-  photo,
-  subtitle,
-  sender,
-  unread,
-  time,
-  count,
-}) {
+export default function MessageListItem({ photo, subtitle, sender, unread }) {
   return (
     <li
       className="before:bg-blue-100 relative flex cursor-pointer items-center gap-2 rounded-[10px] before:absolute

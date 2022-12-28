@@ -4,6 +4,7 @@ const useMessagesStore = create((set) => ({
   isMessagesOpen: false,
   conversation: null,
   messageList: [],
+  chatList: [],
   setIsMessagesOpen: (payload) =>
     set(() => ({
       isMessagesOpen: payload,
@@ -12,9 +13,13 @@ const useMessagesStore = create((set) => ({
     set(() => ({
       conversation: payload,
     })),
-    setMessageList: (payload) =>
+  setMessageList: (payload) =>
     set(() => ({
       messageList: payload,
+    })),
+  setChatList: (payload) =>
+    set(() => ({
+      chatList: payload,
     })),
 }));
 
