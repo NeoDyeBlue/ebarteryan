@@ -3,15 +3,19 @@ import { CircleButton } from "../Buttons";
 import Image from "next/image";
 import useMessagesStore from "../../store/useMessagesStore";
 import { useSession } from "next-auth/react";
+import useUserOnlineCheck from "../../lib/hooks/useUserOnlineCheck";
 
 export default function ChatHeader({ showClose, onClose }) {
   const { conversation } = useMessagesStore();
   const { data: session } = useSession();
 
-  console.log(conversation);
-
-  const receiver = conversation?.members?.find(
+  const recipient = conversation?.members?.find(
     (member) => member._id !== (session && session.user.id)
+  );
+
+  const isOnline = useUserOnlineCheck(
+    session && session.user.id,
+    recipient._id
   );
   return (
     <div
@@ -27,17 +31,19 @@ export default function ChatHeader({ showClose, onClose }) {
       <div className="flex items-center gap-3">
         <div className="relative h-[36px] w-[36px] flex-shrink-0">
           <Image
-            src={receiver?.image?.url}
+            src={recipient?.image?.url}
             layout="fill"
             className="rounded-full"
             alt="user image"
           />
-          <span
-            className="absolute right-0 z-10 h-[12px] w-[12px] 
+          {isOnline && (
+            <span
+              className="absolute right-0 bottom-0 z-10 h-[14px] w-[14px] 
     rounded-full border-[2px] border-white bg-green-400"
-          ></span>
+            ></span>
+          )}
         </div>
-        <p className="font-display font-medium">{receiver?.fullName}</p>
+        <p className="font-display font-medium">{recipient?.fullName}</p>
       </div>
       {showClose && (
         <CircleButton

@@ -1,105 +1,20 @@
 import { BadgedIcon } from "../Icons";
-import { Chat } from "@carbon/icons-react";
-import { useState } from "react";
+import { Chat, Add } from "@carbon/icons-react";
 import {
   ChatHeader,
   ChatContainer,
   ChatInput,
-  ChatBubble,
   MessageList,
-  MessageListItem,
   MessageSearchBox,
 } from "../Messages";
 import useMessagesStore from "../../store/useMessagesStore";
-
 import { OverflowMenuVertical } from "@carbon/icons-react";
 import { CircleButton } from "../Buttons/";
 
 export default function MessagesPopup({ className, hasBadge }) {
-  const userId = 1;
-
   //stores
-  const { isMessagesOpen, setIsMessagesOpen } = useMessagesStore();
-  const chats = [
-    {
-      id: 1,
-      sender: {
-        id: 1,
-        name: "User Name",
-        image: {
-          url: "https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg",
-        },
-      },
-      type: "text",
-      content: "Hello",
-    },
-    {
-      id: 2,
-      sender: {
-        id: 2,
-        name: "User Name",
-        image: {
-          url: "https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg",
-        },
-      },
-      type: "text",
-      content: "Hello",
-    },
-    {
-      id: 3,
-      sender: {
-        id: 2,
-        name: "User Name",
-        image: {
-          url: "https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg",
-        },
-      },
-      type: "text",
-      content: "Hello",
-    },
-  ];
-
-  const chatBubbles = chats.map((message, index) => {
-    // console.log(message);
-    let isFromUser = message.sender.id == userId ? true : false;
-    if (index + 1 <= chats.length - 1) {
-      if (message.sender.id == chats[index + 1].sender.id) {
-        return (
-          <ChatBubble
-            key={index}
-            isFromUser={isFromUser}
-            consecutive={true}
-            content={message.content}
-            type={message.type}
-          />
-        );
-      } else {
-        return (
-          <ChatBubble
-            key={index}
-            isFromUser={isFromUser}
-            consecutive={false}
-            content={message.content}
-            userPic={message.sender.image.url}
-            type={message.type}
-          />
-        );
-      }
-    } else {
-      return (
-        <ChatBubble
-          key={index}
-          isFromUser={isFromUser}
-          consecutive={false}
-          content={message.content}
-          userPic={message.sender.image.url}
-          type={message.type}
-        />
-      );
-    }
-  });
-
-  // const [isMessagesOpen, setIsOpen] = useState(false);
+  const { isMessagesOpen, setIsMessagesOpen, conversation } =
+    useMessagesStore();
 
   return (
     <div className={className}>
@@ -146,54 +61,42 @@ export default function MessagesPopup({ className, hasBadge }) {
               <div className="px-4">
                 <MessageSearchBox />
               </div>
-              <div className="custom-scrollbar overflow-y-auto overflow-x-hidden px-4">
-                <MessageList>
-                  <MessageListItem
-                    photo="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-                    sender="Other Userassssss"
-                    subtitle="Other: Good work!"
-                  />
-                  <MessageListItem
-                    photo="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-                    sender="OtherLong UserNamesss"
-                    subtitle="Other: Good work!"
-                    unread={true}
-                  />
-                  <MessageListItem
-                    photo="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-                    sender="Other User"
-                    subtitle="Other: Good work!"
-                  />
-                  <MessageListItem
-                    photo="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-                    sender="Other User"
-                    subtitle="Other: Good work!"
-                  />
-                  <MessageListItem
-                    photo="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-                    sender="Other User"
-                    subtitle="Other: Good work!"
-                  />
-                </MessageList>
-              </div>
+              <MessageList />
             </div>
-            <div
-              className="grid max-h-full min-h-full w-full grid-cols-1 
+            {conversation ? (
+              <div
+                className="grid max-h-full min-h-full w-full grid-cols-1 
             grid-rows-[auto_1fr_auto] overflow-hidden"
-            >
-              <div className="w-full border-b border-gray-100 px-4">
-                <ChatHeader
-                  showClose={true}
-                  onClose={() => setIsMessagesOpen(false)}
-                />
+              >
+                <div className="w-full border-b border-gray-100 px-4">
+                  <ChatHeader
+                    showClose={true}
+                    onClose={() => setIsMessagesOpen(false)}
+                  />
+                </div>
+                <div className="custom-scrollbar min-h-full overflow-y-auto px-4">
+                  <ChatContainer />
+                </div>
+                <div className="w-full border-t border-gray-100 px-4">
+                  <ChatInput />
+                </div>
               </div>
-              <div className="custom-scrollbar min-h-full overflow-y-auto px-4">
-                <ChatContainer />
+            ) : (
+              <div
+                className="relative flex max-h-full min-h-full w-full items-center justify-center overflow-hidden
+              p-6"
+              >
+                <div className="absolute top-0 right-0 px-4 py-3">
+                  <CircleButton
+                    onClick={() => setIsMessagesOpen(false)}
+                    icon={<Add size={32} className="rotate-[135deg]" />}
+                  />
+                </div>
+                <p className="text-center text-lg text-gray-200">
+                  Select a conversation
+                </p>
               </div>
-              <div className="w-full border-t border-gray-100 px-4">
-                <ChatInput />
-              </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

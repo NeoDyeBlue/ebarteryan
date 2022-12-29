@@ -86,7 +86,7 @@ export default function ChatContainer({ children }) {
         hasMore={!isEndReached}
         isReverse
         loader={
-          <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
+          <div className="my-2 flex h-[48px] flex-shrink-0 items-center justify-center">
             <DotLoader color="#C7EF83" size={32} />
           </div>
         }

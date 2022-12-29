@@ -5,10 +5,10 @@ import NextNProgress from "nextjs-progressbar";
 // import { ToastContainer, Slide } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "react-hot-toast";
-import { useEffect, useCallback } from "react";
+import { useEffect } from "react";
 import useSocketStore from "../store/useSocketStore";
+import { UserSocketInitializer } from "../components/Misc";
 import { io } from "socket.io-client";
-import { useSession } from "next-auth/react";
 
 const socket = io();
 
@@ -31,12 +31,10 @@ export default function MyApp({
   pageProps: { session, ...pageProps },
 }) {
   const { setSocket } = useSocketStore();
-  // const { session: userSession, status } = useSession();
   useEffect(() => {
     function handleSocket() {
       fetch("/api/socket").then(() => {
         setSocket(socket);
-        socket.emit("initialize");
       });
 
       return () => {
@@ -101,7 +99,7 @@ export default function MyApp({
             },
           }}
         />
-        {layout}
+        <UserSocketInitializer>{layout}</UserSocketInitializer>
       </SWRConfig>
     </SessionProvider>
   );
