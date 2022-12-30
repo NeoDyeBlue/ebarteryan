@@ -1,5 +1,6 @@
 import { Server } from "socket.io";
-import serverTimeHandler from "../../lib/sockets/server-time-handler";
+import { joinConversation } from "../../lib/sockets/conversation-room-handler";
+import { sendChat } from "../../lib/sockets/chat-handler";
 import {
   joinItemRoom,
   leaveItemRoom,
@@ -43,6 +44,14 @@ export default function handler(req, res) {
           isOnline: Array.from(sockets.values()).includes(userIds.userToCheck),
           user: userIds.userToCheck,
         });
+      });
+
+      socket.on("join-conversation", (rooms) => {
+        joinConversation(rooms, socket);
+      });
+
+      socket.on("chat", async (chat) => {
+        await sendChat(chat, socket, io);
       });
 
       socket.on("join-item-room", (room) => {

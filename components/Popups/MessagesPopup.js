@@ -74,7 +74,7 @@ export default function MessagesPopup({ className, hasBadge }) {
                     onClose={() => setIsMessagesOpen(false)}
                   />
                 </div>
-                <div className="custom-scrollbar min-h-full overflow-y-auto px-4">
+                <div className="custom-scrollbar min-h-full overflow-y-auto">
                   <ChatContainer />
                 </div>
                 <div className="w-full border-t border-gray-100 px-4">

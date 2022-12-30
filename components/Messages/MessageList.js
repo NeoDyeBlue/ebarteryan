@@ -5,25 +5,41 @@ import { ConvoItemSkeleton } from "../Loaders";
 import usePaginate from "../../lib/hooks/usePaginate";
 import InfiniteScroll from "react-infinite-scroller";
 import useMessagesStore from "../../store/useMessagesStore";
+import useSocketStore from "../../store/useSocketStore";
 
-export default function MessageList({ children }) {
-  const { setMessageList, messageList, setConversation } = useMessagesStore();
+export default function MessageList() {
+  const { setMessageList, messageList, setConversation, conversation } =
+    useMessagesStore();
+  const { socket } = useSocketStore();
   const { data: session, status } = useSession();
 
   const {
     data: conversations,
     isLoading,
     isEndReached,
-    error,
     setSize,
     size,
   } = usePaginate("/api/messages", 10);
 
+  //effects
   useEffect(() => {
     if (conversations.length) {
       setMessageList(conversations);
     }
   }, [conversations, setMessageList]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("update-convo-list", (updatedConvo) => {
+        setMessageList([
+          updatedConvo,
+          ...messageList.filter((convo) => convo._id != updatedConvo._id),
+        ]);
+      });
+
+      return () => socket.off("update-convo-list");
+    }
+  }, [socket, setMessageList, messageList]);
 
   const conversationItems =
     messageList.length &&
@@ -50,13 +66,23 @@ export default function MessageList({ children }) {
         <MessageListItem
           key={message._id}
           convoId={message._id}
-          onClick={() => setConversation(message)}
+          onClick={() => joinConversation(message)}
           image={recipient.image.url}
           recipient={recipient}
           subtitle={subtitle}
         />
       );
     });
+
+  function joinConversation(room) {
+    if (conversation?._id !== room._id) {
+      socket.emit("join-conversation", {
+        newRoom: room._id,
+        oldRoom: conversation?._id,
+      });
+      setConversation(room);
+    }
+  }
 
   return (
     <div className="h-full px-2">

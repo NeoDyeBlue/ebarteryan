@@ -34,7 +34,8 @@ export default function OfferListItem({
 
   //stores
   const { socket } = useSocketStore();
-  const { setIsMessagesOpen, setConversation } = useMessagesStore();
+  const { setIsMessagesOpen, setConversation, conversation } =
+    useMessagesStore();
 
   //elements
   const itemImages = offer?.images?.map((image, index) => (
@@ -77,8 +78,7 @@ export default function OfferListItem({
   async function openChat() {
     setIsMessagesOpen(true);
     if (convo) {
-      socket.emit("join-conversation", convo?._id);
-      setConversation(convo);
+      joinConversation(convo);
     } else {
       const res = await fetch("/api/messages", {
         method: "POST",
@@ -91,11 +91,21 @@ export default function OfferListItem({
       });
       const result = await res.json();
       if (result && result.success) {
-        setConversation(result.data);
+        joinConversation(result.data);
         setConvo(result.data);
       } else if (!result.success) {
         toast.error("Can't chat user");
       }
+    }
+  }
+
+  function joinConversation(room) {
+    if (conversation?._id !== room._id) {
+      socket.emit("join-conversation", {
+        newRoom: room._id,
+        oldRoom: conversation._id,
+      });
+      setConversation(room);
     }
   }
 
