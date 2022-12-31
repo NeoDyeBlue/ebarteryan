@@ -10,12 +10,12 @@ export default function ChatHeader({ showClose, onClose }) {
   const { data: session } = useSession();
 
   const recipient = conversation?.members?.find(
-    (member) => member._id !== (session && session.user.id)
+    (member) => member.user._id !== (session && session.user.id)
   );
 
   const isOnline = useUserOnlineCheck(
     session && session.user.id,
-    recipient._id
+    recipient.user._id
   );
   return (
     <div
@@ -31,7 +31,7 @@ export default function ChatHeader({ showClose, onClose }) {
       <div className="flex items-center gap-3">
         <div className="relative h-[36px] w-[36px] flex-shrink-0">
           <Image
-            src={recipient?.image?.url}
+            src={recipient?.user?.image?.url}
             layout="fill"
             className="rounded-full"
             alt="user image"
@@ -43,7 +43,7 @@ export default function ChatHeader({ showClose, onClose }) {
             ></span>
           )}
         </div>
-        <p className="font-display font-medium">{recipient?.fullName}</p>
+        <p className="font-display font-medium">{recipient?.user?.fullName}</p>
       </div>
       {showClose && (
         <CircleButton

@@ -103,7 +103,7 @@ export default function OfferListItem({
     if (conversation?._id !== room._id) {
       socket.emit("join-conversation", {
         newRoom: room._id,
-        oldRoom: conversation._id,
+        oldRoom: conversation?._id,
       });
       setConversation(room);
     }

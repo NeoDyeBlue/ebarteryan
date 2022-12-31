@@ -36,6 +36,9 @@ export default function ChatInput() {
     if (values.body || values.images.length) {
       const chat = {
         sender: session && session.user.id,
+        receiver: conversation.members?.find(
+          (member) => member.user._id !== (session && session.user.id)
+        ).user._id,
         conversation: conversation._id,
         images: values.images,
         body: values.body,

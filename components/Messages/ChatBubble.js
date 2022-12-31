@@ -13,9 +13,9 @@ export default function ChatBubble({
   //   const timestamp = new Date(props.createdAt);
   return (
     <li
-      className={`relative my-3 flex max-w-[70%] items-end gap-2 ${
+      className={`relative flex max-w-[70%] items-end gap-2 ${
         isFromUser ? "flex-row-reverse self-end" : "self-start"
-      } ${consecutive ? "mb-0 last:mb-4" : ""}`}
+      } ${consecutive ? "mb-1" : "mb-4"}`}
     >
       {!isFromUser && (
         <div className="relative h-[24px] w-[24px] shrink-0 overflow-hidden rounded-full">

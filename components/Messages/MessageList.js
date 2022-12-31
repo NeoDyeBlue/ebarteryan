@@ -46,11 +46,16 @@ export default function MessageList() {
     messageList.map((message) => {
       let subtitle;
       let latestChatSender = "You";
+
       const recipient = message?.members?.find(
-        (member) => member._id !== (session && session.user.id)
+        (member) => member.user._id !== (session && session.user.id)
       );
+      const sender = message?.members?.find(
+        (member) => member.user._id == (session && session.user.id)
+      );
+
       if (message.latestChat.sender !== (session && session.user.id)) {
-        latestChatSender = recipient.firstName;
+        latestChatSender = recipient.user.firstName;
       }
 
       if (
@@ -67,9 +72,10 @@ export default function MessageList() {
           key={message._id}
           convoId={message._id}
           onClick={() => joinConversation(message)}
-          image={recipient.image.url}
+          image={recipient.user.image.url}
           recipient={recipient}
           subtitle={subtitle}
+          read={sender.read}
         />
       );
     });

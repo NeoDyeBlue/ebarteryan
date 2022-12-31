@@ -104,33 +104,7 @@ export default function ChatContainer() {
     messagesEnd.current.scrollIntoView({ behavior: "smooth" });
   }
 
-  console.log(isEndReached, chatList);
-
   return (
-    // <div className="custom-scrollbar flex h-full w-full overflow-auto px-4">
-    //   <InfiniteScroll
-    //     ref={chatsContainer}
-    //     element="ul"
-    //     className="flex w-full flex-col"
-    //     // pageStart={size}
-    //     loadMore={() => {
-    //       if (!isLoading) {
-    //         setSize(size + 1);
-    //       }
-    //     }}
-    //     hasMore={!isEndReached}
-    //     isReverse={true}
-    //     loader={
-    //       <div className="my-2 flex h-[48px] flex-shrink-0 items-center justify-center">
-    //         <DotLoader color="#C7EF83" size={32} />
-    //       </div>
-    //     }
-    //     useWindow={false}
-    //   >
-    //     {chatBubbles}
-    //     <li ref={messagesEnd}></li>
-    //   </InfiniteScroll>
-    // </div>
     <ul
       id="chatsContainer"
       className="custom-scrollbar relative flex h-full w-full flex-col-reverse overflow-auto p-4"

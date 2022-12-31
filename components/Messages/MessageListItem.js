@@ -2,27 +2,40 @@ import Image from "next/image";
 import useMessagesStore from "../../store/useMessagesStore";
 import { useSession } from "next-auth/react";
 import useUserOnlineCheck from "../../lib/hooks/useUserOnlineCheck";
+import { useState, useEffect } from "react";
 
 export default function MessageListItem({
   convoId,
   image,
   subtitle,
   recipient,
-  unread,
   onClick,
+  read = false,
 }) {
+  const [isRead, setIsRead] = useState(false);
   const { conversation } = useMessagesStore();
   const { data: session } = useSession();
 
+  useEffect(() => {
+    setIsRead(read);
+  }, [read]);
+
   const isOnline = useUserOnlineCheck(
     session && session.user.id,
-    recipient._id
+    recipient.user._id
   );
 
-  console.log(isOnline);
+  function handleClick() {
+    console.log("run");
+    if (!isRead) {
+      setIsRead(true);
+    }
+    onClick();
+  }
+
   return (
     <li
-      onClick={onClick}
+      onClick={handleClick}
       className={`group relative flex cursor-pointer items-center gap-2 overflow-hidden 
       rounded-[10px] px-2 py-0  ${
         convoId == conversation?._id ? "bg-gray-100/30" : "hover:bg-gray-100/30"
@@ -52,11 +65,11 @@ export default function MessageListItem({
       whitespace-nowrap py-3"
       >
         <p className="overflow-hidden text-ellipsis whitespace-nowrap font-display font-semibold">
-          {recipient?.fullName}
+          {recipient?.user?.fullName}
         </p>
         <p
           className={` overflow-hidden text-ellipsis whitespace-nowrap text-sm ${
-            unread ? "font-semibold text-black-light" : "text-gray-300"
+            isRead ? "text-gray-300 " : "font-semibold text-black-light"
           }`}
         >
           {subtitle}

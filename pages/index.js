@@ -25,8 +25,6 @@ export default function Home() {
       : {}),
   });
 
-  console.log(isEndReached, isLoading);
-
   const itemCards =
     items.length &&
     items.map((item) => (
