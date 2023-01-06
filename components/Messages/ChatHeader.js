@@ -5,8 +5,8 @@ import useMessagesStore from "../../store/useMessagesStore";
 import { useSession } from "next-auth/react";
 import useUserOnlineCheck from "../../lib/hooks/useUserOnlineCheck";
 
-export default function ChatHeader({ showClose, onClose }) {
-  const { conversation } = useMessagesStore();
+export default function ChatHeader({ showClose = false, onClose }) {
+  const { conversation, setIsPageConversationOpen } = useMessagesStore();
   const { data: session } = useSession();
 
   const recipient = conversation?.members?.find(
@@ -24,9 +24,12 @@ export default function ChatHeader({ showClose, onClose }) {
       }`}
     >
       {!showClose && (
-        <button>
-          <ArrowLeft size={24} />
-        </button>
+        <div className="md:hidden">
+          <CircleButton
+            onClick={() => setIsPageConversationOpen(false)}
+            icon={<ArrowLeft size={24} />}
+          />
+        </div>
       )}
       <div className="flex items-center gap-3">
         <div className="relative h-[36px] w-[36px] flex-shrink-0">

@@ -26,7 +26,6 @@ export default function MessageListItem({
   );
 
   function handleClick() {
-    console.log("run");
     if (!isRead) {
       setIsRead(true);
     }
@@ -38,7 +37,9 @@ export default function MessageListItem({
       onClick={handleClick}
       className={`group relative flex cursor-pointer items-center gap-2 overflow-hidden 
       rounded-[10px] px-2 py-0  ${
-        convoId == conversation?._id ? "bg-gray-100/30" : "hover:bg-gray-100/30"
+        convoId == conversation?._id
+          ? "lg:bg-gray-100/30"
+          : "hover:bg-gray-100/30"
       }`}
     >
       <div className="relative h-[48px] w-[48px] flex-shrink-0">

@@ -36,7 +36,7 @@ export default function NavLayout({
             status == "authenticated" && (
               <MessagesPopup
                 hasBadge={true}
-                className="pointer-events-none fixed bottom-0 z-40 hidden w-full lg:block"
+                className="pointer-events-none fixed bottom-0 z-50 w-full lg:block"
               />
             )}
           {!noFooter && <Footer />}

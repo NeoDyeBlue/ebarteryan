@@ -1,22 +1,75 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Add } from "@carbon/icons-react";
+import ImageViewer from "react-simple-image-viewer";
+import { useState, useCallback } from "react";
 
 export default function ChatBubble({
   isFromUser,
   consecutive,
   type,
   userPic,
-  images,
+  images = [],
   offer,
   text,
 }) {
-  //   const timestamp = new Date(props.createdAt);
+  const [currentImage, setCurrentImage] = useState(0);
+  const [isViewerOpen, setIsViewerOpen] = useState(false);
+
+  //elements
+  const chatImages = images.map((image, index) => (
+    <div
+      key={index}
+      onClick={() => openImageViewer(index)}
+      className={`relative aspect-square h-full w-full cursor-pointer
+      overflow-hidden
+      `}
+    >
+      <Image
+        src={image.url || image.content}
+        layout="fill"
+        objectFit="cover"
+        placeholder="blur"
+        blurDataURL="/images/placeholder.png"
+        alt="selected image"
+      />
+    </div>
+  ));
+
+  //callbacks
+  const openImageViewer = useCallback((index) => {
+    setCurrentImage(index);
+    setIsViewerOpen(true);
+  }, []);
+
+  //functions
+  const closeImageViewer = () => {
+    setCurrentImage(0);
+    setIsViewerOpen(false);
+  };
   return (
     <li
-      className={`relative flex max-w-[70%] items-end gap-2 ${
+      className={`relative flex ${
+        images.length ? "w-[70%]" : "max-w-[70%]"
+      } items-end gap-2 ${
         isFromUser ? "flex-row-reverse self-end" : "self-start"
       } ${consecutive ? "mb-1" : "mb-4"}`}
     >
+      {isViewerOpen && (
+        <ImageViewer
+          backgroundStyle={{
+            zIndex: 100,
+            backgroundColor: "rgba(0,0,0,0.75)",
+            padding: "1.5rem",
+          }}
+          closeComponent={<Add className="rotate-[135deg]" size={48} />}
+          src={images.map((image) => image.content || image.url)}
+          currentIndex={currentImage}
+          disableScroll={true}
+          closeOnClickOutside={true}
+          onClose={closeImageViewer}
+        />
+      )}
       {!isFromUser && (
         <div className="relative h-[24px] w-[24px] shrink-0 overflow-hidden rounded-full">
           {!consecutive ? (
@@ -31,34 +84,14 @@ export default function ChatBubble({
           )}
         </div>
       )}
-      {/* <div
-        className={`whitespace-pre-wrap break-all rounded-t-[10px] p-3 ${
+      <div
+        className={`flex w-full flex-col overflow-hidden whitespace-pre-wrap break-all rounded-t-[10px] ${
           isFromUser
             ? "rounded-bl-[10px] bg-green-500 text-white"
-            : "rounded-br-[10px] bg-gray-100"
+            : "rounded-br-[10px] bg-gray-100/30"
         }`}
       >
-        {type == "text" && <p>{content}</p>}
-      </div> */}
-      {type == "text" && (
-        <div
-          className={`whitespace-pre-wrap break-all rounded-t-[10px] p-3 ${
-            isFromUser
-              ? "rounded-bl-[10px] bg-green-500 text-white"
-              : "rounded-br-[10px] bg-gray-100/30"
-          }`}
-        >
-          <p>{text}</p>
-        </div>
-      )}
-      {type == "offer" && offer && (
-        <div
-          className={`flex flex-col overflow-hidden whitespace-pre-wrap break-all rounded-t-[10px] ${
-            isFromUser
-              ? "rounded-bl-[10px] bg-green-500 text-white"
-              : "rounded-br-[10px] bg-gray-100/30"
-          }`}
-        >
+        {type == "offer" && offer && (
           <Link href={`/items/${offer?.item}`}>
             <a className="relative h-[120px] w-full">
               <Image
@@ -69,21 +102,16 @@ export default function ChatBubble({
               />
             </a>
           </Link>
-          <p className="p-3">{text}</p>
-        </div>
-      )}
-      {/* <div
-        className={`${styles["c-chat__timestamp-wrap"]} ${
-          props.isFromUser ? styles["c-chat__timestamp-wrap--right"] : ""
-        }`}
-      >
-        <p className={styles["c-chat__timestamp"]}>
-          {props.createdAt && timestamp.toLocaleDateString()}
-        </p>
-        <p className={styles["c-chat__timestamp"]}>
-          {props.createdAt && timestamp.toLocaleTimeString()}
-        </p>
-      </div> */}
+        )}
+        {(type == "mixed" || type == "image") && images.length && (
+          <div
+            className={`grid max-w-full grid-cols-[repeat(auto-fit,_minmax(80px,_1fr))] gap-1 bg-white`}
+          >
+            {chatImages}
+          </div>
+        )}
+        {type !== "image" && <p className="p-3">{text}</p>}
+      </div>
     </li>
   );
 }

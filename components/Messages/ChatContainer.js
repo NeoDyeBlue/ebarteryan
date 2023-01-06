@@ -24,7 +24,7 @@ export default function ChatContainer() {
     error,
     setSize,
     size,
-  } = usePaginate(`/api/messages/${conversation?._id}`, 10);
+  } = usePaginate(`/api/messages/${conversation?._id}`, 20);
 
   //effects
   useEffect(() => {

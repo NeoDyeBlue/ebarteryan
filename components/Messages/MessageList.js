@@ -7,9 +7,14 @@ import InfiniteScroll from "react-infinite-scroller";
 import useMessagesStore from "../../store/useMessagesStore";
 import useSocketStore from "../../store/useSocketStore";
 
-export default function MessageList() {
-  const { setMessageList, messageList, setConversation, conversation } =
-    useMessagesStore();
+export default function MessageList({ isForPage = false }) {
+  const {
+    setMessageList,
+    messageList,
+    setConversation,
+    conversation,
+    setIsPageConversationOpen,
+  } = useMessagesStore();
   const { socket } = useSocketStore();
   const { data: session, status } = useSession();
 
@@ -31,6 +36,7 @@ export default function MessageList() {
   useEffect(() => {
     if (socket) {
       socket.on("update-convo-list", (updatedConvo) => {
+        console.log(updatedConvo);
         setMessageList([
           updatedConvo,
           ...messageList.filter((convo) => convo._id != updatedConvo._id),
@@ -87,6 +93,9 @@ export default function MessageList() {
         oldRoom: conversation?._id,
       });
       setConversation(room);
+    }
+    if (isForPage) {
+      setIsPageConversationOpen(true);
     }
   }
 

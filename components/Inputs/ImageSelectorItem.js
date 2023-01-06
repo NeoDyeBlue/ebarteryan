@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function ImageSelectorItem({ src, onRemove }) {
   return (
-    <div className="relative aspect-square overflow-hidden rounded-[10px]">
+    <div className="relative aspect-square min-h-[70px] min-w-[70px] flex-shrink-0 overflow-hidden rounded-[10px]">
       <button
         onClick={onRemove}
         type="button"

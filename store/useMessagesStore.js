@@ -2,12 +2,18 @@ import create from "zustand";
 
 const useMessagesStore = create((set) => ({
   isMessagesOpen: false,
+  isPageConversationOpen: false,
   conversation: null,
   messageList: [],
   chatList: [],
+  newChats: [],
   setIsMessagesOpen: (payload) =>
     set(() => ({
       isMessagesOpen: payload,
+    })),
+  setIsPageConversationOpen: (payload) =>
+    set(() => ({
+      isPageConversationOpen: payload,
     })),
   setConversation: (payload) =>
     set(() => ({
@@ -20,6 +26,13 @@ const useMessagesStore = create((set) => ({
   setChatList: (payload) =>
     set(() => ({
       chatList: payload,
+    })),
+  reset: () =>
+    set(() => ({
+      isMessagesOpen: false,
+      conversation: null,
+      messageList: [],
+      chatList: [],
     })),
 }));
 
