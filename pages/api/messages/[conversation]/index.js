@@ -2,7 +2,10 @@ import {
   successResponse,
   errorResponse,
 } from "../../../../utils/response-utils";
-import { getChats } from "../../../../lib/controllers/message-controller";
+import {
+  getChats,
+  createChat,
+} from "../../../../lib/controllers/message-controller";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(req, res) {
@@ -11,14 +14,14 @@ export default async function handler(req, res) {
     const { conversation } = req.query;
     // if (req.method == "POST") {
     //   if (token && token.verified) {
-    //     const { receiver, item, offer } = req.body;
-    //     const conversation = await createConversation(
+    //     const { conversation, images, body } = req.body;
+    //     const chat = await createChat(
     //       token?.sub,
-    //       receiver,
-    //       item,
-    //       offer
+    //       conversation,
+    //       images,
+    //       body
     //     );
-    //     return successResponse(req, res, conversation);
+    //     return successResponse(req, res, chat);
     //   }
     //   return errorResponse(req, res, "unauthorized request", 401);
     // }

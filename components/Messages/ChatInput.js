@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useFilePicker } from "use-file-picker";
+import { v4 as uuidv4 } from "uuid";
 
 export default function ChatInput() {
   const { socket } = useSocketStore();
@@ -66,6 +67,7 @@ export default function ChatInput() {
 
   function sendChat(values) {
     if (values.body || values.images.length) {
+      const tempId = uuidv4();
       const chat = {
         sender: session && session.user.id,
         receiver: conversation.members?.find(
@@ -74,9 +76,10 @@ export default function ChatInput() {
         conversation: conversation._id,
         images: values.images,
         body: values.body,
+        tempId,
       };
 
-      // socket.emit("chat", chat);
+      socket.emit("chat", chat);
       setChatList([
         ...chatList,
         {
@@ -90,6 +93,8 @@ export default function ChatInput() {
           offer: null,
           images: values.images,
           body: values.body,
+          sent: false,
+          tempId,
         },
       ]);
 

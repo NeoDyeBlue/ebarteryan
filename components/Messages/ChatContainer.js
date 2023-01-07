@@ -47,12 +47,25 @@ export default function ChatContainer() {
         }
       });
 
-      return () => socket.off("message-receive");
+      socket.on("chat-sent", (id) => {
+        setChatList(
+          chatList.map((chat) => {
+            if (chat?.tempId == id) {
+              return { ...chat, sent: true };
+            }
+            return chat;
+          })
+        );
+      });
+
+      return () => {
+        socket.off("message-receive");
+        socket.off("chat-sent");
+      };
     }
   }, [socket, chatList, setChatList, conversation]);
 
   const chatBubbles = chatList.map((message, index) => {
-    // console.log(message);
     let isFromUser = message.sender.id == session?.user?.id ? true : false;
     if (index + 1 <= chatList.length - 1) {
       if (
@@ -61,19 +74,20 @@ export default function ChatContainer() {
       ) {
         return (
           <ChatBubble
-            key={index}
+            key={message?._id || message?.tempId}
             isFromUser={isFromUser}
             consecutive={true}
             images={message.images}
             offer={message?.offer}
             text={message.body}
             type={message.type}
+            sent={message?.sent}
           />
         );
       } else {
         return (
           <ChatBubble
-            key={index}
+            key={message?._id || message?.tempId}
             isFromUser={isFromUser}
             consecutive={false}
             userPic={message.sender.image.url}
@@ -81,13 +95,14 @@ export default function ChatContainer() {
             offer={message?.offer}
             text={message.body}
             type={message.type}
+            sent={message?.sent}
           />
         );
       }
     } else {
       return (
         <ChatBubble
-          key={index}
+          key={message?._id || message?.tempId}
           isFromUser={isFromUser}
           consecutive={false}
           images={message.images}
@@ -95,6 +110,7 @@ export default function ChatContainer() {
           text={message.body}
           type={message.type}
           userPic={message.sender.image.url}
+          sent={message?.sent}
         />
       );
     }

@@ -36,7 +36,6 @@ export default function MessageList({ isForPage = false }) {
   useEffect(() => {
     if (socket) {
       socket.on("update-convo-list", (updatedConvo) => {
-        console.log(updatedConvo);
         setMessageList([
           updatedConvo,
           ...messageList.filter((convo) => convo._id != updatedConvo._id),
