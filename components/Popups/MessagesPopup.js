@@ -1,13 +1,14 @@
 import { BadgedIcon } from "../Icons";
-import { Chat } from "@carbon/icons-react";
-import { MessageList, MessageSearchBox, Conversation } from "../Messages";
+import { Chat, Launch } from "@carbon/icons-react";
+import { useRouter } from "next/router";
+import { MessageList, Conversation } from "../Messages";
 import useMessagesStore from "../../store/useMessagesStore";
-import { OverflowMenuVertical } from "@carbon/icons-react";
 import { CircleButton } from "../Buttons/";
 import useOnClickOutside from "../../lib/hooks/useOnClickOutside";
 import { useRef } from "react";
 
 export default function MessagesPopup({ className, hasBadge }) {
+  const router = useRouter();
   //stores
   const popupRef = useRef();
   const { isMessagesOpen, setIsMessagesOpen } = useMessagesStore();
@@ -19,7 +20,7 @@ export default function MessagesPopup({ className, hasBadge }) {
       <div
         className={`mx-auto flex justify-end transition-transform duration-500 lg:container ${
           isMessagesOpen
-            ? "translate-y-0"
+            ? "translate-3d-0"
             : "translate-y-[75vh] lg:translate-y-[calc(70vh-0.75rem*-1)]"
         }`}
       >
@@ -54,13 +55,13 @@ export default function MessagesPopup({ className, hasBadge }) {
             className="pointer-events-auto z-10 flex h-[75vh] w-screen overflow-hidden rounded-t-[10px] border
         border-gray-100 bg-white shadow-lg lg:mb-3 lg:h-[70vh] lg:w-[50vw] lg:rounded-[10px]"
           >
-            <div className="hidden w-full max-w-[280px] flex-col gap-4 border-r border-gray-100 lg:flex">
-              <div className="flex items-center justify-between gap-4 px-4 pt-4">
+            <div className="hidden w-full max-w-[280px] flex-col border-r border-gray-100 lg:flex">
+              <div className="mb-4 flex items-center justify-between px-4 pt-4">
                 <h1 className="text-lg font-semibold">Messages</h1>
-                <CircleButton icon={<OverflowMenuVertical size={24} />} />
-              </div>
-              <div className="px-4">
-                <MessageSearchBox />
+                <CircleButton
+                  onClick={() => router.push("/messages")}
+                  icon={<Launch size={20} />}
+                />
               </div>
               <MessageList />
             </div>

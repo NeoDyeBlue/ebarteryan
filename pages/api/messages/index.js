@@ -20,8 +20,13 @@ export default async function handler(req, res) {
         return successResponse(req, res, conversation);
       }
       if (req.method == "GET") {
-        const { page, limit } = req.query;
-        const conversations = await getMessages(token?.sub, page, limit);
+        const { page, limit, search } = req.query;
+        const conversations = await getMessages(
+          token?.sub,
+          page,
+          limit,
+          search
+        );
         return successResponse(req, res, conversations);
       }
       return errorResponse(req, res, "method not allowed", 405);

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Add } from "@carbon/icons-react";
 import ImageViewer from "react-simple-image-viewer";
 import { useState, useCallback, useEffect } from "react";
+import useMessagesStore from "../../store/useMessagesStore";
 
 export default function ChatBubble({
   isFromUser,
@@ -18,7 +19,7 @@ export default function ChatBubble({
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isSent, setIsSent] = useState(true);
 
-  console.log(images);
+  const { setIsImageViewerOpen } = useMessagesStore();
 
   //elements
   const chatImages = images.map((image, index) => (
@@ -46,20 +47,25 @@ export default function ChatBubble({
   }, [sent]);
 
   //callbacks
-  const openImageViewer = useCallback((index) => {
-    setCurrentImage(index);
-    setIsViewerOpen(true);
-  }, []);
+  const openImageViewer = useCallback(
+    (index) => {
+      setCurrentImage(index);
+      setIsViewerOpen(true);
+      setIsImageViewerOpen(true);
+    },
+    [setIsImageViewerOpen]
+  );
 
   //functions
   const closeImageViewer = () => {
     setCurrentImage(0);
     setIsViewerOpen(false);
+    setIsImageViewerOpen(false);
   };
   return (
     <li
       className={`relative flex ${
-        images.length ? "w-[70%]" : "max-w-[70%]"
+        images.length ? "w-[70%] max-w-[300px]" : "max-w-[70%]"
       } items-end gap-2 ${
         isFromUser ? "flex-row-reverse self-end" : "self-start"
       } ${consecutive ? "mb-1" : "mb-4"} ${!isSent ? "opacity-50" : ""}`}

@@ -1,16 +1,16 @@
 import { NavLayout } from "../../components/Layouts";
 import Head from "next/head";
-import {
-  Conversation,
-  MessageList,
-  MessageSearchBox,
-} from "../../components/Messages";
+import { Conversation, MessageList } from "../../components/Messages";
 import useUiSizesStore from "../../store/useUiSizesStore";
 import useMessagesStore from "../../store/useMessagesStore";
+import { useEffect } from "react";
 
 export default function Messages() {
   const { navbarHeight } = useUiSizesStore();
-  const { isPageConversationOpen } = useMessagesStore();
+  const { isPageConversationOpen, isImageViewerOpen, setIsImageViewerOpen } =
+    useMessagesStore();
+
+  useEffect(() => setIsImageViewerOpen(false), [setIsImageViewerOpen]);
 
   return (
     <div
@@ -24,22 +24,21 @@ export default function Messages() {
       </Head>
       <div className="container relative mx-auto flex h-[calc(100%-70px)] md:h-full">
         {/* message list */}
-        <div className="relative flex w-full flex-col gap-4 border-gray-100 py-4 md:max-w-[320px] md:border-x">
-          <div className="flex justify-between gap-4 md:px-4">
+        <div className="relative flex w-full flex-col gap-4 border-gray-100 py-4 md:max-w-[320px] md:border-r">
+          <div className="flex justify-between gap-4 md:pr-4">
             <h1 className="text-2xl font-semibold">Messages</h1>
           </div>
-          <div className="md:px-4">
-            <MessageSearchBox />
-          </div>
-          <div className="custom-scrollbar -mx-4 overflow-y-auto overflow-x-hidden md:px-4">
+          <div className="custom-scrollbar -mx-4 overflow-y-auto overflow-x-hidden md:pr-4">
             <MessageList isForPage />
           </div>
         </div>
         {/* convo */}
         <div
           className={`fixed top-0 left-0 z-50 h-full w-full border-gray-100 bg-white transition-transform
-           duration-300 md:relative md:z-0 md:border-r lg:relative
-        ${isPageConversationOpen ? "" : "translate-x-full lg:translate-x-0"}`}
+           duration-300 md:relative md:border-r
+        ${isPageConversationOpen ? "" : "translate-x-full md:transform-none"} ${
+            isImageViewerOpen ? "" : "md:z-40"
+          }`}
         >
           <Conversation />
         </div>

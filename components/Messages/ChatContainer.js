@@ -6,7 +6,7 @@ import ChatBubble from "./ChatBubble";
 import { DotLoader } from "react-spinners";
 // import InfiniteScroll from "react-infinite-scroller";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useMemo } from "react";
 
 export default function ChatContainer() {
   const chatsContainer = useRef(null);
@@ -26,16 +26,18 @@ export default function ChatContainer() {
     size,
   } = usePaginate(`/api/messages/${conversation?._id}`, 20);
 
+  const reversedChats = useMemo(() => chats.reverse(), [chats]);
+
   //effects
   useEffect(() => {
-    if (chats.length) {
-      setChatList(chats.reverse());
+    if (reversedChats.length) {
+      setChatList(reversedChats);
       // chatsContainer?.current?.scrollTo(
       //   0,
       //   chatsContainer?.current?.scrollHeight
       // );
     }
-  }, [chats, setChatList]);
+  }, [reversedChats, setChatList]);
 
   // useEffect(() => scrollToEnd(), [chatList]);
 
@@ -65,7 +67,7 @@ export default function ChatContainer() {
     }
   }, [socket, chatList, setChatList, conversation]);
 
-  const chatBubbles = chatList.map((message, index) => {
+  const chatBubbles = chatList.reverse().map((message, index) => {
     let isFromUser = message.sender.id == session?.user?.id ? true : false;
     if (index + 1 <= chatList.length - 1) {
       if (

@@ -1,6 +1,7 @@
 import MessageListItem from "./MessageListItem";
+import MessageSearchBox from "./MessageSearchBox";
 import { useSession } from "next-auth/react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { ConvoItemSkeleton } from "../Loaders";
 import usePaginate from "../../lib/hooks/usePaginate";
 import InfiniteScroll from "react-infinite-scroller";
@@ -16,7 +17,9 @@ export default function MessageList({ isForPage = false }) {
     setIsPageConversationOpen,
   } = useMessagesStore();
   const { socket } = useSocketStore();
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
+  const [prevSearchValue, setPrevSearchValue] = useState("");
+  const [searchValue, setSearchValue] = useState("");
 
   const {
     data: conversations,
@@ -24,11 +27,14 @@ export default function MessageList({ isForPage = false }) {
     isEndReached,
     setSize,
     size,
-  } = usePaginate("/api/messages", 10);
+    mutate,
+    isValidating,
+    cancel,
+  } = usePaginate("/api/messages", 10, { search: searchValue });
 
   //effects
   useEffect(() => {
-    if (conversations.length) {
+    if (conversations || conversations.length) {
       setMessageList(conversations);
     }
   }, [conversations, setMessageList]);
@@ -45,6 +51,11 @@ export default function MessageList({ isForPage = false }) {
       return () => socket.off("update-convo-list");
     }
   }, [socket, setMessageList, messageList]);
+
+  useEffect(() => {
+    cancel();
+    mutate();
+  }, [searchValue]);
 
   const conversationItems =
     messageList.length &&
@@ -98,27 +109,41 @@ export default function MessageList({ isForPage = false }) {
     }
   }
 
+  function handleSearchValueChange(event) {
+    setSearchValue(event.target.value);
+  }
+
   return (
-    <div className="h-full px-2">
-      <InfiniteScroll
-        element="ul"
-        className="custom-scrollbar flex h-full w-full flex-col gap-2 overflow-y-auto"
-        pageStart={size}
-        loadMore={() => {
-          if (!isLoading) {
-            setSize(size + 1);
-          }
-        }}
-        hasMore={!isEndReached}
-        loader={[...Array(4)].map((_, i) => (
-          <ConvoItemSkeleton key={i} />
-        ))}
-        useWindow={false}
-      >
-        {!messageList.length && !isEndReached && isLoading
-          ? [...Array(8)].map((_, i) => <ConvoItemSkeleton key={i} />)
-          : conversationItems}
-      </InfiniteScroll>
+    <div className="h-full overflow-hidden">
+      <div className="mb-4 px-4">
+        <MessageSearchBox
+          value={searchValue}
+          onChange={handleSearchValueChange}
+        />
+      </div>
+      <div className="h-full px-2">
+        <InfiniteScroll
+          element="ul"
+          className="custom-scrollbar flex h-full w-full flex-col gap-2 overflow-y-auto"
+          pageStart={size}
+          loadMore={() => {
+            if (!isLoading) {
+              setSize(size + 1);
+            }
+          }}
+          hasMore={!isEndReached}
+          loader={[...Array(4)].map((_, i) => (
+            <ConvoItemSkeleton key={i} />
+          ))}
+          useWindow={false}
+        >
+          {(!messageList.length && !isEndReached && isLoading) || isValidating
+            ? [...Array(8)].map((_, i) => <ConvoItemSkeleton key={i} />)
+            : conversationItems.length
+            ? conversationItems
+            : null}
+        </InfiniteScroll>
+      </div>
     </div>
   );
 }

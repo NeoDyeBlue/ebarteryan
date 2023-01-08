@@ -28,3 +28,11 @@ export default async function handler(req, res) {
     return errorResponse(req, res, error.message, 400, error.name);
   }
 }
+
+export const config = {
+  api: {
+    bodyParser: {
+      sizeLimit: "50mb",
+    },
+  },
+};

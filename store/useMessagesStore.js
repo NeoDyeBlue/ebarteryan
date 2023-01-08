@@ -3,6 +3,7 @@ import create from "zustand";
 const useMessagesStore = create((set) => ({
   isMessagesOpen: false,
   isPageConversationOpen: false,
+  isImageViewerOpen: false,
   conversation: null,
   messageList: [],
   chatList: [],
@@ -14,6 +15,10 @@ const useMessagesStore = create((set) => ({
   setIsPageConversationOpen: (payload) =>
     set(() => ({
       isPageConversationOpen: payload,
+    })),
+  setIsImageViewerOpen: (payload) =>
+    set(() => ({
+      isImageViewerOpen: payload,
     })),
   setConversation: (payload) =>
     set(() => ({
