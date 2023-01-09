@@ -1,6 +1,7 @@
 import { Server } from "socket.io";
 import { joinConversation } from "../../lib/sockets/conversation-room-handler";
-import { sendChat, updateRead } from "../../lib/sockets/chat-handler";
+import { sendChat } from "../../lib/sockets/chat-handler";
+import { checkHasUnreadConvo } from "../../lib/sockets/read-handler";
 import {
   joinItemRoom,
   leaveItemRoom,
@@ -50,9 +51,9 @@ export default function handler(req, res) {
         joinConversation(rooms, socket);
       });
 
-      // socket.on("update-read", async (userIds, room) => {
-      //   await updateRead(sockets, userIds, room);
-      // });
+      socket.on("check-has-unread-convo", async (user) => {
+        await checkHasUnreadConvo(user, sockets, io);
+      });
 
       socket.on("chat", async (chat) => {
         await sendChat(chat, socket, sockets, io);

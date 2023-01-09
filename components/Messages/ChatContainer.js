@@ -60,12 +60,14 @@ export default function ChatContainer() {
         );
       });
 
+      socket.emit("check-has-unread-convo", session && session.user.id);
+
       return () => {
         socket.off("message-receive");
         socket.off("chat-sent");
       };
     }
-  }, [socket, chatList, setChatList, conversation]);
+  }, [socket, chatList, setChatList, conversation, session]);
 
   const chatBubbles = chatList.reverse().map((message, index) => {
     let isFromUser = message.sender.id == session?.user?.id ? true : false;

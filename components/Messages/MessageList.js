@@ -18,7 +18,6 @@ export default function MessageList({ isForPage = false }) {
   } = useMessagesStore();
   const { socket } = useSocketStore();
   const { data: session } = useSession();
-  const [prevSearchValue, setPrevSearchValue] = useState("");
   const [searchValue, setSearchValue] = useState("");
 
   const {
@@ -46,11 +45,12 @@ export default function MessageList({ isForPage = false }) {
           updatedConvo,
           ...messageList.filter((convo) => convo._id != updatedConvo._id),
         ]);
+        socket.emit("check-has-unread-convo", session && session.user.id);
       });
 
       return () => socket.off("update-convo-list");
     }
-  }, [socket, setMessageList, messageList]);
+  }, [socket, setMessageList, messageList, session]);
 
   useEffect(() => {
     cancel();

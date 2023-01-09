@@ -5,15 +5,31 @@ import { MessageList, Conversation } from "../Messages";
 import useMessagesStore from "../../store/useMessagesStore";
 import { CircleButton } from "../Buttons/";
 import useOnClickOutside from "../../lib/hooks/useOnClickOutside";
-import { useRef } from "react";
+import useSocketStore from "../../store/useSocketStore";
+import { useRef, useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function MessagesPopup({ className, hasBadge }) {
   const router = useRouter();
+  const { data: session } = useSession();
+  const [hasUnread, setHasUnread] = useState(false);
   //stores
   const popupRef = useRef();
   const { isMessagesOpen, setIsMessagesOpen } = useMessagesStore();
+  const { socket } = useSocketStore();
 
   useOnClickOutside(popupRef, () => setIsMessagesOpen(false));
+
+  useEffect(() => {
+    if (socket) {
+      socket.emit("check-has-unread-convo", session && session.user.id);
+
+      socket.on("has-unread", (hasUnreadMessasges) => {
+        console.log(hasUnreadMessasges);
+        setHasUnread(hasUnreadMessasges);
+      });
+    }
+  }, [socket, session]);
 
   return (
     <div className={className} ref={popupRef}>
@@ -45,7 +61,7 @@ export default function MessagesPopup({ className, hasBadge }) {
         font-display font-medium text-black-light shadow-lg transition-all delay-300 duration-300
         "
             >
-              <BadgedIcon hasBadge={true}>
+              <BadgedIcon hasBadge={hasUnread}>
                 <Chat size={24} />
               </BadgedIcon>
               <p>Messages</p>
