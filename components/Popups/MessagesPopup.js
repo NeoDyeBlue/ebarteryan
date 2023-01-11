@@ -24,9 +24,8 @@ export default function MessagesPopup({ className, hasBadge }) {
     if (socket) {
       socket.emit("check-has-unread-convo", session && session.user.id);
 
-      socket.on("has-unread", (hasUnreadMessasges) => {
-        console.log(hasUnreadMessasges);
-        setHasUnread(hasUnreadMessasges);
+      socket.on("has-unread-convo", (hasUnread) => {
+        setHasUnread(hasUnread);
       });
     }
   }, [socket, session]);

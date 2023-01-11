@@ -1,7 +1,10 @@
 import { Server } from "socket.io";
 import { joinConversation } from "../../lib/sockets/conversation-room-handler";
 import { sendChat } from "../../lib/sockets/chat-handler";
-import { checkHasUnreadConvo } from "../../lib/sockets/read-handler";
+import {
+  checkHasUnreadConversation,
+  checkHasUnreadNotification,
+} from "../../lib/sockets/read-handler";
 import {
   joinItemRoom,
   leaveItemRoom,
@@ -52,7 +55,11 @@ export default function handler(req, res) {
       });
 
       socket.on("check-has-unread-convo", async (user) => {
-        await checkHasUnreadConvo(user, sockets, io);
+        await checkHasUnreadConversation(user, sockets, io);
+      });
+
+      socket.on("check-has-unread-notif", async (user) => {
+        await checkHasUnreadNotification(user, sockets, io);
       });
 
       socket.on("chat", async (chat) => {
@@ -71,12 +78,15 @@ export default function handler(req, res) {
         offerHandler(socket, offer, room);
       });
 
-      socket.on("question", ({ question, room }) =>
-        questionHandler(io, question, room)
+      socket.on(
+        "question",
+        async ({ question, room }) => await questionHandler(io, question, room)
       );
 
-      socket.on("answer", ({ answeredQuestion, room }) =>
-        answerHandler(io, answeredQuestion, room)
+      socket.on(
+        "answer",
+        async ({ answeredQuestion, room }) =>
+          await answerHandler(io, answeredQuestion, room)
       );
     });
   }

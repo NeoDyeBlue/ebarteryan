@@ -178,7 +178,6 @@ export default function ItemPageTabs({
       });
 
       socket.on("new-question", (question) => {
-        console.log(question.data);
         if (questionsEndReached || !questions.length || !itemQuestions.length) {
           const updatedQuestions = storedQuestions.length
             ? [...storedQuestions, question.data.docs[0]]

@@ -28,7 +28,7 @@ export default function MessageList({ isForPage = false }) {
     size,
     mutate,
     isValidating,
-    cancel,
+    // cancel,
   } = usePaginate("/api/messages", 10, { search: searchValue });
 
   //effects
@@ -53,7 +53,7 @@ export default function MessageList({ isForPage = false }) {
   }, [socket, setMessageList, messageList, session]);
 
   useEffect(() => {
-    cancel();
+    // cancel();
     mutate();
   }, [searchValue]);
 

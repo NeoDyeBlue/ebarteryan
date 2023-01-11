@@ -20,6 +20,7 @@ import ProfileMenu from "./ProfileMenu";
 import IconLink from "./IconLink";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
+import useNotificationStore from "../../store/useNotificationStore";
 
 export default function Navbar({ sticky }) {
   const [showNotifications, setShowNotifications] = useState(false);
@@ -31,6 +32,7 @@ export default function Navbar({ sticky }) {
   const currentRoute = router.asPath;
   const { setNavbarHeight } = useUiSizesStore();
   const { data: session, status } = useSession();
+  const { unreadCount } = useNotificationStore();
 
   useOnClickOutside(notificationsPopupRef, hideNotificationsPopup);
   useOnClickOutside(profileMenuRef, hideProfileMenu);
@@ -108,7 +110,7 @@ export default function Navbar({ sticky }) {
                   onClick={showNotificationsPopup}
                 >
                   <button
-                    className={`flex h-[40px] w-[40px] items-center justify-center rounded-full ${
+                    className={`group flex h-[40px] w-[40px] items-center justify-center rounded-full ${
                       showNotifications || currentRoute == "/notifications"
                         ? "bg-gray-100/30"
                         : "hover:bg-gray-100/30"
@@ -117,7 +119,8 @@ export default function Navbar({ sticky }) {
                     data-tooltip-content="Notifications"
                   >
                     <BadgedIcon
-                      hasBadge
+                      hasBadge={unreadCount > 0}
+                      count={unreadCount}
                       tooltipMessage="Notifications"
                       id="notifications"
                     >
@@ -125,7 +128,7 @@ export default function Navbar({ sticky }) {
                     </BadgedIcon>
                   </button>
                   <Tooltip anchorId="notifications" />
-                  {showNotifications && <NotificationsPopup />}
+                  <NotificationsPopup isOpen={showNotifications} />
                 </li>
               </>
             ) : null}

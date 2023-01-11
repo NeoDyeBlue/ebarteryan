@@ -12,8 +12,8 @@ export default function IconLink({ children, to, tooltipMessage, id }) {
         <a
           id={id}
           data-tooltip-content={tooltipMessage}
-          className={`flex h-[40px] w-[40px] items-center
-        justify-center rounded-full ${
+          className={`group flex h-[40px] w-[40px]
+        items-center justify-center rounded-full ${
           currentRoute == to ? "bg-gray-100/30" : "hover:bg-gray-100/30"
         }`}
         >
