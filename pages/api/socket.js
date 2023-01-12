@@ -80,13 +80,14 @@ export default function handler(req, res) {
 
       socket.on(
         "question",
-        async ({ question, room }) => await questionHandler(io, question, room)
+        async ({ question, room }) =>
+          await questionHandler(io, question, room, sockets)
       );
 
       socket.on(
         "answer",
         async ({ answeredQuestion, room }) =>
-          await answerHandler(io, answeredQuestion, room)
+          await answerHandler(io, answeredQuestion, room, sockets)
       );
     });
   }

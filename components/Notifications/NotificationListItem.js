@@ -9,10 +9,9 @@ import useNotificationStore from "../../store/useNotificationStore";
 export default function NotificationListItem({ read, type, data }) {
   const router = useRouter();
   let message = "";
-  let image = "";
-  let url = "";
+  const userCount = data?.users?.length || 0;
+  const image = data?.users[userCount - 1]?.image?.url;
 
-  const { socket } = useSocketStore();
   const { setUnreadCount } = useNotificationStore();
 
   const [isRead, setIsRead] = useState(read);
@@ -21,20 +20,24 @@ export default function NotificationListItem({ read, type, data }) {
 
   switch (type) {
     case "question":
-      message = "asked a question about your item";
-      image = data?.question?.user?.image?.url;
+      message = `${
+        userCount > 1
+          ? `and ${userCount - 1} other${userCount > 2 ? "s" : ""}`
+          : ""
+      } asked a question about your item`;
       break;
     case "answer":
       message = "answered your question on item";
-      image = data?.item?.user?.image?.url;
       break;
     case "offer":
-      message = "offered on your item";
-      image = data?.offer?.user?.image?.url;
+      message = `${
+        userCount > 1
+          ? `and ${userCount - 1} other${userCount > 2 ? "s" : ""}`
+          : ""
+      } offered on your item`;
       break;
     case "offer-accepted":
       message = "accepted your offer on item";
-      image = data?.item?.user?.image?.url;
       break;
     case "item-ended":
       message = "accepts an offer on item";
@@ -48,6 +51,7 @@ export default function NotificationListItem({ read, type, data }) {
     });
     const result = await res.json();
     if (result && result.success) {
+      console.log(result);
       setUnreadCount(result.data.unreadNotifications);
     }
     router.push(`/items/${data?.item?._id}`);
@@ -57,7 +61,7 @@ export default function NotificationListItem({ read, type, data }) {
     <li
       onClick={handleNotificationClicked}
       className={`relative flex cursor-pointer items-start gap-3 rounded-[10px] p-2
-    ${isRead ? "hover:bg-gray-100/30" : "bg-green-200"}`}
+    ${isRead ? "hover:bg-gray-100/30" : "bg-green-200/50"}`}
     >
       <div className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
         <Image src={image} layout="fill" alt="notif image" />
@@ -65,8 +69,7 @@ export default function NotificationListItem({ read, type, data }) {
       <div className="max-h-full overflow-hidden">
         <p className="overflow-ellipsis">
           <span className="font-semibold">
-            {type == "question" && data?.question?.user?.fullName}
-            {type == "answer" && data?.item?.user?.fullName}
+            {data?.users[userCount - 1]?.fullName}
           </span>{" "}
           {message} <span className="font-semibold">{data?.item?.name}</span>
         </p>

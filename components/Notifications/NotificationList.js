@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import useSocketStore from "../../store/useSocketStore";
 import { useSession } from "next-auth/react";
 
-export default function NotificationList({ unread }) {
+export default function NotificationList({ unread, scrollableTargetId }) {
   const { data: session } = useSession();
   const { notificationList, setNotificationList, setUnreadCount } =
     useNotificationStore();
@@ -17,9 +17,8 @@ export default function NotificationList({ unread }) {
     isLoading,
     isEndReached,
     setSize,
-    isValidating,
     size,
-  } = usePaginate("/api/notifications", 10);
+  } = usePaginate("/api/notifications", 5);
 
   useEffect(() => {
     if (notifications || notifications.length) {
@@ -32,7 +31,7 @@ export default function NotificationList({ unread }) {
       socket.on("notification", (data) => {
         console.log(data);
         setNotificationList([data.notification, ...notificationList]);
-        setUnreadCount(data.unreadCount);
+        setUnreadCount(data.unreadNotifications);
       });
 
       socket.on("has-unread-notif", (count) => {
@@ -65,7 +64,7 @@ export default function NotificationList({ unread }) {
         dataLength={notificationList.length}
         next={() => setSize(size + 1)}
         hasMore={!isEndReached}
-        scrollableTarget="notificationsPopup"
+        scrollableTarget={scrollableTargetId}
         className="flex flex-col gap-2"
         loader={[...Array(10)].map((_, i) => (
           <NotifItemSkeleton key={i} />

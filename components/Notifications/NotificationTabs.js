@@ -1,7 +1,5 @@
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import NotificationList from "./NotificationList";
-import NotificationListItem from "./NotificationListItem";
-import Link from "next/link";
 
 export default function NotificationTabs() {
   return (
@@ -17,19 +15,10 @@ export default function NotificationTabs() {
         </TabList>
         <div>
           <TabPanel>
-            <NotificationList>
-              <NotificationListItem />
-              <NotificationListItem unread={true} />
-              <NotificationListItem />
-              <NotificationListItem />
-              <NotificationListItem />
-              <NotificationListItem />
-            </NotificationList>
+            <NotificationList scrollableTargetId={"notificationsPopup"} />
           </TabPanel>
           <TabPanel>
-            <NotificationList>
-              <NotificationListItem unread={true} />
-            </NotificationList>
+            <NotificationList scrollableTargetId={"notificationsPopup"} />
           </TabPanel>
         </div>
       </Tabs>

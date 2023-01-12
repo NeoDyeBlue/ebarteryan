@@ -4,7 +4,7 @@ import { getToken } from "next-auth/jwt";
 
 export default async function handler(req, res) {
   try {
-    if (req.method == "GET") {
+    if (req.method == "PATCH") {
       const token = await getToken({ req });
       if (token && token?.sub) {
         const { notification } = req.query;

@@ -127,7 +127,7 @@ export default function Navbar({ sticky }) {
                       <Notification size={24} />
                     </BadgedIcon>
                   </button>
-                  <Tooltip anchorId="notifications" />
+                  <Tooltip className="z-[100]" anchorId="notifications" />
                   <NotificationsPopup isOpen={showNotifications} />
                 </li>
               </>
