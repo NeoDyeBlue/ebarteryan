@@ -18,26 +18,6 @@ import useQuestionAnswerStore from "../../store/useQuestionAnswerStore";
 import useItemOffersStore from "../../store/useItemOffersStore";
 import useItemIdStore from "../../store/useItemIdStore";
 
-/**
- *
- * @param {*} obj
- * @param {*} key
- * @param {*} value
- * @returns Object result
- * @see {@link https://stackoverflow.com/questions/15523514/find-by-key-deep-in-a-nested-array}
- */
-
-function findNestedObj(obj, key, value) {
-  try {
-    JSON.stringify(obj, (_, nestedValue) => {
-      if (nestedValue && nestedValue[key] === value) throw nestedValue;
-      return nestedValue;
-    });
-  } catch (result) {
-    return result;
-  }
-}
-
 export default function ItemPageTabs({
   itemId,
   itemLister,
@@ -178,12 +158,7 @@ export default function ItemPageTabs({
       });
 
       socket.on("new-question", (question) => {
-        if (questionsEndReached || !questions.length || !itemQuestions.length) {
-          const updatedQuestions = storedQuestions.length
-            ? [...storedQuestions, question.data.docs[0]]
-            : [question.data.docs[0]];
-          setQuestions(updatedQuestions);
-        }
+        setQuestions([question.data.docs[0], ...storedQuestions]);
         setTotalQuestions(question.data.totalDocs);
       });
     }

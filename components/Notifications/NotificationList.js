@@ -30,7 +30,7 @@ export default function NotificationList({ unread, scrollableTargetId }) {
     if (socket) {
       socket.on("notification", (data) => {
         console.log(data);
-        setNotificationList([data.notification, ...notificationList]);
+        setNotificationList([data.notification, ...notificationList.filter(notif => notif._id !== data.notification._id)]);
         setUnreadCount(data.unreadNotifications);
       });
 

@@ -109,16 +109,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
 
   const offers = usePaginate(`/api/items/${itemData._id}/offers`, 10);
 
-  const questions = usePaginate(
-    `/api/questions/${itemData._id}`,
-    10,
-    {},
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
-  );
+  const questions = usePaginate(`/api/questions/${itemData._id}`, 10);
 
   const itemImages =
     itemData?.images?.length &&
