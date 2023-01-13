@@ -94,82 +94,84 @@ export default function ItemPageTabs({
       />
     ));
 
-  useEffect(() => {
-    if (questions.length >= storedQuestions.length || itemId !== item) {
-      setQuestions(questions);
-      setTotalQuestions(
-        totalQuestionDocs >= totalQuestions || itemId == item
-          ? totalQuestionDocs
-          : totalQuestions
-      );
-      if (itemId !== item) {
-        setItem(itemId);
-      }
-    }
+  // useEffect(() => {
+  //   if (questions.length >= storedQuestions.length || itemId !== item) {
+  //     setQuestions(questions);
+  //     setTotalQuestions(
+  //       totalQuestionDocs >= totalQuestions || itemId == item
+  //         ? totalQuestionDocs
+  //         : totalQuestions
+  //     );
+  //     if (itemId !== item) {
+  //       setItem(itemId);
+  //     }
+  //   }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    questions,
-    // setQuestions,
-    storedQuestions,
-    // setTotalQuestions,
-    totalQuestionDocs,
-    totalQuestions,
-    itemId,
-    item,
-    // setItem,
-  ]);
-
-  useEffect(() => {
-    if (offers.length >= storedOffers.length || itemId !== item) {
-      setOffers(offers);
-      setTotalOffers(
-        totalOfferDocs >= totalOffers || itemId == item
-          ? totalOfferDocs
-          : totalOffers
-      );
-      if (itemId !== item) {
-        setItem(itemId);
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    offers,
-    // setOffers,
-    storedOffers,
-    // setTotalOffers,
-    totalOfferDocs,
-    totalOffers,
-    itemId,
-    item,
-    // setItem,
-  ]);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [
+  //   questions,
+  //   // setQuestions,
+  //   storedQuestions,
+  //   // setTotalQuestions,
+  //   totalQuestionDocs,
+  //   totalQuestions,
+  //   itemId,
+  //   item,
+  //   // setItem,
+  // ]);
 
   useEffect(() => {
+    setQuestions(questions);
+    setTotalQuestions(totalQuestionDocs);
     if (socket) {
-      socket.on("another-offer", (offer) => {
-        if (offersEndReached || !offers.length) {
-          const updatedOffers = storedOffers.length
-            ? [...storedOffers, offer.data.docs[0]]
-            : [offer.data.docs[0]];
-          setOffers(updatedOffers);
-        }
-        setTotalOffers(offer.data.totalDocs);
-      });
-
-      socket.on("new-question", (question) => {
-        setQuestions([question.data.docs[0], ...storedQuestions]);
-        setTotalQuestions(question.data.totalDocs);
-      });
+      socket.emit("question:count", itemId);
     }
   }, [
     socket,
-    offersEndReached,
-    itemOffers?.length,
-    offers,
-    itemQuestions?.length,
-    questionsEndReached,
+    itemId,
     questions,
+    setQuestions,
+    totalQuestionDocs,
+    setTotalQuestions,
+  ]);
+
+  useEffect(() => {
+    setOffers(offers);
+    setTotalOffers(totalOfferDocs);
+    if (socket) {
+      socket.emit("offer:count", itemId);
+    }
+  }, [socket, itemId, offers, setOffers, totalOfferDocs, setTotalOffers]);
+
+  useEffect(() => {
+    if (socket) {
+      socket.on("offer:add", (data) => {
+        setOffers([data.offer, ...storedOffers]);
+        setTotalOffers(data.totalOffers);
+      });
+
+      socket.on("question:add", (data) => {
+        setQuestions([data.question, ...storedQuestions]);
+        setTotalQuestions(data.totalQuestions);
+      });
+
+      socket.on("offer:update-count", (count) => {
+        setTotalOffers(count);
+      });
+
+      socket.on("question:update-count", (count) => {
+        setTotalQuestions(count);
+      });
+
+      return () => {
+        socket.off("offer:add");
+        socket.off("question:add");
+        socket.off("offer:update-count");
+        socket.off("question:update-count");
+      };
+    }
+  }, [
+    socket,
     setQuestions,
     setTotalQuestions,
     storedQuestions,
@@ -197,10 +199,12 @@ export default function ItemPageTabs({
       });
       const result = await res.json();
       if (result && result.success) {
-        socket.emit("question", {
-          question: result,
-          room: result.data.docs[0].item,
+        socket.emit("question:create", {
+          question: result.data,
+          room: result.data.question.item,
         });
+        setQuestions([result.data.question, ...storedQuestions]);
+        setTotalQuestions(result.data.totalQuestions);
         questionFormik.setFieldValue("question", "");
         toast.success("Question asked");
       } else {

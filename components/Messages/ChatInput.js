@@ -52,11 +52,11 @@ export default function ChatInput() {
 
   useEffect(() => {
     if (socket) {
-      socket.on("message-error", (error) => {
+      socket.on("chat:error", (error) => {
         toast.error(error);
       });
 
-      return () => socket.off("message-error");
+      return () => socket.off("chat:error");
     }
   }, [socket]);
 
@@ -79,7 +79,7 @@ export default function ChatInput() {
         tempId,
       };
 
-      socket.emit("chat", chat);
+      socket.emit("chat:create", chat);
       setChatList([
         ...chatList,
         {

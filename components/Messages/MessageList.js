@@ -40,15 +40,18 @@ export default function MessageList({ isForPage = false }) {
 
   useEffect(() => {
     if (socket) {
-      socket.on("update-convo-list", (updatedConvo) => {
+      socket.on("conversation:update-list", (updatedConvo) => {
         setMessageList([
           updatedConvo,
           ...messageList.filter((convo) => convo._id != updatedConvo._id),
         ]);
-        socket.emit("check-has-unread-convo", session && session.user.id);
+        socket.emit(
+          "conversation:check-has-unread",
+          session && session.user.id
+        );
       });
 
-      return () => socket.off("update-convo-list");
+      return () => socket.off("conversation:update-list");
     }
   }, [socket, setMessageList, messageList, session]);
 

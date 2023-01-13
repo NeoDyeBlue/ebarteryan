@@ -186,9 +186,9 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
 
   useEffect(() => {
     if (socket) {
-      socket.emit("join-item-room", itemData?._id);
+      socket.emit("item:join", itemData?._id);
 
-      return () => socket.emit("leave-item-room", itemData?._id);
+      return () => socket.emit("item:leave", itemData?._id);
     }
   }, [socket, itemData?._id]);
 

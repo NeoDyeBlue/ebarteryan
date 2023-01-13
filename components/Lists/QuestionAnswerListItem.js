@@ -33,7 +33,7 @@ export default function QuestionAnswerListItem({ withInput, data }) {
       if (result && result.success) {
         setAnswer(result.data.answer);
         // console.log(result);
-        socket.emit("answer", {
+        socket.emit("question:answer", {
           answeredQuestion: result.data,
           room: result.data.item,
         });
@@ -47,11 +47,13 @@ export default function QuestionAnswerListItem({ withInput, data }) {
 
   useEffect(() => {
     if (socket) {
-      socket.on("answered-question", (answeredQuestion) => {
+      socket.on("question:answered", (answeredQuestion) => {
         if (data._id == answeredQuestion._id) {
           setAnswer(answeredQuestion.answer);
         }
       });
+
+      return () => socket.off("question:answered");
     }
   }, [socket, data._id, data.answer]);
 

@@ -9,17 +9,18 @@ import {
   joinItemRoom,
   leaveItemRoom,
 } from "../../lib/sockets/item-room-jhandler";
-import offerHandler from "../../lib/sockets/offer-handler";
+import { offerSend, countOffers } from "../../lib/sockets/offer-handler";
 import {
   questionHandler,
   answerHandler,
+  countQuestions,
 } from "../../lib/sockets/question-answer-handler";
 
 // https://stackoverflow.com/questions/70086135/how-to-show-online-users-in-socket-io-server-in-node-js
 
 let sockets = new Map();
 
-export default function handler(req, res) {
+export default async function handler(req, res) {
   if (res.socket.server.io) {
     console.log("Socket is already running");
   } else {
@@ -28,66 +29,75 @@ export default function handler(req, res) {
     res.socket.server.io = io;
 
     io.on("connection", (socket) => {
-      socket.on("connect-user", (userId) => {
+      socket.on("user:connect", (userId) => {
         sockets.set(socket.id, userId);
-        io.sockets.emit("user-connect", userId);
+        io.sockets.emit("user:connected", userId);
         console.log(`${userId} connected`);
         socket.join(userId);
       });
 
       socket.on("disconnect", () => {
         if (sockets.has(socket.id)) {
-          io.sockets.emit("user-disconnect", sockets.get(socket.id));
+          io.sockets.emit("user:disconnected", sockets.get(socket.id));
           // console.log(`${socket.id} disconnected`);
           sockets.delete(socket.id); // delete socket from Map object
         }
       });
 
-      socket.on("user-online-check", (userIds) => {
-        io.in(userIds.client).emit("user-is-online", {
+      socket.on("user:online-check", (userIds) => {
+        io.in(userIds.client).emit("user:online", {
           isOnline: Array.from(sockets.values()).includes(userIds.userToCheck),
           user: userIds.userToCheck,
         });
       });
 
-      socket.on("join-conversation", (rooms) => {
+      socket.on("conversation:join", (rooms) => {
         joinConversation(rooms, socket);
       });
 
-      socket.on("check-has-unread-convo", async (user) => {
+      socket.on("conversation:check-has-unread", async (user) => {
         await checkHasUnreadConversation(user, sockets, io);
       });
 
-      socket.on("check-has-unread-notif", async (user) => {
+      socket.on("notification:count-unread", async (user) => {
         await checkHasUnreadNotification(user, sockets, io);
       });
 
-      socket.on("chat", async (chat) => {
+      socket.on("chat:create", async (chat) => {
         await sendChat(chat, socket, sockets, io);
       });
 
-      socket.on("join-item-room", (room) => {
+      socket.on("item:join", (room) => {
         joinItemRoom(socket, room);
       });
 
-      socket.on("leave-item-room", (room) => {
+      socket.on("item:leave", (room) => {
         leaveItemRoom(socket, room);
       });
 
-      socket.on("offer", ({ offer, room }) => {
-        offerHandler(socket, offer, room);
+      socket.on("offer:create", ({ offer, room }) => {
+        offerSend(socket, offer, room);
+      });
+
+      socket.on("offer:count", (item) => {
+        countOffers(io, item);
       });
 
       socket.on(
-        "question",
+        "question:create",
         async ({ question, room }) =>
-          await questionHandler(io, question, room, sockets)
+          await questionHandler(socket, io, question, room, sockets)
       );
 
       socket.on(
-        "answer",
+        "question:answer",
         async ({ answeredQuestion, room }) =>
           await answerHandler(io, answeredQuestion, room, sockets)
+      );
+
+      socket.on(
+        "question:count",
+        async (item) => await countQuestions(io, item)
       );
     });
   }

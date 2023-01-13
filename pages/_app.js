@@ -7,8 +7,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import useSocketStore from "../store/useSocketStore";
-import { UserSocketInitializer } from "../components/Misc";
+// import { UserSocketInitializer } from "../components/Misc";
 import { io } from "socket.io-client";
+import { getSession } from "next-auth/react";
 
 const socket = io();
 
@@ -32,10 +33,15 @@ export default function MyApp({
 }) {
   const { setSocket } = useSocketStore();
   useEffect(() => {
-    function handleSocket() {
+    async function handleSocket() {
       fetch("/api/socket").then(() => {
         setSocket(socket);
       });
+
+      const session = await getSession();
+      if (session) {
+        socket.emit("user:connect", session.user.id);
+      }
 
       return () => {
         socket.disconnect();
@@ -68,19 +74,6 @@ export default function MyApp({
             "relative flex p-1 min-h-10 rounded-full justify-between overflow-hidden cursor-pointer border border-green font-body"
           }
         />
-        {/* <ToastContainer
-          position="bottom-center"
-          autoClose={5000}
-          hideProgressBar
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover={false}
-          theme="dark"
-          transition={Slide}
-        /> */}
         <Toaster
           position="bottom-center"
           containerStyle={{
@@ -99,7 +92,7 @@ export default function MyApp({
             },
           }}
         />
-        <UserSocketInitializer>{layout}</UserSocketInitializer>
+        {layout}
       </SWRConfig>
     </SessionProvider>
   );

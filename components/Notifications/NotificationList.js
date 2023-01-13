@@ -3,7 +3,7 @@ import NotificationListItem from "./NotificationListItem";
 import { NotifItemSkeleton } from "../Loaders";
 import usePaginate from "../../lib/hooks/usePaginate";
 import useNotificationStore from "../../store/useNotificationStore";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import useSocketStore from "../../store/useSocketStore";
 import { useSession } from "next-auth/react";
 
@@ -21,28 +21,30 @@ export default function NotificationList({ unread, scrollableTargetId }) {
   } = usePaginate("/api/notifications", 5);
 
   useEffect(() => {
-    if (notifications || notifications.length) {
-      setNotificationList(notifications);
-    }
+    setNotificationList(notifications);
   }, [notifications, setNotificationList]);
 
   useEffect(() => {
     if (socket) {
-      socket.on("notification", (data) => {
-        console.log(data);
-        setNotificationList([data.notification, ...notificationList.filter(notif => notif._id !== data.notification._id)]);
+      socket.on("notification:add", (data) => {
+        setNotificationList([
+          data.notification,
+          ...notificationList.filter(
+            (notif) => notif._id !== data.notification._id
+          ),
+        ]);
         setUnreadCount(data.unreadNotifications);
       });
 
-      socket.on("has-unread-notif", (count) => {
+      socket.on("notification:unread-count", (count) => {
         setUnreadCount(count);
       });
 
-      socket.emit("check-has-unread-notif", session && session.user?.id);
+      socket.emit("notification:count-unread", session && session.user?.id);
 
       return () => {
-        socket.off("notification");
-        socket.off("has-unread-notif");
+        socket.off("notification:add");
+        socket.off("notification:unread-count");
       };
     }
   }, [socket, setNotificationList, setUnreadCount, notificationList, session]);

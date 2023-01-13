@@ -43,13 +43,13 @@ export default function ChatContainer() {
 
   useEffect(() => {
     if (socket) {
-      socket.on("message-receive", (chat) => {
+      socket.on("chat:add", (chat) => {
         if (conversation && conversation._id == chat.conversation) {
           setChatList([...chatList, chat]);
         }
       });
 
-      socket.on("chat-sent", (id) => {
+      socket.on("chat:sent", (id) => {
         setChatList(
           chatList.map((chat) => {
             if (chat?.tempId == id) {
@@ -60,11 +60,11 @@ export default function ChatContainer() {
         );
       });
 
-      socket.emit("check-has-unread-convo", session && session.user.id);
+      socket.emit("conversation:check-has-unread", session && session.user.id);
 
       return () => {
-        socket.off("message-receive");
-        socket.off("chat-sent");
+        socket.off("chat:add");
+        socket.off("chat:sent");
       };
     }
   }, [socket, chatList, setChatList, conversation, session]);
