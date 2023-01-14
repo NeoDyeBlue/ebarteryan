@@ -22,9 +22,9 @@ export default function MessagesPopup({ className, hasBadge }) {
 
   useEffect(() => {
     if (socket) {
-      socket.emit("check-has-unread-convo", session && session.user.id);
+      socket.emit("conversation:check-has-unread", session && session.user.id);
 
-      socket.on("has-unread-convo", (hasUnread) => {
+      socket.on("conversation:has-unread", (hasUnread) => {
         setHasUnread(hasUnread);
       });
     }

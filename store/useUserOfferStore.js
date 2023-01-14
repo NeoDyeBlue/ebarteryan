@@ -32,7 +32,7 @@ const useUserOfferStore = create((set, get) => ({
     try {
       console.log(get().item);
       set({ isSubmitting: true });
-      const res = await fetch(`/api/offers/${get().item}`, {
+      const res = await fetch(`/api/items/${get().item}/offers`, {
         method: "POST",
         body: JSON.stringify(get().offer),
         headers: { "Content-Type": "application/json" },
@@ -41,11 +41,11 @@ const useUserOfferStore = create((set, get) => ({
       if (result && result.success) {
         set({ isSubmitting: false });
         set({ isSubmitSuccess: true });
-        useSocketStore.getState().socket.emit("offer", {
-          offer: result,
-          room: result.data.docs[0].item,
+        useSocketStore.getState().socket.emit("offer:create", {
+          offer: result.data.offer,
+          room: result.data.offer.item,
         });
-        useItemOffersStore.setState({ totalOffers: result.data.totalDocs });
+        useItemOffersStore.setState({ totalOffers: result.data.totalOffers });
         toast.success("Offer Added");
         // set({ offer: result.data });
         set({ socket: null });

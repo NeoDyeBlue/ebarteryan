@@ -26,14 +26,13 @@ export default function NotificationList({ unread, scrollableTargetId }) {
 
   useEffect(() => {
     if (socket) {
-      socket.on("notification:add", (data) => {
+      socket.on("notification:add", (notification) => {
+        // console.log(data);
         setNotificationList([
-          data.notification,
-          ...notificationList.filter(
-            (notif) => notif._id !== data.notification._id
-          ),
+          notification,
+          ...notificationList.filter((notif) => notif._id !== notification._id),
         ]);
-        setUnreadCount(data.unreadNotifications);
+        // setUnreadCount(data.unreadNotifications);
       });
 
       socket.on("notification:unread-count", (count) => {

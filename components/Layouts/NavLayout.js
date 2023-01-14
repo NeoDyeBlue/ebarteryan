@@ -29,7 +29,7 @@ export default function NavLayout({
           {children}
           <MobileNavbar
             className="fixed bottom-0 z-20 flex h-[70px]
-      w-full items-center border-t border-gray-200 bg-white py-4 lg:hidden"
+      w-full items-center border-t border-gray-200 bg-white py-4 md:hidden"
           />
           {currentPath !== "/messages" &&
             session &&

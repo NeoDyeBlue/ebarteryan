@@ -101,7 +101,7 @@ export default function MessageList({ isForPage = false }) {
 
   function joinConversation(room) {
     if (conversation?._id !== room._id) {
-      socket.emit("join-conversation", {
+      socket.emit("conversation:join", {
         newRoom: room._id,
         oldRoom: conversation?._id,
       });
@@ -124,29 +124,31 @@ export default function MessageList({ isForPage = false }) {
           onChange={handleSearchValueChange}
         />
       </div>
-      <div className="h-full px-2">
-        <InfiniteScroll
-          element="ul"
-          className="custom-scrollbar flex h-full w-full flex-col gap-2 overflow-y-auto"
-          pageStart={size}
-          loadMore={() => {
-            if (!isLoading) {
-              setSize(size + 1);
-            }
-          }}
-          hasMore={!isEndReached}
-          loader={[...Array(4)].map((_, i) => (
-            <ConvoItemSkeleton key={i} />
-          ))}
-          useWindow={false}
-        >
-          {(!messageList.length && !isEndReached && isLoading) || isValidating
-            ? [...Array(8)].map((_, i) => <ConvoItemSkeleton key={i} />)
-            : conversationItems.length
-            ? conversationItems
-            : null}
-        </InfiniteScroll>
-      </div>
+      {messageList.length ? (
+        <div className="h-full px-2">
+          <InfiniteScroll
+            element="ul"
+            className="custom-scrollbar flex h-full w-full flex-col gap-2 overflow-y-auto"
+            pageStart={size}
+            loadMore={() => {
+              if (!isLoading) {
+                setSize(size + 1);
+              }
+            }}
+            hasMore={!isEndReached}
+            loader={[...Array(4)].map((_, i) => (
+              <ConvoItemSkeleton key={i} />
+            ))}
+            useWindow={false}
+          >
+            {(!messageList.length && !isEndReached && isLoading) || isValidating
+              ? [...Array(8)].map((_, i) => <ConvoItemSkeleton key={i} />)
+              : conversationItems.length
+              ? conversationItems
+              : null}
+          </InfiniteScroll>
+        </div>
+      ) : null}
     </div>
   );
 }

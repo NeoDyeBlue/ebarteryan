@@ -53,13 +53,13 @@ export default function OfferForm({ onClose }) {
     setOffer(values);
     try {
       setIsSubmitting(true);
-      await stall(5000);
-      setIsSubmitting(false);
-      setIsSubmitSuccess(false);
-      // toast.success("Offer Added");
-      toast.error("Can't add offer");
-      return;
-      const res = await fetch(`/api/offers/${item}`, {
+      // await stall(5000);
+      // setIsSubmitting(false);
+      // setIsSubmitSuccess(false);
+      // // toast.success("Offer Added");
+      // toast.error("Can't add offer");
+      // return;
+      const res = await fetch(`/api/items/${item}/offers`, {
         method: "POST",
         body: JSON.stringify(values),
         headers: { "Content-Type": "application/json" },
@@ -68,19 +68,21 @@ export default function OfferForm({ onClose }) {
       if (result && result.success) {
         setIsSubmitting(false);
         setIsSubmitSuccess(true);
-        socket.emit("offer", {
-          offer: result,
-          room: result.data.docs[0].item,
+        socket.emit("offer:create", {
+          offer: result.data,
+          room: result.data.item,
         });
-        setTotalOffers(result.data.totalDocs);
+        // setTotalOffers(result.data.totalOffers);
         toast.success("Offer Added");
       } else {
+        console.log("here");
         setIsSubmitting(false);
         setIsSubmitSuccess(false);
         // setOffer(null);
         toast.error("Can't add offer");
       }
     } catch (error) {
+      console.log(error);
       setIsSubmitting(false);
       setIsSubmitSuccess(false);
       // setOffer(null);

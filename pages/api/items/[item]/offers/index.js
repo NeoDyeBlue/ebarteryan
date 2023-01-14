@@ -1,6 +1,6 @@
 import {
   getItemOffers,
-  offer,
+  createOffer,
 } from "../../../../../lib/controllers/offer-controller";
 import {
   successResponse,
@@ -19,8 +19,13 @@ export default async function handler(req, res) {
     }
     if (req.method == "POST") {
       if (token && token.verified) {
-        const data = await offer({ item, user: token?.sub, ...req.body });
-        return successResponse(req, res, data);
+        const offer = await createOffer({
+          item,
+          user: token?.sub,
+          ...req.body,
+        });
+
+        return successResponse(req, res, offer);
       }
       return errorResponse(req, res, "unauthorized request", 401);
     }

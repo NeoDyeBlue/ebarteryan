@@ -17,6 +17,7 @@ import { PopupLoader } from "../Loaders";
 import { ConfirmationModal } from "../Modals";
 import useSocketStore from "../../store/useSocketStore";
 import useMessagesStore from "../../store/useMessagesStore";
+import { useSession } from "next-auth/react";
 // import { KebabMenu, KebabMenuItem } from "../Navigation";
 
 export default function OfferListItem({
@@ -31,6 +32,8 @@ export default function OfferListItem({
   const [convo, setConvo] = useState(offer?.conversation);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+
+  const { data: session } = useSession();
 
   //stores
   const { socket } = useSocketStore();
@@ -69,10 +72,6 @@ export default function OfferListItem({
 
   function showConfirmation() {
     setAcceptConfirmationOpen(true);
-    // setIsLoading(true);
-    // await stall(3000);
-    // setIsLoading(false);
-    // toast.success("Offer accepted");
   }
 
   async function openChat() {
@@ -93,6 +92,12 @@ export default function OfferListItem({
       if (result && result.success) {
         joinConversation(result.data);
         setConvo(result.data);
+        socket.emit("conversation:create", {
+          conversation: result.data,
+          receiver: result.data.members.find(
+            (member) => member.user._id !== (session && session.user.id)
+          ).user._id,
+        });
       } else if (!result.success) {
         toast.error("Can't chat user");
       }
@@ -101,7 +106,7 @@ export default function OfferListItem({
 
   function joinConversation(room) {
     if (conversation?._id !== room._id) {
-      socket.emit("join-conversation", {
+      socket.emit("conversation:join", {
         newRoom: room._id,
         oldRoom: conversation?._id,
       });

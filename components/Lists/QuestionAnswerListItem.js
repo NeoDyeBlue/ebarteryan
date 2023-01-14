@@ -6,8 +6,10 @@ import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import useSocketStore from "../../store/useSocketStore";
 import format from "date-fns/format";
+import { useSession } from "next-auth/react";
 
 export default function QuestionAnswerListItem({ withInput, data }) {
+  const { data: session } = useSession();
   const [isAnswerSubmitting, setIsAnswerSubmitting] = useState(false);
   const [answer, setAnswer] = useState(data?.answer);
   const answerFormik = useFormik({
@@ -35,6 +37,7 @@ export default function QuestionAnswerListItem({ withInput, data }) {
         // console.log(result);
         socket.emit("question:answer", {
           answeredQuestion: result.data,
+          answerer: session && session.user?.id,
           room: result.data.item,
         });
         toast.success("Question answered");

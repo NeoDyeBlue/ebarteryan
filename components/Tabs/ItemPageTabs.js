@@ -85,47 +85,20 @@ export default function ItemPageTabs({
 
   const itemOffers =
     storedOffers?.length &&
-    storedOffers.map((offer) => (
-      <OfferListItem
-        key={offer._id}
-        offer={offer}
-        onAccept={handleOfferAccept}
-        withButtons={showUserControls && available}
-      />
-    ));
-
-  // useEffect(() => {
-  //   if (questions.length >= storedQuestions.length || itemId !== item) {
-  //     setQuestions(questions);
-  //     setTotalQuestions(
-  //       totalQuestionDocs >= totalQuestions || itemId == item
-  //         ? totalQuestionDocs
-  //         : totalQuestions
-  //     );
-  //     if (itemId !== item) {
-  //       setItem(itemId);
-  //     }
-  //   }
-
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [
-  //   questions,
-  //   // setQuestions,
-  //   storedQuestions,
-  //   // setTotalQuestions,
-  //   totalQuestionDocs,
-  //   totalQuestions,
-  //   itemId,
-  //   item,
-  //   // setItem,
-  // ]);
+    storedOffers.map((offer) => {
+      return (
+        <OfferListItem
+          key={offer._id}
+          offer={offer}
+          onAccept={handleOfferAccept}
+          withButtons={showUserControls && available}
+        />
+      );
+    });
 
   useEffect(() => {
     setQuestions(questions);
     setTotalQuestions(totalQuestionDocs);
-    if (socket) {
-      socket.emit("question:count", itemId);
-    }
   }, [
     socket,
     itemId,
@@ -138,21 +111,16 @@ export default function ItemPageTabs({
   useEffect(() => {
     setOffers(offers);
     setTotalOffers(totalOfferDocs);
-    if (socket) {
-      socket.emit("offer:count", itemId);
-    }
   }, [socket, itemId, offers, setOffers, totalOfferDocs, setTotalOffers]);
 
   useEffect(() => {
     if (socket) {
-      socket.on("offer:add", (data) => {
-        setOffers([data.offer, ...storedOffers]);
-        setTotalOffers(data.totalOffers);
+      socket.on("offer:add", (offer) => {
+        setOffers([offer, ...storedOffers]);
       });
 
-      socket.on("question:add", (data) => {
-        setQuestions([data.question, ...storedQuestions]);
-        setTotalQuestions(data.totalQuestions);
+      socket.on("question:add", (question) => {
+        setQuestions([question, ...storedQuestions]);
       });
 
       socket.on("offer:update-count", (count) => {
@@ -163,6 +131,9 @@ export default function ItemPageTabs({
         setTotalQuestions(count);
       });
 
+      socket.emit("offer:count", itemId);
+      socket.emit("question:count", itemId);
+
       return () => {
         socket.off("offer:add");
         socket.off("question:add");
@@ -171,6 +142,7 @@ export default function ItemPageTabs({
       };
     }
   }, [
+    itemId,
     socket,
     setQuestions,
     setTotalQuestions,
@@ -201,10 +173,9 @@ export default function ItemPageTabs({
       if (result && result.success) {
         socket.emit("question:create", {
           question: result.data,
-          room: result.data.question.item,
+          room: result.data.item,
         });
-        setQuestions([result.data.question, ...storedQuestions]);
-        setTotalQuestions(result.data.totalQuestions);
+        setQuestions([result.data, ...storedQuestions]);
         questionFormik.setFieldValue("question", "");
         toast.success("Question asked");
       } else {

@@ -475,7 +475,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
         <div className="container mx-auto flex flex-col gap-4 pt-6 md:flex-row md:gap-6 lg:max-w-[1200px]">
           <div className="flex flex-col gap-3 pb-6 md:w-full md:border-0">
             <h2 className="text-xl font-medium">Description</h2>
-            <p>{itemData.description}</p>
+            <p className="leading-8">{itemData.description}</p>
           </div>
           <div
             className="flex flex-col gap-4 rounded-[10px] border border-gray-100 bg-white p-6

@@ -1,5 +1,8 @@
 import { Server } from "socket.io";
-import { joinConversation } from "../../lib/sockets/conversation-room-handler";
+import {
+  joinConversation,
+  addConversation,
+} from "../../lib/sockets/conversation-room-handler";
 import { sendChat } from "../../lib/sockets/chat-handler";
 import {
   checkHasUnreadConversation,
@@ -59,6 +62,10 @@ export default async function handler(req, res) {
         await checkHasUnreadConversation(user, sockets, io);
       });
 
+      socket.on("conversation:create", ({ conversation, receiver }) => {
+        addConversation(io, sockets, conversation, receiver);
+      });
+
       socket.on("notification:count-unread", async (user) => {
         await checkHasUnreadNotification(user, sockets, io);
       });
@@ -75,8 +82,8 @@ export default async function handler(req, res) {
         leaveItemRoom(socket, room);
       });
 
-      socket.on("offer:create", ({ offer, room }) => {
-        offerSend(socket, offer, room);
+      socket.on("offer:create", async ({ offer, room }) => {
+        await offerSend(io, socket, offer, room, sockets);
       });
 
       socket.on("offer:count", (item) => {
@@ -86,13 +93,13 @@ export default async function handler(req, res) {
       socket.on(
         "question:create",
         async ({ question, room }) =>
-          await questionHandler(socket, io, question, room, sockets)
+          await questionHandler(io, socket, question, room, sockets)
       );
 
       socket.on(
         "question:answer",
-        async ({ answeredQuestion, room }) =>
-          await answerHandler(io, answeredQuestion, room, sockets)
+        async ({ answeredQuestion, answerer, room }) =>
+          await answerHandler(io, answeredQuestion, answerer, room, sockets)
       );
 
       socket.on(
