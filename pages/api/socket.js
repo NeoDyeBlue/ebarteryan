@@ -12,12 +12,17 @@ import {
   joinItemRoom,
   leaveItemRoom,
 } from "../../lib/sockets/item-room-jhandler";
-import { offerSend, countOffers } from "../../lib/sockets/offer-handler";
+import {
+  offerSend,
+  countOffers,
+  acceptOffer,
+} from "../../lib/sockets/offer-handler";
 import {
   questionHandler,
   answerHandler,
   countQuestions,
 } from "../../lib/sockets/question-answer-handler";
+import { reviewNotify } from "../../lib/sockets/review-handler";
 
 // https://stackoverflow.com/questions/70086135/how-to-show-online-users-in-socket-io-server-in-node-js
 
@@ -90,6 +95,10 @@ export default async function handler(req, res) {
         countOffers(io, item);
       });
 
+      socket.on("offer:accept", async ({ accepter, item }) => {
+        await acceptOffer(io, sockets, accepter, item);
+      });
+
       socket.on(
         "question:create",
         async ({ question, room }) =>
@@ -106,6 +115,10 @@ export default async function handler(req, res) {
         "question:count",
         async (item) => await countQuestions(io, item)
       );
+
+      socket.on("review:create", async (review) => {
+        await reviewNotify(io, sockets, review);
+      });
     });
   }
   res.end();

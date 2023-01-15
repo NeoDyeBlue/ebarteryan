@@ -126,6 +126,10 @@ export default function OfferListItem({
       if (result && result.success) {
         onAccept(true, offer);
         setIsLoading(false);
+        socket.emit("offer:accept", {
+          accepter: session && session.user.id,
+          item: offer.item,
+        });
         toast.success("Offer accepted");
       } else if (!result.success) {
         setIsLoading(false);
@@ -200,7 +204,8 @@ export default function OfferListItem({
           <div className="flex w-full items-center justify-between">
             <div className="flex flex-col">
               <p className="min-w-[150px] font-display">
-                {offer?.user?.fullName}
+                {offer?.user?.fullName ||
+                  `${offer?.user?.firstName} ${offer?.user?.lastName}`}
               </p>
               <div className="flex gap-1">
                 <span className="flex w-full items-center justify-start gap-1">
@@ -215,8 +220,10 @@ export default function OfferListItem({
                     size={18}
                   /> */}
                   <StarFilled size={18} />
-                  <span>5</span>
-                  <span className="text-gray-200">{"(10)"}</span>
+                  <span>{offer?.user?.reviews?.rating || 0}</span>
+                  <span className="text-gray-200">{`(${
+                    offer?.user?.reviews?.count || 0
+                  })`}</span>
                 </span>
               </div>
             </div>

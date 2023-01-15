@@ -1,8 +1,7 @@
 import Image from "next/image";
 import { useRouter } from "next/router";
 import format from "date-fns/format";
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
 import useSocketStore from "../../store/useSocketStore";
 import useNotificationStore from "../../store/useNotificationStore";
 
@@ -39,6 +38,9 @@ export default function NotificationListItem({ read, type, data }) {
     case "offer-accepted":
       message = "accepted your offer on item";
       break;
+    case "review":
+      message = `wrote you a review for your item`;
+      break;
     case "item-ended":
       message = "accepts an offer on item";
       break;
@@ -54,7 +56,11 @@ export default function NotificationListItem({ read, type, data }) {
       console.log(result);
       setUnreadCount(result.data.unreadNotifications);
     }
-    router.push(`/items/${data?.item?._id}`);
+    if (type == "review") {
+      router.push(`/profile`);
+    } else {
+      router.push(`/items/${data?.item?._id}`);
+    }
   }
 
   return (

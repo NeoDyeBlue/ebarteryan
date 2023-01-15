@@ -13,6 +13,8 @@ export default function ChatHeader({ showClose = false, onClose }) {
     (member) => member.user._id !== (session && session.user.id)
   );
 
+  console.log(recipient);
+
   const isOnline = useUserOnlineCheck(
     session && session.user.id,
     recipient.user._id
@@ -46,7 +48,10 @@ export default function ChatHeader({ showClose = false, onClose }) {
             ></span>
           )}
         </div>
-        <p className="font-display font-medium">{recipient?.user?.fullName}</p>
+        <p className="font-display font-medium">
+          {recipient?.user?.fullName ||
+            `${recipient?.user?.firstName} ${recipient?.user?.lastName}`}
+        </p>
       </div>
       {showClose && (
         <CircleButton

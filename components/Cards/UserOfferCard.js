@@ -139,43 +139,6 @@ export default function UserOfferCard({
           {itemImages}
         </div>
       </div>
-      {/* <div className={`flex w-full items-center gap-4 self-start`}>
-        <div className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
-          <Image
-            src={
-              offer?.user?.image?.url ||
-              "https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-            }
-            layout="fill"
-            // objectFit="cover"
-            alt="user image"
-          />
-        </div>
-        <div className="flex w-full items-center justify-between">
-          <div className="flex flex-col">
-            <p className="min-w-[150px] font-display text-sm md:mt-[0.1rem]">
-              {session?.user && status == "authenticated"
-                ? `${session.user.firstName} ${session.user.lastName}`
-                : ""}
-            </p>
-            <div className="flex gap-1">
-              <span className="-ml-[2px] flex w-full items-center justify-start gap-1">
-                <Rating
-                  className="align-middle"
-                  transition
-                  allowHalfIcon
-                  fillColor="#85CB33"
-                  emptyColor="#D2D2D2"
-                  initialValue={4.5}
-                  readonly
-                  size={18}
-                />
-                <span className="mt-[0.2rem] text-xs">• 10</span>
-              </span>
-            </div>
-          </div>
-        </div>
-      </div> */}
       <div className="flex w-full flex-col items-start gap-2 self-start md:flex-row md:items-center">
         <div className="flex w-full items-center gap-4">
           <div className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
@@ -192,24 +155,13 @@ export default function UserOfferCard({
                 {offer?.user?.fullName ||
                   `${session?.user?.firstName} ${session?.user?.lastName}`}
               </p>
-              <div className="flex gap-1">
+              {/* <div className="flex gap-1">
                 <span className="flex w-full items-center justify-start gap-1">
-                  {/* <Rating
-                    className="align-middle"
-                    transition
-                    allowHalfIcon
-                    fillColor="#100B00"
-                    emptyColor="#D2D2D2"
-                    initialValue={4.5}
-                    readonly
-                    size={18}
-                  /> */}
-                  {/* <span className="mt-[0.2rem] text-xs">• 10</span> */}
                   <StarFilled size={18} />
                   <span>5</span>
                   <span className="text-gray-200">{"(10)"}</span>
                 </span>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>

@@ -3,17 +3,18 @@ import { Button } from "../Buttons";
 import { Form, FormikProvider, useFormik } from "formik";
 import { useState } from "react";
 import { toast } from "react-hot-toast";
-import { stall } from "../../utils/test-utils";
 import { Rating } from "react-simple-star-rating";
 import useReviewStore from "../../store/useReviewStore";
 import { PopupLoader } from "../Loaders";
+import useSocketStore from "../../store/useSocketStore";
 
 export default function ReviewForm({ onClose }) {
   const { reviewee, item } = useReviewStore();
+  const { socket } = useSocketStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   async function handleReviewSubmit(values) {
     try {
-      values.reviewee = reviewee;
+      values.user = reviewee;
       values.item = item;
       setIsSubmitting(true);
       const res = await fetch(`/api/reviews`, {
@@ -25,6 +26,7 @@ export default function ReviewForm({ onClose }) {
       if (result && result.success) {
         setIsSubmitting(false);
         toast.success("Review submitted!");
+        socket.emit("review:create", result.data);
         onClose();
       } else {
         setIsSubmitting(false);

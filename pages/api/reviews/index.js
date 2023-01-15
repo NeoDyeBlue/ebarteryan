@@ -7,11 +7,11 @@ export default async function handler(req, res) {
     const token = await getToken({ req });
     if (req.method == "POST") {
       if (token && token.verified) {
-        const { reviewee, item, rate, review } = req.body;
+        const { user, item, rate, review } = req.body;
         // console.log(req.body);
         const reviewData = await submitReview(
           token?.sub,
-          reviewee,
+          user,
           item,
           rate,
           review

@@ -516,16 +516,22 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                 <p>•</p>
                 <p className="text-[15px]">10</p> */}
                 <StarFilled size={20} />
-                <span className="text-lg">5</span>
+                <span className="text-lg">
+                  {itemData?.user?.reviews?.rating || 0}
+                </span>
                 <p>•</p>
-                <span className="text-lg">{"10 reviews"}</span>
+                <span className="text-lg">
+                  {itemData?.user?.reviews?.count || 0} reviews
+                </span>
               </div>
             </div>
             <div className="flex gap-4">
               <div className="flex w-full flex-col items-center justify-center gap-2 rounded-[10px] border border-gray-100 p-4">
                 <div className="flex items-center gap-2">
                   <ArrowsHorizontal size={32} />
-                  <p className="text-2xl">8</p>
+                  <p className="text-2xl">
+                    {itemData.user.barteredItems.count || 0}
+                  </p>
                 </div>
                 <p className="text-center font-display text-sm">
                   Bartered Items
@@ -534,7 +540,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
               <div className="flex w-full flex-col items-center justify-center gap-2 rounded-[10px] border border-gray-100 p-4">
                 <div className="flex items-center gap-2">
                   <Need size={32} />
-                  <p className="text-2xl">10</p>
+                  <p className="text-2xl">{itemData.user.offers.count || 0}</p>
                 </div>
                 <p className="text-center font-display text-sm">
                   Offered Items
