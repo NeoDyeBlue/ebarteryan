@@ -1,14 +1,14 @@
-import { Timer, Need, TrashCan } from "@carbon/icons-react";
+import { TrashCan } from "@carbon/icons-react";
 import Image from "next/image";
 import Link from "next/link";
-import { CircleButton, Button } from "../Buttons";
+import { CircleButton } from "../Buttons";
 
 export default function SavedListItem({
+  itemId,
   image,
   name,
-  description,
-  time,
-  offers,
+  exchangeFor,
+  onDelete,
   to,
 }) {
   return (
@@ -16,12 +16,8 @@ export default function SavedListItem({
       <Link href={to}>
         <a className="flex w-full gap-2 md:gap-4">
           <div className="relative aspect-square w-full max-w-[120px] flex-shrink-0 overflow-hidden rounded-[10px] md:max-w-[150px]">
-            <div className="justify-centers absolute top-0 right-0 z-10 m-2 flex items-center gap-1 rounded-[10px] bg-gray-400 px-2 py-1 text-white shadow-md">
-              <Timer size={16} />
-              <p className="text-sm">{time}</p>
-            </div>
             <Image
-              src="https://res.cloudinary.com/dppgyhery/image/upload/v1631456018/samples/ecommerce/leather-bag-gray.jpg"
+              src={image}
               layout="fill"
               objectFit="cover"
               alt="item image"
@@ -33,21 +29,13 @@ export default function SavedListItem({
             </p>
             <p className="text-[15px] font-medium">Exchange for:</p>
             <p className="overflow-hidden overflow-ellipsis whitespace-nowrap text-[15px]">
-              {description}
+              {exchangeFor}
             </p>
-            <div className="flex items-center gap-1 text-black-light">
-              <Need />
-              <p className="font-display text-sm font-semibold">{offers}</p>
-            </div>
           </div>
         </a>
       </Link>
       <div className="self-start">
-        {/* <Button autoWidth={true} secondary={true}>
-          <TrashCan size={24} />
-          <p className="hidden md:block">Remove</p>
-        </Button> */}
-        <CircleButton icon={<TrashCan size={24} />} />
+        <CircleButton onClick={onDelete} icon={<TrashCan size={24} />} />
       </div>
     </li>
   );
