@@ -12,7 +12,8 @@ export default async function handler(req, res) {
   try {
     if (req.method == "GET") {
       const { item } = req.query;
-      const data = await getItem(item);
+      const token = await getToken({ req });
+      const data = await getItem(item, token.sub);
       return successResponse(req, res, data);
     }
     if (req.method == "PATCH") {

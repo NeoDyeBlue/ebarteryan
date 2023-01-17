@@ -9,6 +9,7 @@ import {
   ArrowsHorizontal,
   Add,
   Bookmark,
+  BookmarkFilled,
   Collaborate,
   Delivery,
   Chat,
@@ -57,8 +58,8 @@ const MemoizedInlineDropdownSelect = memo(InlineDropdownSelect);
 export async function getServerSideProps(context) {
   const { params } = context;
   try {
-    const item = await getItem(params.item);
     const session = await getSession(context);
+    const item = await getItem(params.item, session && session?.user?.id);
     let userOffer = null;
     let acceptedOffer = null;
     let fromUser = false;
@@ -98,6 +99,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [saved, setSaved] = useState(itemData?.requester?.isSaved);
 
   //others
   const { data: session, status } = useSession();
@@ -162,6 +164,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
 
   const updateAvailability = useCallback(async () => {
     setIsUpdating(true);
+    console.log(available);
     const res = await fetch(`/api/items/${itemData?._id}`, {
       method: "PATCH",
       body: JSON.stringify({ available }),
@@ -207,6 +210,25 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
   }, [available, fromUser, prevAvailability, updateAvailability]);
 
   //other functions
+  async function handleSaveClick() {
+    try {
+      const res = await fetch(`/api/items/saved?item=${itemData._id}`, {
+        method: saved ? "DELETE" : "POST",
+      });
+      const result = await res.json();
+      console.log(result);
+      if (result && result.success) {
+        toast.success(saved ? "Item removed from saved list" : "Item saved");
+        setSaved((prev) => !prev);
+      } else {
+        toast.error("An error occured, please try again later");
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("An error occured, please try again later");
+    }
+  }
+
   function openOfferModal() {
     if (session && session.user.verified && status == "authenticated") {
       setOfferModalOpen(true);
@@ -344,8 +366,13 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                     <Button onClick={openOfferModal}>Offer Now</Button>
                   ) : null}
                   <div className="hidden md:block">
-                    <Button secondary={true}>
-                      <Bookmark size={20} /> Save
+                    <Button onClick={handleSaveClick} secondary={true}>
+                      {saved ? (
+                        <BookmarkFilled className="text-green-500" size={20} />
+                      ) : (
+                        <Bookmark size={20} />
+                      )}
+                      {saved ? "Saved" : "Save"}
                     </Button>
                   </div>
                 </div>
@@ -414,7 +441,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
               <p>{itemData.exchangeFor}</p>
             </div>
             <div className="flex flex-col gap-4 pb-6">
-              <div className="flex items-center justify-between rounded-[10px] border border-gray-100 p-4">
+              <div className="flex min-h-[65px] items-center justify-between rounded-[10px] border border-gray-100 p-4">
                 <p className="font-display font-medium">Availability</p>
                 {fromUser && !ended ? (
                   <MemoizedInlineDropdownSelect
@@ -448,9 +475,13 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                   </div>
                 )}
               </div>
-              <div className="flex flex-col gap-3 rounded-[10px] border border-gray-100 p-4 md:flex-row md:items-center md:justify-between">
-                <p className="font-display font-medium">Claiming Options</p>
-                <div className="flex gap-3">{itemClaimingOptions}</div>
+              <div className="flex min-h-[65px] flex-col gap-3 rounded-[10px] border border-gray-100 p-4 md:flex-row md:items-center md:justify-between">
+                <p className="w-fit font-display font-medium">
+                  Claiming Options
+                </p>
+                <div className="flex flex-wrap justify-end gap-3">
+                  {itemClaimingOptions}
+                </div>
               </div>
             </div>
             {available && !ended && !fromUser ? (
@@ -460,8 +491,13 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                 ) : !itemData.ended || itemData.available ? (
                   <Button onClick={openOfferModal}>Offer Now</Button>
                 ) : null}
-                <Button secondary={true}>
-                  <Bookmark size={20} /> Save
+                <Button onClick={handleSaveClick} secondary={true}>
+                  {saved ? (
+                    <BookmarkFilled className="text-green-500" size={20} />
+                  ) : (
+                    <Bookmark size={20} />
+                  )}
+                  {saved ? "Saved" : "Save"}
                 </Button>
               </div>
             ) : (
@@ -503,18 +539,6 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
             <div className="flex flex-col items-center justify-center gap-2 rounded-[10px] border border-gray-100 p-4">
               <p className="font-display text-sm">Barterer Rating</p>
               <div className="flex w-full items-center justify-center gap-1 font-medium">
-                {/* <Rating
-                  className="align-middle"
-                  transition
-                  allowHalfIcon
-                  fillColor="#85CB33"
-                  emptyColor="#D2D2D2"
-                  initialValue={4.5}
-                  readonly
-                  size={24}
-                />
-                <p>•</p>
-                <p className="text-[15px]">10</p> */}
                 <StarFilled size={20} />
                 <span className="text-lg">
                   {itemData?.user?.reviews?.rating || 0}
