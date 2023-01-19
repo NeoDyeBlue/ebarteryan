@@ -7,7 +7,12 @@ import { useEffect } from "react";
 import useSocketStore from "../../store/useSocketStore";
 import { useSession } from "next-auth/react";
 
-export default function NotificationList({ unread, scrollableTargetId }) {
+export default function NotificationList({
+  unread = false,
+  scrollableTargetId,
+  useParentScroll = false,
+  forPage = false,
+}) {
   const { data: session } = useSession();
   const { notificationList, setNotificationList, setUnreadCount } =
     useNotificationStore();
@@ -18,7 +23,7 @@ export default function NotificationList({ unread, scrollableTargetId }) {
     isEndReached,
     setSize,
     size,
-  } = usePaginate("/api/notifications", 5);
+  } = usePaginate("/api/notifications", 5, { unread });
 
   useEffect(() => {
     setNotificationList(notifications);
@@ -60,12 +65,12 @@ export default function NotificationList({ unread, scrollableTargetId }) {
     ));
 
   return (
-    <ul className="flex flex-col gap-2 py-4 px-2">
+    <ul className={`flex flex-col gap-2 py-4 px-2 ${forPage ? "-mx-2" : ""}`}>
       <InfiniteScroll
         dataLength={notificationList.length}
         next={() => setSize(size + 1)}
         hasMore={!isEndReached}
-        scrollableTarget={scrollableTargetId}
+        scrollableTarget={useParentScroll ? "" : scrollableTargetId}
         className="flex flex-col gap-2"
         loader={[...Array(10)].map((_, i) => (
           <NotifItemSkeleton key={i} />

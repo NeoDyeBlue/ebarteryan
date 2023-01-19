@@ -12,7 +12,7 @@ export default function SavedListItem({
   to,
 }) {
   return (
-    <li className="flex flex-row gap-2 rounded-[10px] p-3 hover:bg-gray-100/30 md:flex-row md:items-center">
+    <li className="flex gap-2 rounded-[10px] p-3 hover:bg-gray-100/30 md:items-center">
       <Link href={to}>
         <a className="flex w-full gap-2 md:gap-4">
           <div className="relative aspect-square w-full max-w-[120px] flex-shrink-0 overflow-hidden rounded-[10px] md:max-w-[150px]">

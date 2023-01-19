@@ -10,7 +10,7 @@ export default async function handler(req, res) {
         const { page, limit, unread } = req.query;
         const notifications = await getNotifications(
           token?.sub,
-          unread,
+          unread == "true" ? true : false,
           page,
           limit
         );

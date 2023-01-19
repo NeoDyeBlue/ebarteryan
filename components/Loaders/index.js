@@ -3,3 +3,4 @@ export { default as PopupLoader } from "./PopupLoader";
 export { default as OfferCardSkeleton } from "./OfferCardSkeleton";
 export { default as ConvoItemSkeleton } from "./ConvoItemSkeleton";
 export { default as NotifItemSkeleton } from "./NotifItemSkeleton";
+export { default as SavedItemSkeleton } from "./SavedItemSkeleton";

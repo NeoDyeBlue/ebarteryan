@@ -7,6 +7,7 @@ import usePaginate from "../lib/hooks/usePaginate";
 import useMapStore from "../store/useMapStore";
 import { Button } from "../components/Buttons";
 import { FacePendingFilled } from "@carbon/icons-react";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export default function Home() {
   const { listingPosition, listingRadius, listingRegion } = useMapStore();
@@ -49,7 +50,33 @@ export default function Home() {
       </Head>
       <LocationBarterButtons />
       <div className="container relative mx-auto">
-        <div
+        <InfiniteScroll
+          dataLength={items.length}
+          next={() => setSize(size + 1)}
+          hasMore={!isEndReached}
+          className={`grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
+           lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:py-6 ${
+             !items.length && isEndReached
+               ? "min-h-[80vh] grid-cols-1 lg:grid-cols-1"
+               : ""
+           }`}
+          loader={[...Array(8)].map((_, i) => (
+            <ItemCardSkeleton key={i} />
+          ))}
+        >
+          {items.length ? (
+            itemCards
+          ) : !isLoading ? (
+            <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+              <FacePendingFilled size={100} />
+              Nothing to show{" "}
+              <span className="font-semibold">
+                {listingRegion ? `${listingRegion} - ${listingRadius}km` : ""}
+              </span>
+            </p>
+          ) : null}
+        </InfiniteScroll>
+        {/* <div
           className={`grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
            lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:py-6 ${
              !items.length && isEndReached
@@ -69,14 +96,14 @@ export default function Home() {
               </span>
             </p>
           ) : null}
-        </div>
-        {!isEndReached && !isLoading ? (
+        </div> */}
+        {/* {!isEndReached && !isLoading ? (
           <div className="mx-auto mb-8 w-full max-w-[300px]">
             <Button secondary={true} onClick={() => setSize(size + 1)}>
               Load More
             </Button>
           </div>
-        ) : null}
+        ) : null} */}
       </div>
     </div>
   );

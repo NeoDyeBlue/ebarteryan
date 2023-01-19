@@ -2,8 +2,9 @@ import { NavLayout } from "../components/Layouts";
 import Head from "next/head";
 import { SavedList, SavedListItem } from "../components/Lists";
 import usePaginate from "../lib/hooks/usePaginate";
-import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { SavedItemSkeleton } from "../components/Loaders";
 
 export default function Saved() {
   const {
@@ -14,13 +15,7 @@ export default function Saved() {
     setSize,
   } = usePaginate("/api/items/saved", 10);
 
-  const [savedList, setSavedList] = useState([]);
-
-  useEffect(() => {
-    setSavedList(items);
-  }, [items]);
-
-  const savedItems = savedList.map((item) => (
+  const savedItems = items.map((item) => (
     <SavedListItem
       image={item.images[0].url}
       onDelete={() => removeItem(item._id)}
@@ -64,7 +59,30 @@ export default function Saved() {
           Saved Items
         </h1>
         <div>
-          <SavedList>{savedItems}</SavedList>
+          <SavedList>
+            <InfiniteScroll
+              dataLength={items.length}
+              next={() => setSize(size + 1)}
+              hasMore={!isEndReached}
+              className="flex flex-col gap-2"
+              endMessage={
+                <p className="mt-4 text-center text-gray-200">
+                  Nothing more to show
+                </p>
+              }
+              loader={[...Array(10)].map((_, i) => (
+                <SavedItemSkeleton key={i} />
+              ))}
+            >
+              {items.length ? (
+                savedItems
+              ) : !isLoading ? (
+                <li className="flex items-center justify-center text-center text-gray-200">
+                  No saved items
+                </li>
+              ) : null}
+            </InfiniteScroll>
+          </SavedList>
         </div>
       </div>
     </div>

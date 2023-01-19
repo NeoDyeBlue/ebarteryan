@@ -1,7 +1,10 @@
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import NotificationList from "./NotificationList";
 
-export default function NotificationTabs() {
+export default function NotificationTabs({
+  useParentScroll = false,
+  forPage = false,
+}) {
   return (
     <div className="w-full">
       <Tabs className="flex flex-col">
@@ -15,10 +18,19 @@ export default function NotificationTabs() {
         </TabList>
         <div>
           <TabPanel>
-            <NotificationList scrollableTargetId={"notificationsPopup"} />
+            <NotificationList
+              useParentScroll={useParentScroll}
+              forPage={forPage}
+              scrollableTargetId={"notificationsPopup"}
+            />
           </TabPanel>
           <TabPanel>
-            <NotificationList scrollableTargetId={"notificationsPopup"} />
+            <NotificationList
+              useParentScroll={useParentScroll}
+              forPage={forPage}
+              scrollableTargetId={"notificationsPopup"}
+              unread
+            />
           </TabPanel>
         </div>
       </Tabs>

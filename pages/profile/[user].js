@@ -2,7 +2,6 @@ import { NavLayout } from "../../components/Layouts";
 import Image from "next/image";
 import Head from "next/head";
 import Link from "next/link";
-import { Rating } from "react-simple-star-rating";
 import {
   ArrowsHorizontal,
   Need,
@@ -18,7 +17,6 @@ import { ItemCardSkeleton } from "../../components/Loaders";
 import usePaginate from "../../lib/hooks/usePaginate";
 import { getSession } from "next-auth/react";
 import { getUserInfo } from "../../lib/controllers/user-controller";
-import useSWR from "swr";
 import { DotLoader } from "react-spinners";
 import { useState } from "react";
 
@@ -41,7 +39,7 @@ export async function getServerSideProps(context) {
     return { notFound: true };
   }
 
-  const userInfo = await getUserInfo({ _id: user });
+  const userInfo = await getUserInfo(user);
 
   if (!userInfo) {
     return { notFound: true };
@@ -78,10 +76,6 @@ export default function OtherProfile({ userInfo }) {
     setSize: setReviewsSize,
     error: reviewsError,
   } = usePaginate(`/api/reviews/${userInfo._id}`, 10);
-
-  const { data: reviewStats, error: reviewStatsError } = useSWR(
-    `/api/reviews/${userInfo._id}/info`
-  );
 
   const userReviews =
     reviews.length &&
@@ -152,10 +146,10 @@ export default function OtherProfile({ userInfo }) {
               <div className="flex items-center gap-2">
                 <p className="flex items-center gap-2 font-display font-semibold">
                   <StarFilled size={20} className="align-middle" />
-                  {reviewStats?.data?.weightedAverage || 0}
+                  {userInfo?.reviews?.weightedAverage || 0}
                 </p>
                 <p className="text-gray-300">
-                  {reviewStats?.data?.totalReviews || 0} {"review(s)"}
+                  {userInfo?.reviews?.totalReviews || 0} {"review(s)"}
                 </p>
               </div>
               <Link href="#reviews">
@@ -168,7 +162,9 @@ export default function OtherProfile({ userInfo }) {
               <div className="flex w-full flex-col items-center gap-2 md:justify-center">
                 <div className="flex items-center gap-2">
                   <ArrowsHorizontal size={32} />
-                  <p className="text-2xl">8</p>
+                  <p className="text-2xl">
+                    {userInfo?.barteredItems?.count || 0}
+                  </p>
                 </div>
                 <p className="text-center font-display text-sm md:whitespace-nowrap">
                   Bartered Items
@@ -178,7 +174,7 @@ export default function OtherProfile({ userInfo }) {
               <div className="flex w-full flex-col items-center justify-center gap-2">
                 <div className="flex items-center gap-2">
                   <Need size={32} />
-                  <p className="text-2xl">10</p>
+                  <p className="text-2xl">{userInfo?.offers?.count || 0}</p>
                 </div>
                 <p className="text-center font-display text-sm md:whitespace-nowrap">
                   Offered Items
@@ -284,17 +280,17 @@ export default function OtherProfile({ userInfo }) {
             <div className="flex items-center gap-4">
               <p className="flex items-center gap-2 font-display text-2xl font-semibold">
                 <StarFilled size={24} className="align-middle" />
-                {reviewStats?.data?.weightedAverage || 0}
+                {userInfo?.reviews?.weightedAverage || 0}
               </p>
               <p className="text-2xl text-gray-300">
-                {reviewStats?.data?.totalReviews || 0} {"review(s)"}
+                {userInfo?.reviews?.totalReviews || 0} {"review(s)"}
               </p>
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">5</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["5"]?.percentage || 0}
+                  completed={userInfo?.reviews?.rates["5"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -304,7 +300,7 @@ export default function OtherProfile({ userInfo }) {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">4</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["4"]?.percentage || 0}
+                  completed={userInfo?.reviews?.rates["4"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -314,7 +310,7 @@ export default function OtherProfile({ userInfo }) {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">3</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["3"]?.percentage || 0}
+                  completed={userInfo?.reviews?.rates["3"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -324,7 +320,7 @@ export default function OtherProfile({ userInfo }) {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">2</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["2"]?.percentage || 0}
+                  completed={userInfo?.reviews?.rates["2"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -334,7 +330,7 @@ export default function OtherProfile({ userInfo }) {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">1</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["1"]?.percentage || 0}
+                  completed={userInfo?.reviews?.rates["1"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"

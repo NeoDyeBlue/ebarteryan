@@ -10,6 +10,7 @@ import usePaginate from "../../lib/hooks/usePaginate";
 import { ItemCard } from "../../components/Cards";
 import { ItemCardSkeleton } from "../../components/Loaders";
 import { FacePendingFilled } from "@carbon/icons-react";
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export async function getServerSideProps(context) {
   const { params } = context;
@@ -99,7 +100,33 @@ export default function Category({ data }) {
       </Head>
       <LocationBarterButtons />
       <div className="container relative mx-auto">
-        <div
+        <InfiniteScroll
+          dataLength={items.length}
+          next={() => setSize(size + 1)}
+          hasMore={!isEndReached}
+          className={`grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
+           lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:py-6 ${
+             !items.length && isEndReached
+               ? "min-h-[80vh] grid-cols-1 lg:grid-cols-1"
+               : ""
+           }`}
+          loader={[...Array(8)].map((_, i) => (
+            <ItemCardSkeleton key={i} />
+          ))}
+        >
+          {items.length ? (
+            itemCards
+          ) : !isLoading ? (
+            <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+              <FacePendingFilled size={100} />
+              Nothing to show{" "}
+              <span className="font-semibold">
+                {listingRegion ? `${listingRegion} - ${listingRadius}km` : ""}
+              </span>
+            </p>
+          ) : null}
+        </InfiniteScroll>
+        {/* <div
           className={`grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
            lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:py-6 ${
              !items.length && isEndReached
@@ -129,7 +156,7 @@ export default function Category({ data }) {
               Load More
             </Button>
           </div>
-        ) : null}
+        ) : null} */}
       </div>
     </div>
   );

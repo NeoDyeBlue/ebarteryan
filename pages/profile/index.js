@@ -2,7 +2,6 @@ import NavLayout from "../../components/Layouts/NavLayout";
 import Image from "next/image";
 import Head from "next/head";
 import Link from "next/link";
-import { Rating } from "react-simple-star-rating";
 import {
   ArrowsHorizontal,
   Need,
@@ -17,12 +16,28 @@ import { ReviewList, ReviewListItem } from "../../components/Lists";
 import { Button } from "../../components/Buttons";
 import { ItemCardSkeleton } from "../../components/Loaders";
 import usePaginate from "../../lib/hooks/usePaginate";
-import { useSession } from "next-auth/react";
+import { useSession, getSession } from "next-auth/react";
 import { DotLoader } from "react-spinners";
-import useSWR from "swr";
+import { getUserInfo } from "../../lib/controllers/user-controller";
 import { useState } from "react";
 
-export default function Profile() {
+export async function getServerSideProps(context) {
+  const session = await getSession(context);
+
+  const userInfo = await getUserInfo(session.user?.id);
+
+  if (!userInfo) {
+    return { notFound: true };
+  }
+
+  return {
+    props: {
+      userInfo: JSON.parse(JSON.stringify(userInfo)),
+    },
+  };
+}
+
+export default function Profile({ userInfo }) {
   const tabs = ["listings", "drafts", "unavailable", "ended"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const { data: session, status } = useSession();
@@ -48,9 +63,9 @@ export default function Profile() {
     error: reviewsError,
   } = usePaginate(`/api/reviews/${session?.user?.id}`, 10);
 
-  const { data: reviewStats, error: reviewStatsError } = useSWR(
-    `/api/reviews/${session?.user?.id}/info`
-  );
+  // const { data: reviewStats, error: reviewStatsError } = useSWR(
+  //   `/api/reviews/${session?.user?.id}/info`
+  // );
 
   const userReviews =
     reviews.length &&
@@ -83,9 +98,9 @@ export default function Profile() {
         {/* profile info */}
         <div className="flex flex-col items-center gap-8 md:flex-row md:items-end md:py-4">
           <div className="relative min-h-[150px] min-w-[150px] overflow-hidden rounded-full shadow-md">
-            {session?.user?.image && (
+            {userInfo?.image?.url && (
               <Image
-                src={session?.user?.image}
+                src={userInfo?.image?.url}
                 layout="fill"
                 objectFit="cover"
                 alt="user image"
@@ -95,34 +110,20 @@ export default function Profile() {
           <div className="flex flex-col items-center gap-4 md:w-full md:items-start">
             <div className="flex flex-col items-center gap-1 md:items-start">
               <h1 className="text-center text-3xl font-semibold md:text-left">
-                {session?.user?.firstName} {session?.user?.lastName}
+                {userInfo?.firstName} {userInfo?.lastName}
               </h1>
               <p className="text-center text-gray-300 md:text-left">
-                Joined in 2022
+                Joined in {new Date(userInfo?.createdAt).getFullYear()}
               </p>
             </div>
             <div className="flex flex-col items-center gap-2 md:items-start md:gap-2">
-              {/* <div className="flex w-full items-end justify-center gap-2">
-                <Rating
-                  className="align-middle"
-                  transition
-                  allowHalfIcon
-                  fillColor="#85CB33"
-                  emptyColor="#D2D2D2"
-                  initialValue={4.5}
-                  readonly
-                  size={24}
-                />
-                <p>•</p>
-                <p className="text-[15px]">10</p>
-              </div> */}
               <div className="flex items-center gap-2">
                 <p className="flex items-center gap-2 font-display font-semibold">
                   <StarFilled size={20} className="align-middle" />
-                  {reviewStats?.data?.weightedAverage || 0}
+                  {userInfo?.reviews?.weightedAverage || 0}
                 </p>
                 <p className="text-gray-300">
-                  {reviewStats?.data?.totalReviews || 0} {"review(s)"}
+                  {userInfo?.reviews?.totalReviews || 0} {"review(s)"}
                 </p>
               </div>
               <Link href="#reviews">
@@ -139,7 +140,9 @@ export default function Profile() {
               <div className="flex w-full flex-col items-center gap-2 md:justify-center">
                 <div className="flex items-center gap-2">
                   <ArrowsHorizontal size={32} />
-                  <p className="text-2xl">8</p>
+                  <p className="text-2xl">
+                    {userInfo?.barteredItems?.count || 0}
+                  </p>
                 </div>
                 <p className="text-center font-display text-sm md:whitespace-nowrap">
                   Bartered Items
@@ -149,7 +152,7 @@ export default function Profile() {
               <div className="flex w-full flex-col items-center justify-center gap-2">
                 <div className="flex items-center gap-2">
                   <Need size={32} />
-                  <p className="text-2xl">10</p>
+                  <p className="text-2xl">{userInfo?.offers?.count || 0}</p>
                 </div>
                 <p className="text-center font-display text-sm md:whitespace-nowrap">
                   Offered Items
@@ -329,17 +332,17 @@ export default function Profile() {
             <div className="flex items-center gap-4">
               <p className="flex items-center gap-2 font-display text-2xl font-semibold">
                 <StarFilled size={24} className="align-middle" />
-                {reviewStats?.data?.weightedAverage || 0}
+                {userInfo?.reviews?.weightedAverage || 0}
               </p>
               <p className="text-2xl text-gray-300">
-                {reviewStats?.data?.totalReviews || 0} {"review(s)"}
+                {userInfo?.reviews?.totalReviews || 0} {"review(s)"}
               </p>
             </div>
             <div className="flex flex-col gap-2">
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">5</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["5"]?.percentage || 0}
+                  completed={userInfo?.reviews?.rates["5"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -349,7 +352,7 @@ export default function Profile() {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">4</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["4"]?.percentage || 0}
+                  completed={userInfo?.reviews?.rates["4"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -359,7 +362,7 @@ export default function Profile() {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">3</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["3"]?.percentage || 0}
+                  completed={userInfo?.reviews?.rates["3"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -369,7 +372,7 @@ export default function Profile() {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">2</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["2"]?.percentage || 0}
+                  completed={userInfo?.reviews?.rates["2"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
@@ -379,7 +382,7 @@ export default function Profile() {
               <div className="flex w-full items-center gap-2">
                 <p className="w-[20px] text-lg">1</p>
                 <ProgressBar
-                  completed={reviewStats?.data?.rates["1"]?.percentage || 0}
+                  completed={userInfo?.reviews?.rates["1"]?.percentage || 0}
                   className="w-full"
                   baseBgColor="#E7F6D1"
                   bgColor="#85CB33"
