@@ -24,9 +24,9 @@ export default function ItemPageTabs({
   offersPaginated,
   questionsPaginated,
   showUserControls,
-  hasUserOffer,
   available,
   onOfferAccept,
+  onUserOfferEdit,
 }) {
   //swr
   const {
@@ -53,7 +53,7 @@ export default function ItemPageTabs({
   const [isQuestionSubmitting, setIsQuestionSubmitting] = useState(false);
 
   //stores
-  const { isSubmitting, isSubmitSuccess, resubmit, offer } =
+  const { isSubmitting, isSubmitSuccess, resubmit, offer, isForUpdating } =
     useUserOfferStore();
   const { socket } = useSocketStore();
   const {
@@ -194,6 +194,8 @@ export default function ItemPageTabs({
     setOffers(updatedOffers);
   }
 
+  // console.log({ isSubmitting, isSubmitSuccess, isForUpdating });
+
   return (
     <Tabs
       defaultIndex={0}
@@ -228,22 +230,25 @@ export default function ItemPageTabs({
               <UserOfferCard
                 offer={offer}
                 isLoading={
-                  hasUserOffer
+                  offer && !isForUpdating
                     ? false
                     : isSubmitting && !isSubmitSuccess
-                    ? true
-                    : false
+                  // ? true
+                  // : false
                 }
-                isSubmitSuccess={hasUserOffer ? true : isSubmitSuccess}
+                isSubmitSuccess={
+                  offer && !isForUpdating ? true : isSubmitSuccess
+                }
                 retryHandler={resubmit}
                 itemLister={itemLister}
+                onEdit={onUserOfferEdit}
                 isAccepted={
                   offer && acceptedOffer && offer._id == acceptedOffer._id
                 }
               />
             </div>
           )}
-          {acceptedOffer && !hasUserOffer && (
+          {acceptedOffer && !offer && (
             <div
               // id="offers"
               className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"

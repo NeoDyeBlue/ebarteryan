@@ -8,6 +8,7 @@ import {
   clearAllBodyScrollLocks,
 } from "body-scroll-lock";
 import { useEffect, useRef } from "react";
+import useUserOfferStore from "../../store/useUserOfferStore";
 
 export default function OfferModal({ onClose, isOpen }) {
   ReactModal.setAppElement("#__next");
@@ -19,6 +20,8 @@ export default function OfferModal({ onClose, isOpen }) {
       enableBodyScroll(modalRef?.current);
     }
   }, [isOpen]);
+
+  const { mode } = useUserOfferStore();
   return (
     <ReactModal
       ref={modalRef}
@@ -37,7 +40,9 @@ export default function OfferModal({ onClose, isOpen }) {
       >
         <div className="flex flex-col gap-4">
           <div className="flex flex-shrink-0 items-center justify-between">
-            <h1 className="text-2xl font-semibold">Create an Offer</h1>
+            <h1 className="text-2xl font-semibold">
+              {mode == "update" ? "Update Offer" : "Create an Offer"}
+            </h1>
             <CircleButton
               onClick={onClose}
               icon={<Add className="rotate-[135deg]" size={32} />}

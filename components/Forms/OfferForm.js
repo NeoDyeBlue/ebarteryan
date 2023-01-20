@@ -11,15 +11,12 @@ import { memo } from "react";
 import { Formik, Form } from "formik";
 import { offerSchema } from "../../lib/validators/item-validator";
 import { LocationModal } from "../Modals";
-import ReactModal from "react-modal";
 import useMapStore from "../../store/useMapStore";
 import { useState } from "react";
 import useUserOfferStore from "../../store/useUserOfferStore";
-import useItemOffersStore from "../../store/useItemOffersStore";
 import { toast } from "react-hot-toast";
 import useSocketStore from "../../store/useSocketStore";
 import { useRouter } from "next/router";
-import { stall } from "../../utils/test-utils";
 
 const MemoizedImageSelector = memo(ImageSelector);
 
@@ -33,9 +30,19 @@ export default function OfferForm({ onClose }) {
     setCreationLocation,
     clearPositionRegion,
   } = useMapStore();
-  const { item, setOffer, setIsSubmitting, setIsSubmitSuccess } =
-    useUserOfferStore();
-  const { setTotalOffers } = useItemOffersStore();
+  const {
+    item,
+    offer,
+    setOffer,
+    setIsSubmitting,
+    setIsSubmitSuccess,
+    mode,
+    oldOffer,
+    setOfferRetryBody,
+    setOldOffer,
+    isForUpdating,
+    setIsForUpdating,
+  } = useUserOfferStore();
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const { socket } = useSocketStore();
   function openLocationModal() {
@@ -51,63 +58,98 @@ export default function OfferForm({ onClose }) {
     onClose();
     router.push("#offers");
     setOffer(values);
+    let formBody;
     try {
+      if (isForUpdating) {
+        const newImages = values.images.filter(
+          (image) => !Object.keys(image).includes("url")
+        );
+        const toRemoveImages = oldOffer?.images?.filter(
+          (image) => !values.images.includes(image)
+        );
+        const newLocation =
+          oldOffer?.location?.coordinates[1] != values?.location?.lat &&
+          oldOffer?.location?.coordinates[0] != values?.location?.lng
+            ? {
+                region: values.location.region,
+                location: {
+                  type: "Point",
+                  coordinates: [values.location.lng, values.location.lat],
+                },
+              }
+            : null;
+
+        let { location, images, ...newFormBody } = values;
+        if (newLocation) {
+          newFormBody = { ...newLocation, ...newFormBody };
+        }
+        newFormBody.newImages = newImages;
+        newFormBody.toRemoveImages = toRemoveImages;
+        formBody = newFormBody;
+      } else {
+        formBody = values;
+      }
       setIsSubmitting(true);
-      // await stall(5000);
-      // setIsSubmitting(false);
-      // setIsSubmitSuccess(false);
-      // // toast.success("Offer Added");
-      // toast.error("Can't add offer");
-      // return;
-      const res = await fetch(`/api/items/${item}/offers`, {
-        method: "POST",
-        body: JSON.stringify(values),
-        headers: { "Content-Type": "application/json" },
-      });
+      setIsSubmitSuccess(false);
+      const res = await fetch(
+        isForUpdating
+          ? `/api/offers/${oldOffer?._id}`
+          : `/api/items/${item}/offers`,
+        {
+          method: isForUpdating ? "PATCH" : "POST",
+          body: JSON.stringify(formBody),
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       const result = await res.json();
       if (result && result.success) {
         setIsSubmitting(false);
         setIsSubmitSuccess(true);
-        socket.emit("offer:create", {
-          offer: result.data,
-          room: result.data.item,
-        });
-        // setTotalOffers(result.data.totalOffers);
-        toast.success("Offer Added");
+        if (isForUpdating) {
+          setOffer(result.data);
+          setOldOffer(null);
+        } else {
+          socket.emit("offer:create", {
+            offer: result.data,
+            room: result.data.item,
+          });
+        }
+        setOfferRetryBody(null);
+        toast.success(isForUpdating ? "Offer updated" : "Offer added");
       } else {
-        console.log("here");
         setIsSubmitting(false);
         setIsSubmitSuccess(false);
-        // setOffer(null);
-        toast.error("Can't add offer");
+        setOfferRetryBody(formBody);
+        toast.error(isForUpdating ? "Can't update offer" : "Can't add offer");
       }
     } catch (error) {
-      console.log(error);
       setIsSubmitting(false);
       setIsSubmitSuccess(false);
-      // setOffer(null);
-      toast.error("Can't add offer");
+      setOfferRetryBody(formBody);
+      toast.error(isForUpdating ? "Can't update offer" : "Can't add offer");
     }
-    // onClose();
-    // setOffer(values);
-    // setIsSubmitting(true);
-    // await stall(5000);
-    // // setIsSubmitSuccess(true);
-    // toast.success("Offer Added");
   }
   return (
     <Formik
       initialValues={{
-        images: [],
-        name: "",
-        description: "",
-        condition: "",
+        images: isForUpdating ? offer?.images : [],
+        name: isForUpdating ? offer?.name : "",
+        description: isForUpdating ? offer?.description : "",
+        condition: isForUpdating ? offer?.condition : "",
         location: {
-          region: creationRegion ? creationRegion : listingRegion,
-          lat: creationPosition.lat
+          region: isForUpdating
+            ? offer?.region
+            : creationRegion
+            ? creationRegion
+            : listingRegion,
+          lat: isForUpdating
+            ? offer?.location?.lat || offer?.location?.coordinates[1]
+            : creationPosition.lat
             ? creationPosition.lat
             : listingPosition.lat,
-          lng: creationPosition.lng
+          lng: isForUpdating
+            ? offer?.location?.lng || offer?.location?.coordinates[0]
+            : creationPosition.lng
             ? creationPosition.lng
             : listingPosition.lng,
         },
@@ -118,19 +160,6 @@ export default function OfferForm({ onClose }) {
       }}
     >
       {(props) => {
-        // this effect is needed to actually change the values for location
-        // useEffect(() => {
-        //   props.setFieldValue(
-        //     "location",
-        //     {
-        //       region: creationRegion,
-        //       lat: creationPosition.lat,
-        //       lng: creationPosition.lng,
-        //     },
-        //     true
-        //   );
-        // }, [creationRegion]);
-
         return (
           <Form>
             <div className="flex flex-col gap-4">
@@ -236,7 +265,7 @@ export default function OfferForm({ onClose }) {
                 </div>
               </div>
               <Button type="submit">
-                <p>Offer</p>
+                <p>{isForUpdating ? "Save" : "Offer"}</p>
               </Button>
             </div>
           </Form>

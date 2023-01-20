@@ -17,7 +17,11 @@ import { useState, useCallback } from "react";
 import ImageViewer from "react-simple-image-viewer";
 import format from "date-fns/format";
 import useUserOfferStore from "../../store/useUserOfferStore";
+import useSocketStore from "../../store/useSocketStore";
 import { KebabMenu, KebabMenuItem } from "../Navigation";
+import { toast } from "react-hot-toast";
+import { PopupLoader } from "../Loaders";
+import { ConfirmationModal } from "../Modals";
 
 export default function UserOfferCard({
   offer,
@@ -26,11 +30,18 @@ export default function UserOfferCard({
   retryHandler,
   itemLister,
   isAccepted = false,
+  onEdit,
 }) {
   const { data: session, status } = useSession();
-  const { setOffer } = useUserOfferStore();
   const [currentImage, setCurrentImage] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+
+  //stores
+  const { setOffer, setOldOffer, oldOffer } = useUserOfferStore();
+  const { socket } = useSocketStore();
   const itemImages = offer?.images?.map((image, index) => (
     <div
       key={index}
@@ -62,7 +73,48 @@ export default function UserOfferCard({
     await retryHandler();
   }
 
-  console.log(offer);
+  function handleEditClick() {
+    setOldOffer(offer);
+    onEdit();
+  }
+
+  function showDeleteConfirmation() {
+    setIsDeleteConfirmationOpen(true);
+  }
+
+  function hideDeleteConfirmationOpen() {
+    setIsDeleteConfirmationOpen(false);
+  }
+
+  async function handleDeletelick() {
+    try {
+      setIsDeleting(true);
+      const res = await fetch(`/api/offers/${offer?._id}`, {
+        method: "DELETE",
+      });
+      const result = await res.json();
+      if (result && result.success) {
+        socket.emit("offer:count", offer?.item);
+        setOffer(null);
+        toast.success("Offer deleted");
+        setIsDeleting(false);
+      } else {
+        toast.error("Can't delete offer");
+        setIsDeleting(false);
+      }
+    } catch (error) {
+      toast.error("Can't delete offer");
+      setIsDeleting(false);
+    }
+  }
+
+  function handleCancelClick() {
+    if (isForUpdating) {
+      setOffer(oldOffer);
+    } else {
+      setOffer(null);
+    }
+  }
 
   return (
     <li
@@ -73,6 +125,14 @@ export default function UserOfferCard({
          : ""
      }`}
     >
+      <PopupLoader message="Deleting offer..." isOpen={isDeleting} />
+      <ConfirmationModal
+        onClose={hideDeleteConfirmationOpen}
+        isOpen={isDeleteConfirmationOpen}
+        label="Delete Offer"
+        message="Deleting your offer will be gone forever!"
+        onConfirm={handleDeletelick}
+      />
       {isLoading ? (
         <BarLoader
           color="#85CB33"
@@ -101,10 +161,10 @@ export default function UserOfferCard({
         />
       )}
       {!isLoading && !isSubmitSuccess ? (
-        <div className="absolute top-0 left-0 z-20 flex h-full w-full items-center justify-center bg-white/50 p-4">
+        <div className="absolute top-0 left-0 z-20 flex h-full w-full items-center justify-center p-4">
           <div className="flex w-full max-w-[200px] flex-col gap-3 drop-shadow-md md:flex-row">
             <Button onClick={resubmit}>Retry</Button>
-            <Button underlined={true} onClick={() => setOffer(null)}>
+            <Button underlined={true} onClick={handleCancelClick}>
               Cancel
             </Button>
           </div>
@@ -126,10 +186,10 @@ export default function UserOfferCard({
           </div>
           {/* <CircleButton icon={<OverflowMenuVertical size={24} />} /> */}
           <KebabMenu>
-            <KebabMenuItem>
+            <KebabMenuItem onClick={handleEditClick}>
               <Edit size={24} /> Edit Offer
             </KebabMenuItem>
-            <KebabMenuItem>
+            <KebabMenuItem onClick={showDeleteConfirmation}>
               <TrashCan size={24} /> Delete Offer
             </KebabMenuItem>
           </KebabMenu>

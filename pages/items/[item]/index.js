@@ -83,6 +83,7 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (error) {
+    console.log(error);
     return { notFound: true };
   }
 }
@@ -105,7 +106,8 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { socket } = useSocketStore();
-  const { offer, setOffer, setItem } = useUserOfferStore();
+  const { offer, setOffer, setItem, setIsForUpdating, setIsSubmitSuccess } =
+    useUserOfferStore();
   const { setAcceptedOffer, acceptedOffer: itemAcceptedOffer } =
     useItemOffersStore();
 
@@ -155,7 +157,18 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
     setItem(itemData?._id);
     setOffer(userOffer);
     setAcceptedOffer(acceptedOffer);
-  }, [itemData, userOffer, setItem, setOffer, acceptedOffer, setAcceptedOffer]);
+    if (userOffer) {
+      setIsSubmitSuccess(true);
+    }
+  }, [
+    itemData,
+    userOffer,
+    setItem,
+    setOffer,
+    acceptedOffer,
+    setAcceptedOffer,
+    setIsSubmitSuccess,
+  ]);
 
   const openImageViewer = useCallback((index) => {
     setCurrentImage(index);
@@ -164,7 +177,6 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
 
   const updateAvailability = useCallback(async () => {
     setIsUpdating(true);
-    console.log(available);
     const res = await fetch(`/api/items/${itemData?._id}`, {
       method: "PATCH",
       body: JSON.stringify({ available }),
@@ -186,6 +198,10 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
   useEffect(() => {
     updateOfferStore();
   }, [updateOfferStore]);
+
+  useEffect(() => {
+    setIsForUpdating(offer ? true : false);
+  }, [offer, setIsForUpdating]);
 
   useEffect(() => {
     if (socket) {
@@ -239,6 +255,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
 
   function closeOfferModal() {
     setOfferModalOpen(false);
+    // setIsForUpdating(false);
   }
 
   function closeAvailabilityConfirmationModal() {
@@ -360,7 +377,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
               </div>
               {available && !ended && !fromUser && (
                 <div className="flex max-w-[250px] gap-3">
-                  {offer || userOffer ? (
+                  {offer ? (
                     <LinkButton link="#offers">See Your Offer</LinkButton>
                   ) : !itemData.ended || itemData.available ? (
                     <Button onClick={openOfferModal}>Offer Now</Button>
@@ -486,7 +503,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
             </div>
             {available && !ended && !fromUser ? (
               <div className="flex flex-col gap-3 md:flex-row">
-                {offer || userOffer ? (
+                {offer ? (
                   <LinkButton link="#offers">See Your Offer</LinkButton>
                 ) : !itemData.ended || itemData.available ? (
                   <Button onClick={openOfferModal}>Offer Now</Button>
@@ -588,6 +605,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
           showUserControls={fromUser}
           hasUserOffer={userOffer ? true : false}
           available={available && !ended}
+          onUserOfferEdit={openOfferModal}
           onOfferAccept={(value) => handleOfferAccept(value)}
         />
       </div>

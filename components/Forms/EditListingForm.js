@@ -102,10 +102,6 @@ export default function EditListingForm({ item }) {
     newFormBody.newImages = newImages;
     newFormBody.toRemoveImages = toRemoveImages;
 
-    // console.log(newFormBody);
-    // // console.table(newImages);
-    // // console.table(toRemoveImages);
-    // return;
     try {
       setIsLoading(true);
       const res = await fetch(`/api/items/${item?._id}`, {
@@ -137,9 +133,6 @@ export default function EditListingForm({ item }) {
       },
     });
   }, [item?.region, item?.location?.coordinates, setCreationLocation]);
-
-  // console.log(creationRegion, creationPosition);
-  function showToast() {}
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 py-6 md:mb-6">

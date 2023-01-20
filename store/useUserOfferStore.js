@@ -1,17 +1,16 @@
 import create from "zustand";
 import useSocketStore from "./useSocketStore";
 import useItemOffersStore from "./useItemOffersStore";
-// import { stall } from "../utils/test-utils";
 import { toast } from "react-hot-toast";
-
-// const { socket: socketStore } = useSocketStore.getState();
-// console.log(socket);
 
 const useUserOfferStore = create((set, get) => ({
   item: "",
   offer: null,
+  oldOffer: null,
+  offerRetryBody: null,
   isSubmitting: false,
   isSubmitSuccess: false,
+  isForUpdating: false,
   setItem: (payload) =>
     set(() => ({
       item: payload,
@@ -19,6 +18,14 @@ const useUserOfferStore = create((set, get) => ({
   setOffer: (payload) =>
     set(() => ({
       offer: payload,
+    })),
+  setOldOffer: (payload) =>
+    set(() => ({
+      oldOffer: payload,
+    })),
+  setOfferRetryBody: (payload) =>
+    set(() => ({
+      offerRetryBody: payload,
     })),
   setIsSubmitting: (payload) =>
     set(() => ({
@@ -28,37 +35,52 @@ const useUserOfferStore = create((set, get) => ({
     set(() => ({
       isSubmitSuccess: payload,
     })),
+  setIsForUpdating: (payload) =>
+    set(() => ({
+      isForUpdating: payload,
+    })),
   resubmit: async () => {
     try {
-      console.log(get().item);
       set({ isSubmitting: true });
-      const res = await fetch(`/api/items/${get().item}/offers`, {
-        method: "POST",
-        body: JSON.stringify(get().offer),
-        headers: { "Content-Type": "application/json" },
-      });
+      set({ isSubmitSuccess: false });
+      const res = await fetch(
+        get().isForUpdating
+          ? `/api/offers/${get().oldOffer?._id}`
+          : `/api/items/${get().item}/offers`,
+        {
+          method: get().isForUpdating ? "PATCH" : "POST",
+          body: JSON.stringify(get().offerRetryBody),
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       const result = await res.json();
       if (result && result.success) {
         set({ isSubmitting: false });
         set({ isSubmitSuccess: true });
-        useSocketStore.getState().socket.emit("offer:create", {
-          offer: result.data.offer,
-          room: result.data.offer.item,
-        });
-        useItemOffersStore.setState({ totalOffers: result.data.totalOffers });
-        toast.success("Offer Added");
-        // set({ offer: result.data });
-        set({ socket: null });
+        if (get().isForUpdating) {
+          set({ offer: result.data });
+          set({ oldOffer: null });
+        } else {
+          useSocketStore.getState().socket.emit("offer:create", {
+            offer: result.data,
+            room: result.data.item,
+          });
+        }
+        set({ offerRetryBody: null });
+        toast.success(get().isForUpdating ? "Offer updated" : "Offer added");
       } else {
         set({ isSubmitting: false });
         set({ isSubmitSuccess: false });
-        toast.error("Can't add offer");
+        toast.error(
+          get().isForUpdating ? "Can't update offer" : "Can't add offer"
+        );
       }
     } catch (error) {
-      console.log(error);
       set({ isSubmitting: false });
       set({ isSubmitSuccess: false });
-      toast.error("Can't add offer");
+      toast.error(
+        get().isForUpdating ? "Can't update offer" : "Can't add offer"
+      );
     }
   },
 }));

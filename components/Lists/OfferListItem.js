@@ -179,7 +179,8 @@ export default function OfferListItem({
                 {offer?.region || offer?.location?.region} •{" "}
                 {offer?.createdAt && format(new Date(offer?.createdAt), "PP")}{" "}
               </span>
-              <ConditionBadge condition={offer?.condition} />
+              <ConditionBadge condition={offer?.condition} />{" "}
+              {offer?.edited ? "(edited)" : ""}
             </p>
           </div>
           {/* <KebabMenu>
