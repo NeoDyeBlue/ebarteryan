@@ -18,6 +18,7 @@ import { ConfirmationModal } from "../Modals";
 import useSocketStore from "../../store/useSocketStore";
 import useMessagesStore from "../../store/useMessagesStore";
 import { useSession } from "next-auth/react";
+import { DotLoader } from "react-spinners";
 // import { KebabMenu, KebabMenuItem } from "../Navigation";
 
 export default function OfferListItem({
@@ -32,6 +33,7 @@ export default function OfferListItem({
   const [convo, setConvo] = useState(offer?.conversation);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isConvoLoading, setIsConvoLoading] = useState(false);
 
   const { data: session } = useSession();
 
@@ -43,7 +45,7 @@ export default function OfferListItem({
   //elements
   const itemImages = offer?.images?.map((image, index) => (
     <div
-      key={index}
+      key={image.cloudId || index}
       onClick={() => openImageViewer(index)}
       className="relative aspect-square w-full cursor-pointer overflow-hidden rounded-md"
     >
@@ -75,10 +77,8 @@ export default function OfferListItem({
   }
 
   async function openChat() {
-    setIsMessagesOpen(true);
-    if (convo) {
-      joinConversation(convo);
-    } else {
+    try {
+      setIsConvoLoading(true);
       const res = await fetch("/api/messages", {
         method: "POST",
         body: JSON.stringify({
@@ -90,17 +90,24 @@ export default function OfferListItem({
       });
       const result = await res.json();
       if (result && result.success) {
-        joinConversation(result.data);
-        setConvo(result.data);
-        socket.emit("conversation:create", {
-          conversation: result.data,
-          receiver: result.data.members.find(
-            (member) => member.user._id !== (session && session.user.id)
-          ).user._id,
-        });
+        joinConversation(result.data.convo);
+        setConvo(result.data.convo);
+        setIsMessagesOpen(true);
+        if (result.data?.newOffer) {
+          socket.emit("conversation:create", {
+            conversation: result.data.convo,
+            receiver: result.data.convo.members.find(
+              (member) => member.user._id !== (session && session.user.id)
+            ).user._id,
+          });
+        }
       } else if (!result.success) {
-        toast.error("Can't chat user");
+        toast.error("Can't intialize conversation");
       }
+      setIsConvoLoading(false);
+    } catch (error) {
+      toast.error("Can't initialize conversation");
+      setIsConvoLoading(false);
     }
   }
 
@@ -210,16 +217,6 @@ export default function OfferListItem({
               </p>
               <div className="flex gap-1">
                 <span className="flex w-full items-center justify-start gap-1">
-                  {/* <Rating
-                    className="align-middle"
-                    transition
-                    allowHalfIcon
-                    fillColor="#100B00"
-                    emptyColor="#D2D2D2"
-                    initialValue={4.5}
-                    readonly
-                    size={18}
-                  /> */}
                   <StarFilled size={18} />
                   <span>{offer?.user?.reviews?.rating || 0}</span>
                   <span className="text-gray-200">{`(${
@@ -232,9 +229,21 @@ export default function OfferListItem({
         </div>
         {withButtons && (
           <div className="flex w-full justify-end gap-2">
-            <Button underlined autoWidth small onClick={openChat}>
-              <Chat size={20} />
-              <p className="hidden lg:block">Ask about the offer</p>
+            <Button
+              disabled={isConvoLoading}
+              underlined
+              autoWidth
+              small
+              onClick={openChat}
+            >
+              {isConvoLoading ? (
+                <DotLoader size={20} color="#85CB33" />
+              ) : (
+                <>
+                  <Chat size={20} />
+                  <p className="hidden lg:block">Ask about the offer</p>
+                </>
+              )}
             </Button>
             {!offer.accepted && (
               <Button

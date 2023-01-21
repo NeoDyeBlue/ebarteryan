@@ -9,6 +9,8 @@ import { KebabMenu, KebabMenuItem } from "../Navigation";
 import { useState } from "react";
 import { ReviewModal } from "../Modals";
 import useReviewStore from "../../store/useReviewStore";
+import { PopupLoader } from "../Loaders";
+import { ConfirmationModal } from "../Modals";
 
 export default function UserOfferListItem({ offer, status }) {
   const { setReviewee, setItem, isReviewDone } = useReviewStore();
@@ -33,6 +35,39 @@ export default function UserOfferListItem({ offer, status }) {
   }
 
   const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
+
+  async function handleDeletelick() {
+    try {
+      setIsDeleting(true);
+      const res = await fetch(`/api/offers/${offer?._id}`, {
+        method: "DELETE",
+      });
+      const result = await res.json();
+      if (result && result.success) {
+        socket.emit("offer:count", offer?.item);
+        setOffer(null);
+        toast.success("Offer deleted");
+        setIsDeleting(false);
+      } else {
+        toast.error("Can't delete offer");
+        setIsDeleting(false);
+      }
+    } catch (error) {
+      toast.error("Can't delete offer");
+      setIsDeleting(false);
+    }
+  }
+
+  function showDeleteConfirmation() {
+    setIsDeleteConfirmationOpen(true);
+  }
+
+  function hideDeleteConfirmationOpen() {
+    setIsDeleteConfirmationOpen(false);
+  }
 
   function showReviewModal() {
     setReviewee(offer?.item?.user?._id);
@@ -50,6 +85,14 @@ export default function UserOfferListItem({ offer, status }) {
     p-3 hover:shadow-md"
       onClick={() => router.push(`/items/${offer?.item?._id}`)}
     >
+      <PopupLoader message="Deleting offer..." isOpen={isDeleting} />
+      <ConfirmationModal
+        onClose={hideDeleteConfirmationOpen}
+        isOpen={isDeleteConfirmationOpen}
+        label="Delete Offer"
+        message="Deleting your offer will be gone forever!"
+        onConfirm={handleDeletelick}
+      />
       <div onClick={(e) => e.stopPropagation()} className="absolute">
         <ReviewModal isOpen={isReviewModalOpen} onClose={hideReviewModal} />
       </div>
@@ -74,7 +117,7 @@ export default function UserOfferListItem({ offer, status }) {
               <Checkmark size={24} /> Set as Received
             </KebabMenuItem>
           )}
-          <KebabMenuItem>
+          <KebabMenuItem onClick={showDeleteConfirmation}>
             <TrashCan size={24} /> Delete Offer
           </KebabMenuItem>
         </KebabMenu>

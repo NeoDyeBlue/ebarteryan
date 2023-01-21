@@ -20,7 +20,6 @@ export default async function handler(req, res) {
       const { item } = req.query;
       const token = await getToken({ req });
       if (token && token.verified) {
-        console.log(req.body);
         const updatedItem = await updateItem(token?.sub, item, req.body);
         return successResponse(req, res, updatedItem);
       }

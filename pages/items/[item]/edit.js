@@ -17,17 +17,17 @@ export async function getServerSideProps(context) {
       : process.env.DEVELOPMENT_URL;
   let fromUser = false;
   let error = false;
+  const session = await getSession(context);
   if (context.req.headers.referer) {
     url = new URL(context.req.headers.referer) || null;
     path = url.pathname;
     host = `${url.protocol}//${context.req.headers.host}`;
   }
   try {
-    const item = await getItem(params.item);
+    const item = await getItem(params.item, session && session.user.id);
     if (!item) {
       throw new Error();
     }
-    const session = await getSession(context);
     if (session && session?.user?.verified) {
       fromUser = item?.user?._id == session?.user?.id;
       if (!fromUser) {

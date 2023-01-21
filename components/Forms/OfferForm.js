@@ -106,7 +106,6 @@ export default function OfferForm({ onClose }) {
         setIsSubmitting(false);
         setIsSubmitSuccess(true);
         if (isForUpdating) {
-          setOffer(result.data);
           setOldOffer(null);
         } else {
           socket.emit("offer:create", {
@@ -114,6 +113,7 @@ export default function OfferForm({ onClose }) {
             room: result.data.item,
           });
         }
+        setOffer(result.data);
         setOfferRetryBody(null);
         toast.success(isForUpdating ? "Offer updated" : "Offer added");
       } else {

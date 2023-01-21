@@ -4,3 +4,4 @@ export { default as CreateListingForm } from "./CreateListingForm";
 export { default as EditListingForm } from "./EditListingForm";
 export { default as OfferForm } from "./OfferForm";
 export { default as ReviewForm } from "./ReviewForm";
+export { default as ProfileForm } from "./ProfileForm";

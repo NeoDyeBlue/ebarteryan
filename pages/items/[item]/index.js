@@ -119,7 +119,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
     itemData?.images?.length &&
     itemData.images.map((image, index) => (
       <div
-        key={image.id}
+        key={image.cloudId}
         onClick={() => openImageViewer(index)}
         className="relative aspect-square min-h-[200px] w-full cursor-pointer
         "

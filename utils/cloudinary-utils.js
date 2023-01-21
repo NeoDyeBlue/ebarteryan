@@ -35,7 +35,7 @@ export async function upload(folder, files) {
             quality: "auto:best",
           })
           .then((result) => {
-            uploadResults.push({ id: result.public_id, url: result.url });
+            uploadResults.push({ cloudId: result.public_id, url: result.url });
           })
           .catch((error) => {
             console.log(error);
@@ -56,6 +56,8 @@ export async function destroy(public_ids) {
   try {
     let destroyResults = [];
     let destroyPromises = [];
+
+    console.log(public_ids);
 
     public_ids.forEach((public_id) => {
       destroyPromises.push(

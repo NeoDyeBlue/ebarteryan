@@ -74,13 +74,14 @@ export default function Saved() {
                 <SavedItemSkeleton key={i} />
               ))}
             >
-              {items.length ? (
+              {savedItems}
+              {/* {items.length ? (
                 savedItems
               ) : !isLoading ? (
                 <li className="flex items-center justify-center text-center text-gray-200">
                   No saved items
                 </li>
-              ) : null}
+              ) : null} */}
             </InfiniteScroll>
           </SavedList>
         </div>

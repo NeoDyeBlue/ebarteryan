@@ -44,7 +44,7 @@ export default function UserOfferCard({
   const { socket } = useSocketStore();
   const itemImages = offer?.images?.map((image, index) => (
     <div
-      key={index}
+      key={image.cloudId || index}
       onClick={() => openImageViewer(index)}
       className="relative aspect-square w-full cursor-pointer overflow-hidden rounded-md"
     >

@@ -21,7 +21,7 @@ export default function OfferModal({ onClose, isOpen }) {
     }
   }, [isOpen]);
 
-  const { mode } = useUserOfferStore();
+  const { isForUpdating } = useUserOfferStore();
   return (
     <ReactModal
       ref={modalRef}
@@ -41,7 +41,7 @@ export default function OfferModal({ onClose, isOpen }) {
         <div className="flex flex-col gap-4">
           <div className="flex flex-shrink-0 items-center justify-between">
             <h1 className="text-2xl font-semibold">
-              {mode == "update" ? "Update Offer" : "Create an Offer"}
+              {isForUpdating ? "Update Offer" : "Create an Offer"}
             </h1>
             <CircleButton
               onClick={onClose}

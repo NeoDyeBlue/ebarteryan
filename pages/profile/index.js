@@ -20,6 +20,7 @@ import { useSession, getSession } from "next-auth/react";
 import { DotLoader } from "react-spinners";
 import { getUserInfo } from "../../lib/controllers/user-controller";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 export async function getServerSideProps(context) {
   const session = await getSession(context);
@@ -39,6 +40,7 @@ export async function getServerSideProps(context) {
 
 export default function Profile({ userInfo }) {
   const tabs = ["listings", "drafts", "unavailable", "ended"];
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const { data: session, status } = useSession();
   const {
@@ -62,10 +64,6 @@ export default function Profile({ userInfo }) {
     setSize: setReviewsSize,
     error: reviewsError,
   } = usePaginate(`/api/reviews/${session?.user?.id}`, 10);
-
-  // const { data: reviewStats, error: reviewStatsError } = useSWR(
-  //   `/api/reviews/${session?.user?.id}/info`
-  // );
 
   const userReviews =
     reviews.length &&
@@ -132,7 +130,11 @@ export default function Profile({ userInfo }) {
             </div>
           </div>
           <div className="flex h-full w-full flex-col items-center justify-between gap-8 md:w-auto md:items-end">
-            <Button small autoWidth>
+            <Button
+              onClick={() => router.push("/profile/settings")}
+              small
+              autoWidth
+            >
               <Settings size={20} />
               Profile & Account
             </Button>
