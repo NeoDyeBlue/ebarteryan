@@ -23,7 +23,6 @@ import {
   EditDeleteButtons,
 } from "../../../components/Buttons";
 import { IconLabel } from "../../../components/Icons";
-import { Rating } from "react-simple-star-rating";
 import { OfferModal, ConfirmationModal } from "../../../components/Modals";
 import { useState, useEffect, useCallback, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -97,6 +96,9 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
   const [available, setAvailable] = useState(itemData.available);
   const [ended, setEnded] = useState(itemData?.ended);
   const [prevAvailability, setPrevAvailbility] = useState(itemData.available);
+  const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
+    useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -279,6 +281,27 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
     setEnded(value);
   }
 
+  async function handleDeleteConfirmlick() {
+    try {
+      setIsDeleting(true);
+      const res = await fetch(`/api/items/${itemData?._id}`, {
+        method: "DELETE",
+      });
+      const result = await res.json();
+      if (result && result.success) {
+        toast.success("Item deleted");
+        router.push("/");
+        // setIsDeleting(false);
+      } else {
+        toast.error("Can't delete item");
+        setIsDeleting(false);
+      }
+    } catch (error) {
+      toast.error("Can't delete item");
+      setIsDeleting(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <Head>
@@ -304,6 +327,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
       )}
       {/* Modal */}
       <PopupLoader isOpen={isUpdating} message="Changing availability" />
+      <PopupLoader isOpen={isDeleting} message="Deleting item..." />
       <ConfirmationModal
         onClose={closeAvailabilityConfirmationModal}
         isOpen={availabilityConfirmationOpen}
@@ -311,6 +335,13 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
         message="Changing availability to unavailable prevents others from sending offers to your item."
         onConfirm={handleAvailabilityConfirmChange}
         onCancel={revertAvailabilityChange}
+      />
+      <ConfirmationModal
+        onClose={() => setIsDeleteConfirmationOpen(false)}
+        isOpen={isDeleteConfirmationOpen}
+        label="Delete Item?"
+        message="This item will be deleted forever and will affect offers."
+        onConfirm={handleDeleteConfirmlick}
       />
       <OfferModal onClose={closeOfferModal} isOpen={offerModalOpen} />
       {/* ScrollTriggered Bar */}
@@ -395,7 +426,10 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                 </div>
               )}
               {fromUser && (
-                <EditDeleteButtons editLink={`/items/${itemData._id}/edit`} />
+                <EditDeleteButtons
+                  editLink={`/items/${itemData._id}/edit`}
+                  onDeleteClick={() => setIsDeleteConfirmationOpen(true)}
+                />
               )}
             </div>
           </motion.div>
@@ -433,7 +467,10 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
               <p className="text-black-light">{itemData.name}</p>
             </span>
             {fromUser && (
-              <EditDeleteButtons editLink={`/items/${itemData._id}/edit`} />
+              <EditDeleteButtons
+                editLink={`/items/${itemData._id}/edit`}
+                onDeleteClick={() => setIsDeleteConfirmationOpen(true)}
+              />
             )}
           </div>
           <div className="flex flex-col gap-4 md:col-start-2 md:row-start-2">
@@ -592,22 +629,25 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
         </div>
       </div>
       {/* Tabs */}
+
       <div
         className="w-full scroll-mt-40 border-t border-t-gray-100
-        pb-6 sm:pt-6"
+            pb-6 sm:pt-6"
         id="offers"
       >
-        <ItemPageTabs
-          itemId={itemData?._id}
-          itemLister={itemData?.user}
-          offersPaginated={offers}
-          questionsPaginated={questions}
-          showUserControls={fromUser}
-          hasUserOffer={userOffer ? true : false}
-          available={available && !ended}
-          onUserOfferEdit={openOfferModal}
-          onOfferAccept={(value) => handleOfferAccept(value)}
-        />
+        {!itemData?.draft && (
+          <ItemPageTabs
+            itemId={itemData?._id}
+            itemLister={itemData?.user}
+            offersPaginated={offers}
+            questionsPaginated={questions}
+            showUserControls={fromUser}
+            hasUserOffer={userOffer ? true : false}
+            available={available && !ended}
+            onUserOfferEdit={openOfferModal}
+            onOfferAccept={(value) => handleOfferAccept(value)}
+          />
+        )}
       </div>
     </div>
   );

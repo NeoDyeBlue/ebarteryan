@@ -26,9 +26,9 @@ export default function ChatBubble({
     <div
       key={index}
       onClick={() => openImageViewer(index)}
-      className={`relative aspect-square h-full w-full cursor-pointer
+      className="relative aspect-square h-full w-full cursor-pointer
       overflow-hidden
-      `}
+      "
     >
       <Image
         src={image.url || image.content}
@@ -65,7 +65,9 @@ export default function ChatBubble({
   return (
     <li
       className={`relative flex ${
-        images.length ? "w-[70%] max-w-[300px]" : "max-w-[70%]"
+        images.length || type == "offer"
+          ? "w-[70%] max-w-[300px]"
+          : "max-w-[70%]"
       } items-end gap-2 ${
         isFromUser ? "flex-row-reverse self-end" : "self-start"
       } ${consecutive ? "mb-1" : "mb-4"} ${!isSent ? "opacity-50" : ""}`}
@@ -108,12 +110,14 @@ export default function ChatBubble({
       >
         {type == "offer" && offer && (
           <Link href={`/items/${offer?.item}`}>
-            <a className="relative h-[120px] w-full">
+            <a className="relative flex aspect-square h-full max-w-full cursor-pointer overflow-hidden">
               <Image
                 src={offer?.images[0]?.url}
                 objectFit="cover"
                 alt="offer image"
                 layout="fill"
+                blurDataURL="/images/placeholder.png"
+                placeholder="blur"
               />
             </a>
           </Link>
@@ -124,6 +128,9 @@ export default function ChatBubble({
           >
             {chatImages}
           </div>
+        )}
+        {type == "offer" && offer && (
+          <p className="mx-3 mt-3 -mb-2 text-sm font-semibold">{offer?.name}</p>
         )}
         {type !== "image" && <p className="p-3">{text}</p>}
       </div>

@@ -15,6 +15,8 @@ export default function MessageList({ isForPage = false }) {
     setConversation,
     conversation,
     setIsPageConversationOpen,
+    offerChatData,
+    setOfferChatData,
   } = useMessagesStore();
   const { socket } = useSocketStore();
   const { data: session } = useSession();
@@ -100,6 +102,10 @@ export default function MessageList({ isForPage = false }) {
     });
 
   function joinConversation(room) {
+    //delete previous conversation if temporary
+    if (offerChatData) {
+      setOfferChatData(null);
+    }
     if (conversation?._id !== room._id) {
       socket.emit("conversation:join", {
         newRoom: room._id,

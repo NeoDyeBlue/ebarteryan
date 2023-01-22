@@ -18,7 +18,11 @@ export default function MessagesPopup({ className, hasBadge }) {
   const { isMessagesOpen, setIsMessagesOpen } = useMessagesStore();
   const { socket } = useSocketStore();
 
-  useOnClickOutside(popupRef, () => setIsMessagesOpen(false));
+  function handleCloseClick() {
+    setIsMessagesOpen(false);
+  }
+
+  useOnClickOutside(popupRef, () => handleCloseClick());
 
   useEffect(() => {
     if (socket) {
@@ -80,7 +84,7 @@ export default function MessagesPopup({ className, hasBadge }) {
               </div>
               <MessageList />
             </div>
-            <Conversation forPopup onClose={() => setIsMessagesOpen(false)} />
+            <Conversation forPopup onClose={() => handleCloseClick()} />
           </div>
         </div>
       </div>

@@ -9,16 +9,23 @@ import { useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { useFilePicker } from "use-file-picker";
 import { v4 as uuidv4 } from "uuid";
+import Image from "next/image";
 
 export default function ChatInput() {
   const { socket } = useSocketStore();
-  const { conversation, chatList, setChatList } = useMessagesStore();
+  const {
+    conversation,
+    chatList,
+    setChatList,
+    offerChatData,
+    setOfferChatData,
+  } = useMessagesStore();
   const { data: session } = useSession();
 
   //formik
   const chatFormik = useFormik({
     initialValues: {
-      body: "",
+      body: offerChatData ? "Can I ask about this offer?" : "",
       images: [],
     },
     // validationSchema: questionSchema,
@@ -68,6 +75,20 @@ export default function ChatInput() {
   function sendChat(values) {
     if (values.body || values.images.length) {
       const tempId = uuidv4();
+      let type = "text";
+      if (values.images.length && !values.body) {
+        type = "image";
+      } else if (offerChatData) {
+        type = "offer";
+      } else if (values.images.length && values.body) {
+        type = "mixed";
+      }
+      // const type =
+      //   values.images.length && !values.body
+      //     ? "image"
+      //     : values.images.length && values.body
+      //     ? "mixed"
+      //     : "text";
       const chat = {
         sender: session && session.user.id,
         receiver: conversation.members?.find(
@@ -76,7 +97,9 @@ export default function ChatInput() {
         conversation: conversation._id,
         images: values.images,
         body: values.body,
+        type,
         tempId,
+        offer: offerChatData?._id,
       };
 
       socket.emit("chat:create", chat);
@@ -84,13 +107,8 @@ export default function ChatInput() {
         ...chatList,
         {
           sender: session.user,
-          type:
-            values.images.length && !values.body
-              ? "image"
-              : values.images.length && values.body
-              ? "mixed"
-              : "text",
-          offer: null,
+          type,
+          offer: offerChatData,
           images: values.images,
           body: values.body,
           sent: false,
@@ -98,6 +116,7 @@ export default function ChatInput() {
         },
       ]);
 
+      setOfferChatData(null);
       chatFormik.setFieldValue("images", []);
       chatFormik.setFieldValue("body", "");
     }
@@ -111,14 +130,36 @@ export default function ChatInput() {
             {selectedImages}
           </div>
         ) : null}
+        {offerChatData ? (
+          <div className="flex w-full items-center gap-3 py-2">
+            <div className="relative h-[60px] w-[60px] flex-shrink-0 overflow-hidden rounded-[5px]">
+              <Image
+                src={offerChatData?.images[0]?.url}
+                layout="fill"
+                objectFit="cover"
+                placeholder="blur"
+                blurDataURL="/images/placeholder.png"
+                alt="thumbnail image"
+              />
+            </div>
+            <p
+              className="overflow-hidden overflow-ellipsis
+              whitespace-nowrap font-display font-medium"
+            >
+              {offerChatData?.name}
+            </p>
+          </div>
+        ) : null}
         <div className="flex items-end gap-3 py-3">
-          <button
-            onClick={openFileSelector}
-            type="button"
-            className="h-[40px] text-green-500"
-          >
-            <ImageIcon size={32} />
-          </button>
+          {!offerChatData && (
+            <button
+              onClick={openFileSelector}
+              type="button"
+              className="h-[40px] text-green-500"
+            >
+              <ImageIcon size={32} />
+            </button>
+          )}
           <TextareaAutosize
             name="body"
             onChange={chatFormik.handleChange}

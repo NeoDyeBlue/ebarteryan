@@ -148,11 +148,11 @@ export default function ChatContainer() {
           {chatBubbles.reverse()}
           <li ref={messagesEnd}></li>
         </InfiniteScroll>
-      ) : (
+      ) : !chatList.length && isLoading ? (
         <li className="absolute top-1/2 left-1/2 m-auto flex h-[48px] flex-shrink-0 -translate-x-1/2 -translate-y-1/2 items-center justify-center">
           <DotLoader color="#C7EF83" size={32} />
         </li>
-      )}
+      ) : null}
     </ul>
   );
 }

@@ -11,6 +11,7 @@ import { ReviewModal } from "../Modals";
 import useReviewStore from "../../store/useReviewStore";
 import { PopupLoader } from "../Loaders";
 import { ConfirmationModal } from "../Modals";
+import { toast } from "react-hot-toast";
 
 export default function UserOfferListItem({ offer, status }) {
   const { setReviewee, setItem, isReviewDone } = useReviewStore();
@@ -47,14 +48,11 @@ export default function UserOfferListItem({ offer, status }) {
       });
       const result = await res.json();
       if (result && result.success) {
-        socket.emit("offer:count", offer?.item);
-        setOffer(null);
         toast.success("Offer deleted");
-        setIsDeleting(false);
       } else {
         toast.error("Can't delete offer");
-        setIsDeleting(false);
       }
+      setIsDeleting(false);
     } catch (error) {
       toast.error("Can't delete offer");
       setIsDeleting(false);
@@ -85,16 +83,16 @@ export default function UserOfferListItem({ offer, status }) {
     p-3 hover:shadow-md"
       onClick={() => router.push(`/items/${offer?.item?._id}`)}
     >
-      <PopupLoader message="Deleting offer..." isOpen={isDeleting} />
-      <ConfirmationModal
-        onClose={hideDeleteConfirmationOpen}
-        isOpen={isDeleteConfirmationOpen}
-        label="Delete Offer"
-        message="Deleting your offer will be gone forever!"
-        onConfirm={handleDeletelick}
-      />
       <div onClick={(e) => e.stopPropagation()} className="absolute">
         <ReviewModal isOpen={isReviewModalOpen} onClose={hideReviewModal} />
+        <PopupLoader message="Deleting offer..." isOpen={isDeleting} />
+        <ConfirmationModal
+          onClose={hideDeleteConfirmationOpen}
+          isOpen={isDeleteConfirmationOpen}
+          label="Delete Offer"
+          message="Deleting your offer will be gone forever!"
+          onConfirm={handleDeletelick}
+        />
       </div>
       <div className="flex items-center justify-between gap-2">
         <div className="flex w-full items-center gap-2 overflow-hidden">

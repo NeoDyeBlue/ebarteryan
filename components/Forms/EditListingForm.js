@@ -43,7 +43,6 @@ export default function EditListingForm({ item }) {
   } = useMapStore();
 
   const { path, host } = useUrlCallbackStore();
-  //   const { item } = useUserItemStore();
   const callbackUrl = useMemo(() => {
     if (
       window &&
@@ -112,8 +111,8 @@ export default function EditListingForm({ item }) {
       const data = await res.json();
       if (data && data.success) {
         toast.success("Item Updated");
-        setIsLoading(false);
-        // router.push(`/items/${item?._id}`);
+        // setIsLoading(false);
+        router.push(`/items/${item?._id}`);
       } else {
         setIsLoading(false);
         toast.error("Can't update item");
@@ -148,6 +147,7 @@ export default function EditListingForm({ item }) {
             ? [...item?.claimingOptions]
             : [],
           category: item?.category?._id,
+          draft: item?.draft,
           condition: item?.condition,
           location: {
             region: creationRegion ? creationRegion : item?.region,
@@ -359,8 +359,29 @@ export default function EditListingForm({ item }) {
                 </MultiSelect>
               </div>
               <div className="flex items-center gap-4">
-                <Button type="submit">Done</Button>
+                {item?.draft && (
+                  <Button
+                    onClick={() => {
+                      props.setFieldValue("draft", true);
+                      props.submitForm();
+                    }}
+                    secondary={true}
+                  >
+                    Save Changes to Drafts
+                  </Button>
+                )}
+                <Button
+                  onClick={() => {
+                    props.setFieldValue("draft", false);
+                    props.submitForm();
+                  }}
+                >
+                  {item?.draft ? "Post" : "Save Changes"}
+                </Button>
               </div>
+              {/* <div className="flex items-center gap-4">
+                <Button type="submit">Done</Button>
+              </div> */}
             </Form>
           );
         }}

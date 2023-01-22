@@ -30,7 +30,6 @@ export default function OfferListItem({
   //states
   const [currentImage, setCurrentImage] = useState(0);
   const [acceptConfirmationOpen, setAcceptConfirmationOpen] = useState(false);
-  const [convo, setConvo] = useState(offer?.conversation);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isConvoLoading, setIsConvoLoading] = useState(false);
@@ -39,7 +38,7 @@ export default function OfferListItem({
 
   //stores
   const { socket } = useSocketStore();
-  const { setIsMessagesOpen, setConversation, conversation } =
+  const { setIsMessagesOpen, setConversation, conversation, setOfferChatData } =
     useMessagesStore();
 
   //elements
@@ -91,16 +90,26 @@ export default function OfferListItem({
       const result = await res.json();
       if (result && result.success) {
         joinConversation(result.data.convo);
-        setConvo(result.data.convo);
+        setOfferChatData(result.data?.newOffer ? offer : null);
+        // if (result.data?.newOffer) {
+        //   setOfferChatData(offer);
+        //   // const receiver = result.data.convo.members.find(
+        //   //   (member) => member.user._id !== (session && session.user.id)
+        //   // ).user._id;
+        //   // socket.emit("conversation:create", {
+        //   //   conversation: result.data.convo,
+        //   //   receiver,
+        //   // });
+        //   // const newOfferChat = {
+        //   //   sender: session && session.user.id,
+        //   //   receiver: receiver,
+        //   //   conversation: result.data.convo,
+        //   //   type: "offer",
+        //   //   offer: offer?._id,
+        //   // };
+        //   // socket.emit("chat:create", newOfferChat);
+        // }
         setIsMessagesOpen(true);
-        if (result.data?.newOffer) {
-          socket.emit("conversation:create", {
-            conversation: result.data.convo,
-            receiver: result.data.convo.members.find(
-              (member) => member.user._id !== (session && session.user.id)
-            ).user._id,
-          });
-        }
       } else if (!result.success) {
         toast.error("Can't intialize conversation");
       }

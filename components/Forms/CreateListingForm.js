@@ -88,19 +88,19 @@ export default function CreateListingForm() {
       });
       const data = await res.json();
       if (data && data.success) {
-        toast.success("Item Posted");
+        toast.success(!values.draft ? "Item posted" : "Saved in drafts");
         router.push(callbackUrl);
       } else {
         setIsLoading(false);
-        toast.error("Can't post the item");
+        toast.success(
+          !values.draft ? "Can't post item" : "Can't save to drafts"
+        );
       }
     } catch (error) {
       setIsLoading(false);
-      toast.error("Can't post the item");
+      toast.success(!values.draft ? "Can't post item" : "Can't save to drafts");
     }
   }
-
-  function showToast() {}
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 py-6 md:mb-6">
@@ -115,6 +115,7 @@ export default function CreateListingForm() {
           claimingOptions: [],
           category: "",
           condition: "",
+          draft: false,
           location: {
             region: creationRegion ? creationRegion : listingRegion,
             lat: creationPosition.lat
@@ -129,19 +130,6 @@ export default function CreateListingForm() {
         onSubmit={handleFormSubmit}
       >
         {(props) => {
-          // this effect is needed to actually change the values for location
-          // useEffect(() => {
-          //   props.setFieldValue(
-          //     "location",
-          //     {
-          //       region: creationRegion,
-          //       lat: creationPosition.lat,
-          //       lng: creationPosition.lng,
-          //     },
-          //     true
-          //   );
-          // }, [creationRegion]);
-
           return (
             <Form className="flex flex-col gap-6">
               <div className="flex flex-col gap-4">
@@ -321,10 +309,23 @@ export default function CreateListingForm() {
                 </MultiSelect>
               </div>
               <div className="flex items-center gap-4">
-                <Button secondary={true} onClick={() => showToast()}>
+                <Button
+                  onClick={() => {
+                    props.setFieldValue("draft", true);
+                    props.submitForm();
+                  }}
+                  secondary={true}
+                >
                   Save to Drafts
                 </Button>
-                <Button type="submit">Post</Button>
+                <Button
+                  onClick={() => {
+                    props.setFieldValue("draft", false);
+                    props.submitForm();
+                  }}
+                >
+                  Post
+                </Button>
               </div>
             </Form>
           );

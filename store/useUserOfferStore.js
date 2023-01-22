@@ -58,7 +58,6 @@ const useUserOfferStore = create((set, get) => ({
         set({ isSubmitting: false });
         set({ isSubmitSuccess: true });
         if (get().isForUpdating) {
-          set({ offer: result.data });
           set({ oldOffer: null });
         } else {
           useSocketStore.getState().socket.emit("offer:create", {
@@ -66,6 +65,7 @@ const useUserOfferStore = create((set, get) => ({
             room: result.data.item,
           });
         }
+        set({ offer: result.data });
         set({ offerRetryBody: null });
         toast.success(get().isForUpdating ? "Offer updated" : "Offer added");
       } else {

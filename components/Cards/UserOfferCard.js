@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Rating } from "react-simple-star-rating";
 import { CircleButton } from "../Buttons";
 import {
   OverflowMenuVertical,

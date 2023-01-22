@@ -13,12 +13,11 @@ export default function ChatHeader({ showClose = false, onClose }) {
     (member) => member.user._id !== (session && session.user.id)
   );
 
-  console.log(recipient);
-
   const isOnline = useUserOnlineCheck(
     session && session.user.id,
     recipient.user._id
   );
+
   return (
     <div
       className={`flex items-center gap-4 py-3 ${

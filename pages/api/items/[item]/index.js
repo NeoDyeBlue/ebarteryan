@@ -5,6 +5,7 @@ import {
 import {
   getItem,
   updateItem,
+  deleteItem,
 } from "../../../../lib/controllers/item-controller";
 import { getToken } from "next-auth/jwt";
 
@@ -22,6 +23,15 @@ export default async function handler(req, res) {
       if (token && token.verified) {
         const updatedItem = await updateItem(token?.sub, item, req.body);
         return successResponse(req, res, updatedItem);
+      }
+      return errorResponse(req, res, "unauthorized request", 401);
+    }
+    if (req.method == "DELETE") {
+      const { item } = req.query;
+      const token = await getToken({ req });
+      if (token && token.verified) {
+        const result = await deleteItem(token?.sub, item);
+        return successResponse(req, res, result);
       }
       return errorResponse(req, res, "unauthorized request", 401);
     }

@@ -5,6 +5,7 @@ const useMessagesStore = create((set) => ({
   isPageConversationOpen: false,
   isImageViewerOpen: false,
   conversation: null,
+  offerChatData: null,
   messageList: [],
   chatList: [],
   newChats: [],
@@ -19,6 +20,10 @@ const useMessagesStore = create((set) => ({
   setIsImageViewerOpen: (payload) =>
     set(() => ({
       isImageViewerOpen: payload,
+    })),
+  setOfferChatData: (payload) =>
+    set(() => ({
+      offerChatData: payload,
     })),
   setConversation: (payload) =>
     set(() => ({
