@@ -64,6 +64,7 @@ export default function EditListingForm({ item }) {
 
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingMessage, setLoadingMessage] = useState("Updating item...");
 
   function openLocationModal() {
     setLocationModalOpen(true);
@@ -112,6 +113,7 @@ export default function EditListingForm({ item }) {
       if (data && data.success) {
         toast.success("Item Updated");
         // setIsLoading(false);
+        setLoadingMessage("Redirecting to the item page...");
         router.push(`/items/${item?._id}`);
       } else {
         setIsLoading(false);
@@ -135,7 +137,7 @@ export default function EditListingForm({ item }) {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 py-6 md:mb-6">
-      <PopupLoader isOpen={isLoading} message="Updating item..." />
+      <PopupLoader isOpen={isLoading} message={loadingMessage} />
       <h1 className="text-2xl font-semibold">Edit Item</h1>
       <Formik
         initialValues={{

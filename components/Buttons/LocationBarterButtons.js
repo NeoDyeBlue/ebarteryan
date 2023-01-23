@@ -1,6 +1,6 @@
 import Button from "./Button";
 import LinkButton from "./LinkButton";
-import { Pen, Location } from "@carbon/icons-react";
+import { Pen, Location, AddAlt } from "@carbon/icons-react";
 import LocationModal from "../Modals/LocationModal";
 import { useState } from "react";
 import useMapStore from "../../store/useMapStore";
@@ -41,7 +41,7 @@ export default function LocationBarterButtons({ className }) {
         }
       >
         <LinkButton link="/create">
-          <Pen size={20} /> Make a Barter
+          <AddAlt size={20} /> Make a Barter
         </LinkButton>
         <Button underlined="true" onClick={openLocationModal}>
           <Location size={20} />

@@ -25,6 +25,7 @@ import useNotificationStore from "../../store/useNotificationStore";
 export default function Navbar({ sticky }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showSearchBox, setShowSearchBox] = useState(false);
   const notificationsPopupRef = useRef(null);
   const profileMenuRef = useRef(null);
   const navbarRef = useRef(null);
@@ -80,7 +81,12 @@ export default function Navbar({ sticky }) {
             </p>
           </a>
         </Link>
-        <SearchBox className="container absolute top-0 left-0 z-10 mx-auto hidden h-full w-full max-w-[500px] px-4 lg:relative lg:block" />
+        <SearchBox
+          onClose={() => setShowSearchBox(false)}
+          className={`${
+            showSearchBox ? "block" : "hidden"
+          } container absolute top-0 left-0 z-10 mx-auto h-full w-full max-w-[500px] lg:relative lg:block`}
+        />
         <div className="relative flex items-center gap-3">
           <ul className="hidden items-center gap-2 md:flex">
             <li>
@@ -133,7 +139,10 @@ export default function Navbar({ sticky }) {
               </>
             ) : null}
           </ul>
-          <button className="flex cursor-pointer items-center justify-center md:hidden">
+          <button
+            onClick={() => setShowSearchBox(true)}
+            className="flex cursor-pointer items-center justify-center md:hidden"
+          >
             <Search size={24} />
           </button>
           <div
