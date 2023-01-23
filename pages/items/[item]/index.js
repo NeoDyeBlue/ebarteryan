@@ -340,7 +340,11 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
         onClose={() => setIsDeleteConfirmationOpen(false)}
         isOpen={isDeleteConfirmationOpen}
         label="Delete Item?"
-        message="This item will be deleted forever and will affect offers."
+        message={
+          itemData?.draft
+            ? "This item will be gone forever"
+            : "This item will be deleted forever and will affect offers!"
+        }
         onConfirm={handleDeleteConfirmlick}
       />
       <OfferModal onClose={closeOfferModal} isOpen={offerModalOpen} />
@@ -497,7 +501,9 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
             <div className="flex flex-col gap-4 pb-6">
               <div className="flex min-h-[65px] items-center justify-between rounded-[10px] border border-gray-100 p-4">
                 <p className="font-display font-medium">Availability</p>
-                {fromUser && !ended ? (
+                {itemData?.draft ? (
+                  <p>Draft</p>
+                ) : fromUser && !ended ? (
                   <MemoizedInlineDropdownSelect
                     name="availability"
                     items={[

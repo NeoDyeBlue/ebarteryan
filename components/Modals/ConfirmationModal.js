@@ -41,6 +41,7 @@ export default function ConfirmationModal({
       // closeTimeoutMS={300}
       overlayClassName={`bg-black/20 fixed top-0 z-50 flex h-full w-full p-4`}
       preventScroll={true}
+      closeTimeoutMS={150}
       onRequestClose={() => {
         onCancel && onCancel();
         onClose();

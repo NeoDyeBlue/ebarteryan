@@ -52,7 +52,7 @@ export default function LocationModal({
       ref={modalRef}
       contentLabel="Location Modal"
       isOpen={isOpen}
-      // closeTimeoutMS={300}
+      closeTimeoutMS={150}
       overlayClassName={`bg-black/20 fixed top-0 z-50 flex h-full w-full items-end`}
       preventScroll={true}
       onRequestClose={onClose}

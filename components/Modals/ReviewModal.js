@@ -20,6 +20,7 @@ export default function ReviewModal({ onClose, isOpen }) {
       ref={modalRef}
       contentLabel="Offer Modal"
       isOpen={isOpen}
+      closeTimeoutMS={150}
       // closeTimeoutMS={300}
       overlayClassName={`bg-black/20 fixed top-0 z-50 flex h-full w-full items-end`}
       preventScroll={true}
