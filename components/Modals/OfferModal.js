@@ -2,11 +2,7 @@ import { Add } from "@carbon/icons-react";
 import { CircleButton } from "../Buttons";
 import { OfferForm } from "../Forms";
 import ReactModal from "react-modal";
-import {
-  disableBodyScroll,
-  enableBodyScroll,
-  clearAllBodyScrollLocks,
-} from "body-scroll-lock";
+import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import { useEffect, useRef } from "react";
 import useUserOfferStore from "../../store/useUserOfferStore";
 

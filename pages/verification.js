@@ -1,8 +1,44 @@
 import { NavLayout } from "../components/Layouts";
 import Head from "next/head";
 import { Email } from "@carbon/icons-react";
+// import { ResendOTP } from "otp-input-react";
+import { FormikProvider, Form, useFormik } from "formik";
+import { Button } from "../components/Buttons";
+import { DotLoader } from "react-spinners";
+import { useState } from "react";
+import AuthCode from "react-auth-code-input";
+import { useRouter } from "next/router";
 
 export default function Verification() {
+  const router = useRouter();
+  const [isVerifying, setIsVerifying] = useState(false);
+  const verificationFormik = useFormik({
+    initialValues: {
+      otp: 0,
+    },
+    onSubmit: handleVerificationSubmit,
+  });
+
+  async function handleVerificationSubmit(values) {
+    try {
+      setIsVerifying(true);
+      const res = await fetch(`/api/verification/verify`, {
+        method: "PATCH",
+        body: JSON.stringify(values),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (result && result.success) {
+        await fetch("/api/auth/session?update");
+        router.push("/");
+      }
+      setIsVerifying(false);
+    } catch (error) {
+      console.log(error);
+      setIsVerifying(false);
+    }
+  }
+
   return (
     <div className="w-full">
       <Head>
@@ -15,12 +51,43 @@ export default function Verification() {
           className="m-auto flex max-w-[480px] flex-col items-center justify-center gap-6
         rounded-[10px] border border-gray-100 bg-white p-6 shadow-lg"
         >
-          <Email size={100} className="text-green-500" />
+          <Email size={100} className="text-gray-100" />
           <h1 className="text-4xl font-semibold">Verification</h1>
-          <p className="text-center">
-            We&apos;ve sent an email containing a verification link. Click the
-            link to finish setting up your account.
-          </p>
+          <div className="flex flex-col gap-4 text-center">
+            <FormikProvider value={verificationFormik}>
+              <Form className="flex w-full flex-col items-center gap-4">
+                <div className="flex w-full flex-col items-center gap-4">
+                  <AuthCode
+                    // inputClassName="otp-input"
+                    inputClassName=" w-full rounded-[10px] border bg-white w-[40px] h-[40px] font-body
+                  placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-green-500 flex-shrink-0 text-center font-semibold"
+                    containerClassName="flex gap-2 w-full justify-center"
+                    onChange={(value) =>
+                      verificationFormik.setFieldValue("otp", value)
+                    }
+                    allowedCharacters="numeric"
+                    autoFocus
+                  />
+                  <Button
+                    autoWidth={true}
+                    type="submit"
+                    disabled={isVerifying}
+                    small
+                  >
+                    {isVerifying ? (
+                      <DotLoader color="#fff" size={24} />
+                    ) : (
+                      <p>Verify</p>
+                    )}
+                  </Button>
+                </div>
+              </Form>
+            </FormikProvider>
+            <p>
+              Enter the 6 digit code we sent to your email to verify your
+              account.
+            </p>
+          </div>
           <p>
             Did&apos;nt receive it?{" "}
             <span className="font-display font-medium text-green-500 hover:underline">

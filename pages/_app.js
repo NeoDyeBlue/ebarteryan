@@ -11,7 +11,11 @@ import useSocketStore from "../store/useSocketStore";
 import { io } from "socket.io-client";
 import { getSession } from "next-auth/react";
 
-const socket = io();
+const socket = io({
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 1000,
+});
 
 /**
  * different _app.js for next-auth useSession()

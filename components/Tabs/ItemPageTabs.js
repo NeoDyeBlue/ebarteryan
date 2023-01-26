@@ -218,10 +218,7 @@ export default function ItemPageTabs({
       <div>
         <TabPanel className="flex flex-col gap-10">
           {offer && (
-            <div
-              // id="offers"
-              className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
-            >
+            <div className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4">
               <p className="font-display text-xl font-semibold">
                 {offer && acceptedOffer && offer._id == acceptedOffer._id
                   ? "Yours & Accepted Offer"
@@ -249,10 +246,7 @@ export default function ItemPageTabs({
             </div>
           )}
           {acceptedOffer && !offer && (
-            <div
-              // id="offers"
-              className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4"
-            >
+            <div className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4">
               <p className="font-display text-xl font-semibold">
                 Accepted Offer
               </p>

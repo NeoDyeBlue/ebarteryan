@@ -24,33 +24,13 @@ export async function middleware(req) {
     "/create",
   ];
 
-  // if going to admin
-  if (pathname.startsWith("/admin")) {
-    if (!session) {
-      return NextResponse.redirect(new URL("/login", req.url));
-    }
-    if (session && verified && role !== "admin") {
-      return NextResponse.redirect(new URL("/", req.url));
-    }
-  }
-
-  // if going to homepage
-  if (pathname == "/") {
-    if (session && verified && role == "admin") {
-      return NextResponse.redirect(new URL("/admin", req.url));
-    }
-  }
-
   // if going to user protected routes
   if (userProtectedRoutes.includes(pathname)) {
     if (!session) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
-    if (session && !verified && role !== "admin") {
+    if (session && !verified) {
       return NextResponse.redirect(new URL("/verification", req.url));
-    }
-    if (session && verified && role == "admin") {
-      return NextResponse.redirect(new URL("/admin", req.url));
     }
   }
 
@@ -60,24 +40,14 @@ export async function middleware(req) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
     if (session && verified) {
-      if (role == "user") {
-        return NextResponse.redirect(new URL("/", req.url));
-      }
-      if (role == "admin") {
-        return NextResponse.redirect(new URL("/admin", req.url));
-      }
+      return NextResponse.redirect(new URL("/", req.url));
     }
   }
 
   // if going to auth pages
   if (pathname == "/login" || pathname == "/signup") {
     if (session && verified) {
-      if (role == "user") {
-        return NextResponse.redirect(new URL("/", req.url));
-      }
-      if (role == "admin") {
-        return NextResponse.redirect(new URL("/admin", req.url));
-      }
+      return NextResponse.redirect(new URL("/", req.url));
     }
     if (session && !verified) {
       return NextResponse.redirect(new URL("/verification", req.url));

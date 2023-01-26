@@ -22,7 +22,7 @@ export default function PopupLoader({ message, isOpen }) {
       ref={modalRef}
       contentLabel="Location Modal"
       isOpen={isOpen}
-      // closeTimeoutMS={300}
+      closeTimeoutMS={150}
       overlayClassName={`bg-black/20 fixed top-0 z-50 flex h-full w-full p-4`}
       preventScroll={true}
       // bodyOpenClassName="modal-open-body"

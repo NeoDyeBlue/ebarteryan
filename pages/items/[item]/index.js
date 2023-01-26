@@ -19,8 +19,8 @@ import {
 } from "@carbon/icons-react";
 import {
   Button,
-  LinkButton,
   EditDeleteButtons,
+  AnchorLinkButton,
 } from "../../../components/Buttons";
 import { IconLabel } from "../../../components/Icons";
 import { OfferModal, ConfirmationModal } from "../../../components/Modals";
@@ -82,7 +82,6 @@ export async function getServerSideProps(context) {
       },
     };
   } catch (error) {
-    console.log(error);
     return { notFound: true };
   }
 }
@@ -413,7 +412,9 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
               {available && !ended && !fromUser && (
                 <div className="flex max-w-[250px] gap-3">
                   {offer ? (
-                    <LinkButton link="#offers">See Your Offer</LinkButton>
+                    <AnchorLinkButton elementId="offers">
+                      See Your Offer
+                    </AnchorLinkButton>
                   ) : !itemData.ended || itemData.available ? (
                     <Button onClick={openOfferModal}>Offer Now</Button>
                   ) : null}
@@ -544,25 +545,30 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                 </div>
               </div>
             </div>
-            {available && !ended && !fromUser ? (
-              <div className="flex flex-col gap-3 md:flex-row">
-                {offer ? (
-                  <LinkButton link="#offers">See Your Offer</LinkButton>
-                ) : !itemData.ended || itemData.available ? (
-                  <Button onClick={openOfferModal}>Offer Now</Button>
-                ) : null}
-                <Button onClick={handleSaveClick} secondary={true}>
-                  {saved ? (
-                    <BookmarkFilled className="text-green-500" size={20} />
-                  ) : (
-                    <Bookmark size={20} />
-                  )}
-                  {saved ? "Saved" : "Save"}
-                </Button>
-              </div>
-            ) : (
-              <LinkButton link="#offers">See Offers</LinkButton>
-            )}
+            {!itemData.draft &&
+              (available && !ended && !fromUser ? (
+                <div className="flex flex-col gap-3 md:flex-row">
+                  {offer ? (
+                    <AnchorLinkButton elementId="offers">
+                      See Your Offer
+                    </AnchorLinkButton>
+                  ) : !itemData.ended || itemData.available ? (
+                    <Button onClick={openOfferModal}>Offer Now</Button>
+                  ) : null}
+                  <Button onClick={handleSaveClick} secondary={true}>
+                    {saved ? (
+                      <BookmarkFilled className="text-green-500" size={20} />
+                    ) : (
+                      <Bookmark size={20} />
+                    )}
+                    {saved ? "Saved" : "Save"}
+                  </Button>
+                </div>
+              ) : (
+                <AnchorLinkButton elementId="offers">
+                  See Offers
+                </AnchorLinkButton>
+              ))}
           </div>
         </motion.div>
       </div>
@@ -635,11 +641,10 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
         </div>
       </div>
       {/* Tabs */}
-
       <div
+        id="offers"
         className="w-full scroll-mt-40 border-t border-t-gray-100
             pb-6 sm:pt-6"
-        id="offers"
       >
         {!itemData?.draft && (
           <ItemPageTabs

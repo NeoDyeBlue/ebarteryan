@@ -1,7 +1,4 @@
-export default function VerificationTemplate({
-  receiverName,
-  verificationLink,
-}) {
+export default function VerificationTemplate({ receiverName, otp }) {
   return (
     <body>
       <section
@@ -19,7 +16,7 @@ export default function VerificationTemplate({
             marginTop: 0,
             fontSize: "3rem",
             fontWeight: "bold",
-            color: "#100B00",
+            color: "#85CB33",
           }}
         >
           Welcome!
@@ -29,41 +26,22 @@ export default function VerificationTemplate({
         </p>
         <p style={{ paddingBottom: "1.5rem" }}>
           Welcome to eBarterYan! We're excited to have you get started. First,
-          you need to confirm your account. Just press the button below.
+          you need to confirm your account. Here is your 6 digit code.
         </p>
         <section style={{ padding: "2rem 0", textAlign: "center" }}>
-          <a
-            href={verificationLink}
-            target="_blank"
+          <p
             style={{
-              padding: "1.5rem",
-              backgroundColor: "#85CB33",
-              color: "#fff",
+              color: "#000",
               textAlign: "center",
-              borderRadius: "10px",
-              cursor: "pointer",
               display: "inline-block",
+              fontWeight: "bold",
+              letterSpacing: "1rem",
+              fontSize: "2rem",
             }}
           >
-            Confirm Account
-          </a>
+            {otp}
+          </p>
         </section>
-        <p style={{ padding: "1.5rem 0" }}>
-          If that doesn't work, copy the link below:
-        </p>
-        <a
-          target="_blank"
-          href={verificationLink}
-          style={{
-            color: "#85CB33",
-            cursor: "pointer",
-            paddingBottom: "1.5rem",
-            display: "inline-block",
-            textDecoration: "underline",
-          }}
-        >
-          {verificationLink}
-        </a>
         <p>Cheers,</p>
         <p>eBarterYan Team</p>
       </section>

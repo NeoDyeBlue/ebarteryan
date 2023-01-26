@@ -6,13 +6,27 @@ import { useRouter } from "next/router";
 export default function SearchBox({ className, onClose }) {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+
+  function handleSubmitSearch(event) {
+    event.preventDefault();
+
+    router.push(
+      `/search?${new URLSearchParams({
+        search_query: searchQuery,
+      }).toString()}`
+    );
+    setSearchQuery("");
+  }
   return (
     <div className={className}>
       <div className="flex h-full items-center gap-2 bg-white">
         <div className="lg:hidden">
           <CircleButton icon={<ArrowLeft size={24} />} onClick={onClose} />
         </div>
-        <div className="flex w-full overflow-hidden rounded-full border border-gray-100 p-2 shadow-md">
+        <form
+          className="flex w-full overflow-hidden rounded-full border border-gray-100 p-2 focus-within:shadow-md"
+          onSubmit={handleSubmitSearch}
+        >
           <input
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -22,18 +36,11 @@ export default function SearchBox({ className, onClose }) {
           ></input>
           <button
             className="flex-shrink-0 rounded-full bg-green-500 p-1 text-white lg:p-2"
-            onClick={() => {
-              router.push(
-                `/search?${new URLSearchParams({
-                  search_query: searchQuery,
-                }).toString()}`
-              );
-              setSearchQuery("");
-            }}
+            type="submit"
           >
             <Search size={16} className="block" />
           </button>
-        </div>
+        </form>
       </div>
     </div>
   );

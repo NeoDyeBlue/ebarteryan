@@ -11,6 +11,7 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import useNotificationStore from "../../store/useNotificationStore";
 import useSocketStore from "../../store/useSocketStore";
+import { toast } from "react-hot-toast";
 
 export default function MobileNavbar({ className }) {
   const [hasUnread, setHasUnread] = useState(false);
@@ -32,13 +33,17 @@ export default function MobileNavbar({ className }) {
     <nav className={className}>
       <ul className="container mx-auto flex w-full items-center justify-between">
         <li
-          className={`${session && status == "authenticated" ? "" : "mx-auto"}`}
+          className={`${
+            session && status == "authenticated" && session.user?.verified
+              ? ""
+              : "mx-auto"
+          }`}
         >
           <IconLink to="/" aka={["/items"]}>
             <Home size={24} />
           </IconLink>
         </li>
-        {session && status == "authenticated" && (
+        {session && status == "authenticated" && session.user?.verified && (
           <>
             <li>
               <IconLink to="/offers">
