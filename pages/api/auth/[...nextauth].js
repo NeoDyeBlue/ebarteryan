@@ -93,9 +93,21 @@ export const authOptions = (req) => ({
       return session;
     },
     async jwt({ token, user, profile }) {
+      // update
+      if (req.url == "/api/auth/session?update" && token) {
+        const updatedUser = await getUserInfo(token.sub);
+        if (updatedUser) {
+          token.name = updatedUser.fullName;
+          token.picture = updatedUser.image.url;
+          token.verified = updatedUser.verified;
+          token.firstName = updatedUser.firstName;
+          token.lastName = updatedUser.lastName;
+          token.email = updatedUser.email;
+        }
+      }
       //google or fb
-      if (profile) {
-        const userProfile = await getUserInfo({ email: profile.email });
+      else if (profile) {
+        const userProfile = await getUserInfo(token.sub);
         token.sub = userProfile._id;
         token.name = userProfile.fullName;
         token.role = userProfile.role;
@@ -105,7 +117,7 @@ export const authOptions = (req) => ({
         token.lastName = userProfile.lastName;
       }
       //credentials
-      if (user && !profile) {
+      else if (user && !profile) {
         token.sub = user.id || user._id;
         token.name = user.fullName;
         token.role = user.role;
@@ -113,17 +125,6 @@ export const authOptions = (req) => ({
         token.verified = user.verified;
         token.firstName = user.firstName;
         token.lastName = user.lastName;
-      }
-      if (req.url == "/api/auth/session?update" && token) {
-        const updatedUser = await getUserInfo({ email: token.email });
-        if (updatedUser) {
-          token.name = updatedUser.fullName;
-          token.picture = updatedUser.image.url;
-          token.verified = updatedUser.verified;
-          token.firstName = updatedUser.firstName;
-          token.lastName = updatedUser.lastName;
-          token.email = updatedUser.email;
-        }
       }
       return token;
     },

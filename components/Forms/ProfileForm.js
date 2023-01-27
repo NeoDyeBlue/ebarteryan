@@ -7,9 +7,12 @@ import { useFilePicker } from "use-file-picker";
 import { useSession } from "next-auth/react";
 import { useEffect, useState, useLayoutEffect } from "react";
 import Image from "next/image";
+import { toast } from "react-hot-toast";
+import { PopupLoader } from "../Loaders";
 
 export default function ProfileForm() {
   const { data: session } = useSession();
+  const [isUpdating, setIsUpdating] = useState(false);
   const [initialValues, setInitialValues] = useState({
     firstName: "",
     lastName: "",
@@ -22,6 +25,7 @@ export default function ProfileForm() {
       image: "",
     },
     validationSchema: profileSchema,
+    onSubmit: handleProfileFormSubmit,
   });
 
   const [openFileSelector, { filesContent, errors }] = useFilePicker({
@@ -55,10 +59,33 @@ export default function ProfileForm() {
     }
   }, [filesContent]);
 
-  async function handleProfileFormSubmit() {}
+  async function handleProfileFormSubmit(values) {
+    try {
+      setIsUpdating(true);
+      const res = await fetch("/api/profile", {
+        method: "PATCH",
+        body: JSON.stringify(values),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (result && result.success) {
+        toast.success("Profile updated");
+        await fetch("/api/auth/session?update");
+        const event = new Event("visibilitychange");
+        document.dispatchEvent(event);
+      } else {
+        toast.error("Can't update profile");
+      }
+      setIsUpdating(false);
+    } catch (error) {
+      toast.error("Can't update profile");
+      setIsUpdating(false);
+    }
+  }
 
   return (
     <FormikProvider value={profileFormik}>
+      <PopupLoader isOpen={isUpdating} message="Updating profile..." />
       <Form className="flex w-full flex-col gap-4 md:py-5">
         <div className="flex flex-col gap-2">
           <p className="font-display font-medium">Profile Picture</p>

@@ -6,7 +6,7 @@ export default function NotificationTabs({
   forPage = false,
 }) {
   return (
-    <div className="w-full">
+    <div className="w-full" onClick={(e) => e.stopPropagation()}>
       <Tabs className="flex flex-col">
         <TabList className="flex gap-4 px-4">
           <Tab className="tab" selectedClassName="tab-active">

@@ -8,18 +8,21 @@ import { DotLoader } from "react-spinners";
 import { useState } from "react";
 import AuthCode from "react-auth-code-input";
 import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
 
 export default function Verification() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [isVerifying, setIsVerifying] = useState(false);
   const verificationFormik = useFormik({
     initialValues: {
-      otp: 0,
+      otp: "",
     },
     onSubmit: handleVerificationSubmit,
   });
 
   async function handleVerificationSubmit(values) {
+    console.log(values);
     try {
       setIsVerifying(true);
       const res = await fetch(`/api/verification/verify`, {
@@ -28,8 +31,15 @@ export default function Verification() {
         headers: { "Content-Type": "application/json" },
       });
       const result = await res.json();
-      if (result && result.success) {
+      if (
+        result &&
+        result.success &&
+        result.data.verified &&
+        status == "authenticated"
+      ) {
         await fetch("/api/auth/session?update");
+        const event = new Event("visibilitychange");
+        document.dispatchEvent(event);
         router.push("/");
       }
       setIsVerifying(false);
@@ -71,7 +81,9 @@ export default function Verification() {
                   <Button
                     autoWidth={true}
                     type="submit"
-                    disabled={isVerifying}
+                    disabled={
+                      isVerifying || verificationFormik.values.otp.length < 6
+                    }
                     small
                   >
                     {isVerifying ? (
