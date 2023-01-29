@@ -9,11 +9,21 @@ import { useState } from "react";
 import AuthCode from "react-auth-code-input";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+import { toast } from "react-hot-toast";
+// import { ResendOTP } from "otp-input-react";
+const ResendOTP = dynamic(
+  () => import("otp-input-react").then((mod) => mod.ResendOTP),
+  {
+    ssr: false,
+  }
+);
 
 export default function Verification() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const [isVerifying, setIsVerifying] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
   const verificationFormik = useFormik({
     initialValues: {
       otp: "",
@@ -41,6 +51,8 @@ export default function Verification() {
         const event = new Event("visibilitychange");
         document.dispatchEvent(event);
         router.push("/");
+      } else {
+        toast.error(result.errorMessage);
       }
       setIsVerifying(false);
     } catch (error) {
@@ -48,6 +60,24 @@ export default function Verification() {
       setIsVerifying(false);
     }
   }
+
+  async function verificationResend() {
+    setShowCountdown(true);
+    await fetch("/api/verification/resend");
+  }
+
+  const renderButton = (buttonProps) => {
+    return (
+      <button
+        {...buttonProps}
+        className="bg-transparent font-display font-medium text-green-500 hover:underline"
+      >
+        {buttonProps.remainingTime !== 0
+          ? `Resend (${buttonProps.remainingTime})`
+          : "Resend"}
+      </button>
+    );
+  };
 
   return (
     <div className="w-full">
@@ -100,11 +130,22 @@ export default function Verification() {
               account.
             </p>
           </div>
-          <p>
-            Did&apos;nt receive it?{" "}
-            <span className="font-display font-medium text-green-500 hover:underline">
-              Resend
-            </span>
+          <p className="flex gap-1">
+            Did&apos;nt receive it?
+            {showCountdown ? (
+              <ResendOTP
+                renderButton={renderButton}
+                onResendClick={() => verificationResend()}
+                renderTime={() => <></>}
+              />
+            ) : (
+              <button
+                onClick={() => verificationResend()}
+                className="bg-transparent font-display font-medium text-green-500 hover:underline"
+              >
+                Resend
+              </button>
+            )}
           </p>
         </div>
       </div>

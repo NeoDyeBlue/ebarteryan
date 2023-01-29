@@ -7,10 +7,12 @@ import { Button } from "../../components/Buttons";
 import { DotLoader } from "react-spinners";
 import { useState } from "react";
 import { InputField } from "../../components/Inputs";
-import { passwordResetSchema } from "../../lib/validators/user-validator";
+import { newPasswordSchema } from "../../lib/validators/user-validator";
 import { useRouter } from "next/router";
+import { toast } from "react-hot-toast";
 
 export default function PasswordReset() {
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const passwordFormik = useFormik({
     initialValues: {
@@ -18,24 +20,29 @@ export default function PasswordReset() {
       confirmPassword: "",
     },
     onSubmit: handlePasswordSubmit,
-    validationSchema: passwordResetSchema,
+    validationSchema: newPasswordSchema,
   });
 
   async function handlePasswordSubmit(values) {
     try {
       setIsSubmitting(true);
-      const res = await fetch(`/api/verification/verify`, {
+      values.token = router.query.token;
+      const res = await fetch(`/api/password/new`, {
         method: "PATCH",
         body: JSON.stringify(values),
         headers: { "Content-Type": "application/json" },
       });
       const result = await res.json();
-      if (result && result.success && result.data.verified) {
-        await fetch("/api/auth/session?update");
+      if (result && result.success) {
+        toast.success("Password updated, please login to your account.");
+        router.push("/login");
+      } else {
+        toast.error(result.errorMessage);
       }
       setIsSubmitting(false);
     } catch (error) {
       setIsSubmitting(false);
+      toast.error("Can't update passsword");
     }
   }
 
@@ -61,13 +68,11 @@ export default function PasswordReset() {
                   label="New Password"
                   type="password"
                   name="password"
-                  value={passwordFormik.values.password}
                 />
                 <InputField
                   label="Confirm Password"
                   type="password"
                   name="confirmPassword"
-                  value={passwordFormik.values.confirmPassword}
                 />
                 <div className="flex w-full flex-col items-center gap-4">
                   <Button type="submit" disabled={isSubmitting}>

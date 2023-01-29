@@ -1,7 +1,7 @@
 import NavLayout from "../../components/Layouts/NavLayout";
 import Head from "next/head";
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
-import { ProfileForm } from "../../components/Forms";
+import { ProfileForm, AccountPasswordForm } from "../../components/Forms";
 import { UserProfile, Account, Pen } from "@carbon/icons-react";
 
 export default function ProfileSettings() {
@@ -33,28 +33,7 @@ export default function ProfileSettings() {
                 <ProfileForm />
               </TabPanel>
               <TabPanel>
-                {/* <form className="flex w-full flex-col gap-4 md:py-5">
-                  <InputField
-                    label="Email"
-                    name="email"
-                    type="email"
-                    placeholder="youremail@mail.com"
-                    infoMessage="changing email needs revalidation"
-                  />
-                  <InputField
-                    label="Current Password"
-                    name="currentPassword"
-                    type="password"
-                  />
-                  <InputField
-                    label="New Password"
-                    name="newPassword"
-                    type="password"
-                  />
-                  <div className="mt-4">
-                    <Button autoWidth={true}>Save Changes</Button>
-                  </div>
-                </form> */}
+                <AccountPasswordForm />
               </TabPanel>
             </div>
           </Tabs>

@@ -46,7 +46,7 @@ export default function LoginForm() {
             <InputField type="email" label="Email" name="email" />
             <div className="flex flex-col gap-2">
               <InputField type="password" label="Password" name="password" />
-              <Link href="/forgotpassword">
+              <Link href="/password/reset">
                 <a className="self-end font-display text-sm font-medium text-green-500 hover:underline">
                   Forgot Password?
                 </a>

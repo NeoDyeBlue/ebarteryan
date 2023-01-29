@@ -34,7 +34,13 @@ export async function middleware(req) {
     }
   }
 
-  // if going to verification pages
+  // if going to password reset page
+  if (pathname == "/password/reset" || pathname == "/password/new") {
+    if (session) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+  }
+  // if going to password pages
   if (pathname == "/verification") {
     if (!session) {
       return NextResponse.redirect(new URL("/login", req.url));

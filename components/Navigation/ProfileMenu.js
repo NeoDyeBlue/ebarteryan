@@ -50,7 +50,7 @@ export default function ProfileMenu() {
               </Link>
             </li>
             <li>
-              <Link href="/profile/edit">
+              <Link href="/profile/settings">
                 <a className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100/30">
                   Settings
                 </a>

@@ -1,16 +1,26 @@
 import { NavLayout } from "../../components/Layouts";
 import Head from "next/head";
-import { Email, UserIdentification } from "@carbon/icons-react";
+import { UserIdentification } from "@carbon/icons-react";
+import dynamic from "next/dynamic";
 // import { ResendOTP } from "otp-input-react";
+const ResendOTP = dynamic(
+  () => import("otp-input-react").then((mod) => mod.ResendOTP),
+  {
+    ssr: false,
+  }
+);
 import { FormikProvider, Form, useFormik } from "formik";
 import { Button } from "../../components/Buttons";
 import { DotLoader } from "react-spinners";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { InputField } from "../../components/Inputs";
 import { passwordResetSchema } from "../../lib/validators/user-validator";
+import Countdown, { CountdownApi } from "react-countdown";
 
 export default function PasswordReset() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitSuccess, setIsSubmitSuccess] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
   const resetFormik = useFormik({
     initialValues: {
       email: "",
@@ -22,20 +32,33 @@ export default function PasswordReset() {
   async function handlePasswordResetSubmit(values) {
     try {
       setIsSubmitting(true);
-      const res = await fetch(`/api/verification/verify`, {
-        method: "PATCH",
+      setShowCountdown(true);
+      const res = await fetch(`/api/password/reset`, {
+        method: "POST",
         body: JSON.stringify(values),
         headers: { "Content-Type": "application/json" },
       });
       const result = await res.json();
-      if (result && result.success && result.data.verified) {
-        await fetch("/api/auth/session?update");
+      if (result && result.success) {
+        setIsSubmitSuccess(true);
+      } else if (result && !result.success && result.error == "UserError") {
+        resetFormik.setFieldError("email", result.errorMessage);
       }
       setIsSubmitting(false);
     } catch (error) {
       setIsSubmitting(false);
     }
   }
+
+  const renderButton = (buttonProps) => {
+    return (
+      <Button {...buttonProps}>
+        {buttonProps.remainingTime !== 0
+          ? `Resend in ${buttonProps.remainingTime} sec`
+          : "Resend"}
+      </Button>
+    );
+  };
 
   return (
     <div className="w-full">
@@ -54,7 +77,14 @@ export default function PasswordReset() {
           <div className="flex flex-col gap-4 text-center">
             <p>Enter the email used in your account to reset its password.</p>
             <FormikProvider value={resetFormik}>
-              <Form className="flex w-full flex-col gap-4">
+              <Form
+                className="flex w-full flex-col gap-4"
+                onKeyPress={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                  }
+                }}
+              >
                 <InputField
                   type="email"
                   name="email"
@@ -62,23 +92,31 @@ export default function PasswordReset() {
                   placeholder="Your Email"
                 />
                 <div className="flex w-full flex-col items-center gap-4">
-                  <Button type="submit" disabled={isSubmitting}>
-                    {isSubmitting ? (
-                      <DotLoader color="#fff" size={24} />
-                    ) : (
+                  {showCountdown ? (
+                    <ResendOTP
+                      className="w-full"
+                      renderButton={renderButton}
+                      onResendClick={() => resetFormik.submitForm()}
+                      renderTime={() => <></>}
+                    />
+                  ) : (
+                    <Button
+                      type="submit"
+                      // onClick={() => countdownRef.current.api.start()}
+                    >
                       <p>Send</p>
-                    )}
-                  </Button>
+                    </Button>
+                  )}
                 </div>
               </Form>
             </FormikProvider>
           </div>
-          <p>
+          {/* <p>
             Did&apos;nt receive it?{" "}
             <span className="font-display font-medium text-green-500 hover:underline">
               Resend
             </span>
-          </p>
+          </p> */}
         </div>
       </div>
     </div>
