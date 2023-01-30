@@ -13,10 +13,21 @@ import { PopupLoader } from "../Loaders";
 import { ConfirmationModal } from "../Modals";
 import { toast } from "react-hot-toast";
 
-export default function UserOfferListItem({ offer, status }) {
+export default function UserOfferListItem({ offer, mutate }) {
   const { setReviewee, setItem, isReviewDone } = useReviewStore();
   const router = useRouter();
   let colors = "";
+  let status;
+  if (offer.accepted && !offer.received) {
+    status = "accepted";
+  } else if (offer.accepted && offer.received) {
+    status = "received";
+  } else if (!offer?.item?.ended && offer?.item?.available) {
+    status = "waiting";
+  } else if (!offer?.item || offer?.item?.ended || !offer?.item?.available) {
+    status = "failed";
+  }
+
   switch (status) {
     case "info":
       colors = "bg-info-500 text-white";
@@ -49,6 +60,7 @@ export default function UserOfferListItem({ offer, status }) {
       const result = await res.json();
       if (result && result.success) {
         toast.success("Offer deleted");
+        mutate();
       } else {
         toast.error("Can't delete offer");
       }
@@ -81,7 +93,7 @@ export default function UserOfferListItem({ offer, status }) {
     <li
       className="relative flex h-fit cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 bg-white
     p-3 hover:shadow-md"
-      onClick={() => router.push(`/items/${offer?.item?._id}`)}
+      onClick={() => offer?.item && router.push(`/items/${offer?.item?._id}`)}
     >
       <div onClick={(e) => e.stopPropagation()} className="absolute">
         <ReviewModal isOpen={isReviewModalOpen} onClose={hideReviewModal} />
@@ -96,17 +108,21 @@ export default function UserOfferListItem({ offer, status }) {
       </div>
       <div className="flex items-center justify-between gap-2">
         <div className="flex w-full items-center gap-2 overflow-hidden">
-          <div className="relative h-[36px] w-[36px] flex-shrink-0 overflow-hidden rounded-full">
-            <Image
-              src={offer?.item?.user?.image?.url}
-              layout="fill"
-              objectFit="cover"
-              alt="user image"
-            />
-          </div>
-          <p className="overflow-hidden overflow-ellipsis whitespace-nowrap font-display text-sm font-medium">
-            {offer?.item?.user?.firstName} {offer?.item?.user?.lastName}
-          </p>
+          {offer?.item && (
+            <>
+              <div className="relative h-[36px] w-[36px] flex-shrink-0 overflow-hidden rounded-full">
+                <Image
+                  src={offer?.item?.user?.image?.url}
+                  layout="fill"
+                  objectFit="cover"
+                  alt="user image"
+                />
+              </div>
+              <p className="overflow-hidden overflow-ellipsis whitespace-nowrap font-display text-sm font-medium">
+                {offer?.item?.user?.firstName} {offer?.item?.user?.lastName}
+              </p>
+            </>
+          )}
           <StatusBadge status={status} statusText={status} />
         </div>
         <KebabMenu>
@@ -142,12 +158,16 @@ export default function UserOfferListItem({ offer, status }) {
           />
         </div> */}
         {/* <p className="text-sm text-gray-200">Exchange for</p> */}
-        <ItemMiniCard
-          from={`${offer?.item?.user?.firstName}'s item`}
-          itemName={offer?.item?.name}
-          image={offer?.item?.image?.url}
-          createdAt={offer?.item?.createdAt}
-        />
+        {offer?.item ? (
+          <ItemMiniCard
+            from={`${offer?.item?.user?.firstName}'s item`}
+            itemName={offer?.item?.name}
+            image={offer?.item?.image?.url}
+            createdAt={offer?.item?.createdAt}
+          />
+        ) : (
+          <ItemMiniCard isNull />
+        )}
       </div>
     </li>
   );

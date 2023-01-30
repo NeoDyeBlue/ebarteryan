@@ -2,17 +2,17 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import Marquee from "react-fast-marquee";
 import { useRef, useState, useCallback } from "react";
+import useSocketStore from "../../store/useSocketStore";
 
 export default function ProfileMenu() {
   const { data: session, status } = useSession();
   const containerRef = useRef(null);
   const [isTextOverflowing, setIsTextOverflowing] = useState(false);
+  const { socket } = useSocketStore();
 
   const textRef = useCallback((node) => {
     if (node !== null) {
       const container = containerRef.current;
-      console.log(node.offsetWidth, container.clientWidth);
-      console.log(node.offsetWidth > container.scrollWidth);
       setIsTextOverflowing(node.offsetWidth > container.scrollWidth);
     }
   }, []);
@@ -77,6 +77,7 @@ export default function ProfileMenu() {
           <button
             className="mt-2 flex items-center gap-2 px-4 py-3 hover:bg-gray-100/30"
             onClick={() => {
+              socket.disconnect();
               signOut();
             }}
           >

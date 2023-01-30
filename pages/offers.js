@@ -17,23 +17,15 @@ export default function Offers() {
     isLoading,
     size,
     setSize,
+    mutate,
   } = usePaginate("/api/offers/user", 8, { status: activeTab });
 
   const userOffers =
     offers.length &&
     offers.map((offer, index) => {
-      let status;
-      if (offer.accepted && !offer.received) {
-        status = "accepted";
-      } else if (offer.accepted && offer.received) {
-        status = "received";
-      } else if (!offer.item.ended && offer.item.available) {
-        status = "waiting";
-      } else if (offer.item.ended || !offer.item.available) {
-        status = "failed";
-      }
-
-      return <UserOfferListItem key={index} offer={offer} status={status} />;
+      return (
+        <UserOfferListItem mutate={mutate} key={offer?._id} offer={offer} />
+      );
     });
 
   return (

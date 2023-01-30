@@ -57,8 +57,6 @@ export async function destroy(public_ids) {
     let destroyResults = [];
     let destroyPromises = [];
 
-    console.log(public_ids);
-
     public_ids.forEach((public_id) => {
       destroyPromises.push(
         cloudinary.uploader

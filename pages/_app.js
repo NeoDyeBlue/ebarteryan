@@ -7,7 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import useSocketStore from "../store/useSocketStore";
-// import { UserSocketInitializer } from "../components/Misc";
+import { UserSocketInitializer } from "../components/Misc";
 import { io } from "socket.io-client";
 import { getSession } from "next-auth/react";
 
@@ -42,9 +42,12 @@ export default function MyApp({
         setSocket(socket);
       });
 
-      const session = await getSession();
-      if (session) {
-        socket.emit("user:connect", session.user.id);
+      //   const session = await getSession();
+      //   if (session) {
+      //     socket.emit("user:connect", session.user.id);
+      //   }
+      if (!socket.connected) {
+        socket.connect();
       }
 
       return () => {
@@ -96,7 +99,7 @@ export default function MyApp({
             },
           }}
         />
-        {layout}
+        <UserSocketInitializer>{layout}</UserSocketInitializer>
       </SWRConfig>
     </SessionProvider>
   );

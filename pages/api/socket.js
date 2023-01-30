@@ -38,10 +38,12 @@ export default async function handler(req, res) {
 
     io.on("connection", (socket) => {
       socket.on("user:connect", (userId) => {
-        sockets.set(socket.id, userId);
-        io.sockets.emit("user:connected", userId);
-        console.log(`${userId} connected`);
-        socket.join(userId);
+        if (!sockets.has(socket.id)) {
+          sockets.set(socket.id, userId);
+          io.sockets.emit("user:connected", userId);
+          console.log(`${userId} connected`);
+          socket.join(userId);
+        }
       });
 
       socket.on("disconnect", () => {
@@ -51,6 +53,14 @@ export default async function handler(req, res) {
           sockets.delete(socket.id); // delete socket from Map object
         }
       });
+
+      // socket.on("user:disconnect", () => {
+      //   if (sockets.has(socket.id)) {
+      //     io.sockets.emit("user:disconnected", sockets.get(socket.id));
+      //     // console.log(`${socket.id} disconnected`);
+      //     sockets.delete(socket.id); // delete socket from Map object
+      //   }
+      // });
 
       socket.on("user:online-check", (userIds) => {
         io.in(userIds.client).emit("user:online", {
