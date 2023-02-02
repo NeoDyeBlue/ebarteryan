@@ -171,19 +171,19 @@ export default function Profile({ userInfo }) {
           >
             <div className="border-t border-t-gray-100">
               <TabList className="flex gap-4 overflow-x-auto scrollbar-hide md:gap-8">
-                <Tab className="tab" selectedClassName="tab-active">
+                <Tab className="tab-full" selectedClassName="tab-active">
                   {/* <Thumbnail_2 itemsSize={24} /> */}
                   <p>Listings</p>
                 </Tab>
-                <Tab className="tab" selectedClassName="tab-active">
+                <Tab className="tab-full" selectedClassName="tab-active">
                   {/* <LicenseDraft itemsSize={24} /> */}
                   <p>Drafts</p>
                 </Tab>
-                <Tab className="tab" selectedClassName="tab-active">
+                <Tab className="tab-full" selectedClassName="tab-active">
                   {/* <LicenseDraft itemsSize={24} /> */}
                   <p>Unavailable</p>
                 </Tab>
-                <Tab className="tab" selectedClassName="tab-active">
+                <Tab className="tab-full" selectedClassName="tab-active">
                   {/* <LicenseDraft itemsSize={24} /> */}
                   <p>Ended</p>
                 </Tab>

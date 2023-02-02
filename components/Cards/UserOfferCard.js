@@ -39,7 +39,7 @@ export default function UserOfferCard({
   const [isViewerOpen, setIsViewerOpen] = useState(false);
 
   //stores
-  const { setOffer, setOldOffer, oldOffer } = useUserOfferStore();
+  const { setOffer, setOldOffer, oldOffer, setTempOffer } = useUserOfferStore();
   const { socket } = useSocketStore();
   const itemImages = offer?.images?.map((image, index) => (
     <div
@@ -112,6 +112,7 @@ export default function UserOfferCard({
       setOffer(oldOffer);
     } else {
       setOffer(null);
+      setTempOffer(null);
     }
   }
 

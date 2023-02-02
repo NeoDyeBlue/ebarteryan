@@ -1,4 +1,4 @@
-export function error(name, message) {
+export default function errorThrower(name, message) {
   let error = new Error(message);
   error.name = name;
   return error;

@@ -94,7 +94,7 @@ export default function Navbar({ sticky }) {
                 <Home size={24} />
               </IconLink>
             </li>
-            {session && session.user.verified && status == "authenticated" ? (
+            {session && status == "authenticated" ? (
               <>
                 <li>
                   <IconLink to="/offers" tooltipMessage="Offers" id="offers">
@@ -139,6 +139,13 @@ export default function Navbar({ sticky }) {
               </>
             ) : null}
           </ul>
+          <div className="block md:hidden">
+            <IconLink to="/notifications">
+              <BadgedIcon hasBadge={unreadCount > 0} count={unreadCount}>
+                <Notification size={24} />
+              </BadgedIcon>
+            </IconLink>
+          </div>
           <button
             onClick={() => setShowSearchBox(true)}
             className="flex cursor-pointer items-center justify-center md:hidden"
@@ -159,7 +166,7 @@ export default function Navbar({ sticky }) {
                   src={session && session.user.image}
                   layout="fill"
                   alt="user image"
-                  // objectFit="cover"
+                  objectFit="cover"
                 />
               </button>
             ) : (

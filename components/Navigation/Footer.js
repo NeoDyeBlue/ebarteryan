@@ -19,7 +19,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-t-gray-100 bg-white-dark">
       <div className="container mx-auto flex flex-col gap-9 py-10">
-        <div className="flex flex-col gap-9 md:flex-row md:items-start md:justify-between">
+        <div className="flex flex-col gap-9 lg:flex-row lg:items-start lg:justify-between">
           <span className="font-display text-2xl font-semibold md:text-4xl">
             eBarterYan
           </span>
@@ -28,7 +28,7 @@ export default function Footer() {
             {categoryListItems}
           </FooterLinkList>
           <FooterLinkList title="Account">
-            {session && session.user.verified && status == "authenticated" ? (
+            {session && status == "authenticated" ? (
               <>
                 <FooterLinkListItem to="/profile" name="Profile" />
                 <FooterLinkListItem to="/offers" name="Offers" />
@@ -36,13 +36,15 @@ export default function Footer() {
                 <FooterLinkListItem to="/messages" name="Messages" />
               </>
             ) : (
-              <>
-                <FooterLinkListItem to="/login" name="Login" />
-                <FooterLinkListItem to="/signup" name="Sign Up" />
-              </>
+              !session && (
+                <>
+                  <FooterLinkListItem to="/login" name="Login" />
+                  <FooterLinkListItem to="/signup" name="Sign Up" />
+                </>
+              )
             )}
           </FooterLinkList>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 self-end lg:self-start">
             <Link href="/">
               <a>
                 <LogoFacebook size={36} />
@@ -56,7 +58,7 @@ export default function Footer() {
           </div>
         </div>
         <p className="mx-auto text-xs text-gray-400">
-          © 2022 EBarterYan. All Rights Reserved
+          © 2023 EBarterYan. All Rights Reserved
         </p>
       </div>
     </footer>

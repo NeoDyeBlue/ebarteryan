@@ -92,13 +92,11 @@ export default function CreateListingForm() {
         router.push(callbackUrl);
       } else {
         setIsLoading(false);
-        toast.success(
-          !values.draft ? "Can't post item" : "Can't save to drafts"
-        );
+        toast.error(!values.draft ? "Can't post item" : "Can't save to drafts");
       }
     } catch (error) {
       setIsLoading(false);
-      toast.success(!values.draft ? "Can't post item" : "Can't save to drafts");
+      toast.error(!values.draft ? "Can't post item" : "Can't save to drafts");
     }
   }
 

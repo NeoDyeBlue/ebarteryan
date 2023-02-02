@@ -7,6 +7,7 @@ import { DotLoader } from "react-spinners";
 // import InfiniteScroll from "react-infinite-scroller";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { useEffect, useRef, useMemo } from "react";
+import format from "date-fns/format";
 
 export default function ChatContainer() {
   const chatsContainer = useRef(null);
@@ -71,51 +72,77 @@ export default function ChatContainer() {
 
   const chatBubbles = chatList.reverse().map((message, index) => {
     let isFromUser = message.sender.id == session?.user?.id ? true : false;
+    const prevMessage = chatList[index - 1];
+    const showSeparator = prevMessage
+      ? new Date(message.createdAt).setHours(0, 0, 0, 0) >
+        new Date(prevMessage.createdAt).setHours(0, 0, 0, 0)
+      : true;
     if (index + 1 <= chatList.length - 1) {
       if (
         message.sender.id == chatList[index + 1].sender.id ||
         message.sender._id == chatList[index + 1].sender._id
       ) {
         return (
-          <ChatBubble
-            key={message?._id || message?.tempId}
-            isFromUser={isFromUser}
-            consecutive={true}
-            images={message.images}
-            offer={message?.offer}
-            text={message.body}
-            type={message.type}
-            sent={message?.sent}
-          />
+          <>
+            <ChatBubble
+              key={message?._id || message?.tempId}
+              isFromUser={isFromUser}
+              consecutive={true}
+              images={message.images}
+              offer={message?.offer}
+              text={message.body}
+              type={message.type}
+              sent={message?.sent}
+            />
+            {showSeparator && (
+              <p className="my-1 text-center text-xs text-gray-200">
+                {format(new Date(message.createdAt), "PPp")}
+              </p>
+            )}
+          </>
         );
       } else {
         return (
-          <ChatBubble
-            key={message?._id || message?.tempId}
-            isFromUser={isFromUser}
-            consecutive={false}
-            userPic={message.sender.image.url}
-            images={message.images}
-            offer={message?.offer}
-            text={message.body}
-            type={message.type}
-            sent={message?.sent}
-          />
+          <>
+            <ChatBubble
+              key={message?._id || message?.tempId}
+              isFromUser={isFromUser}
+              consecutive={false}
+              userPic={message.sender.image.url}
+              images={message.images}
+              offer={message?.offer}
+              text={message.body}
+              type={message.type}
+              sent={message?.sent}
+            />
+            {showSeparator && (
+              <p className="my-1 text-center text-xs text-gray-200">
+                {format(new Date(message.createdAt), "PPp")}
+              </p>
+            )}
+          </>
         );
       }
     } else {
       return (
-        <ChatBubble
-          key={message?._id || message?.tempId}
-          isFromUser={isFromUser}
-          consecutive={false}
-          images={message.images}
-          offer={message?.offer}
-          text={message.body}
-          type={message.type}
-          userPic={message.sender.image.url}
-          sent={message?.sent}
-        />
+        <>
+          <ChatBubble
+            key={message?._id || message?.tempId}
+            isFromUser={isFromUser}
+            consecutive={false}
+            images={message.images}
+            offer={message?.offer}
+            text={message.body}
+            type={message.type}
+            userPic={message.sender.image.url}
+            sent={message?.sent}
+          />
+          {showSeparator && (
+            <p className="my-1 text-center text-xs text-gray-200">
+              {format(new Date(message.createdAt), "PPp")}
+            </p>
+          )}
+        </>
       );
     }
   });

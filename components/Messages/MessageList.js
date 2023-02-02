@@ -4,7 +4,8 @@ import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 import { ConvoItemSkeleton } from "../Loaders";
 import usePaginate from "../../lib/hooks/usePaginate";
-import InfiniteScroll from "react-infinite-scroller";
+// import InfiniteScroll from "react-infinite-scroller";
+import InfiniteScroll from "react-infinite-scroll-component";
 import useMessagesStore from "../../store/useMessagesStore";
 import useSocketStore from "../../store/useSocketStore";
 
@@ -60,6 +61,7 @@ export default function MessageList({ isForPage = false }) {
   useEffect(() => {
     // cancel();
     mutate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue]);
 
   const conversationItems =
@@ -130,31 +132,34 @@ export default function MessageList({ isForPage = false }) {
           onChange={handleSearchValueChange}
         />
       </div>
-      {messageList.length ? (
-        <div className="h-full px-2">
-          <InfiniteScroll
-            element="ul"
-            className="custom-scrollbar flex h-full w-full flex-col gap-2 overflow-y-auto"
-            pageStart={size}
-            loadMore={() => {
-              if (!isLoading) {
-                setSize(size + 1);
-              }
-            }}
-            hasMore={!isEndReached}
-            loader={[...Array(4)].map((_, i) => (
-              <ConvoItemSkeleton key={i} />
-            ))}
-            useWindow={false}
-          >
-            {(!messageList.length && !isEndReached && isLoading) || isValidating
-              ? [...Array(8)].map((_, i) => <ConvoItemSkeleton key={i} />)
-              : conversationItems.length
-              ? conversationItems
-              : null}
-          </InfiniteScroll>
-        </div>
-      ) : null}
+      <ul
+        id="messageList"
+        className="custom-scrollbar flex h-full w-full flex-col gap-2 overflow-y-auto px-2"
+      >
+        <InfiniteScroll
+          dataLength={messageList.length}
+          next={() => setSize(size + 1)}
+          hasMore={!isEndReached}
+          scrollableTarget={"messageList"}
+          className="flex flex-col gap-2"
+          loader={[...Array(4)].map((_, i) => (
+            <ConvoItemSkeleton key={i} />
+          ))}
+        >
+          {/* {(!messageList.length && !isEndReached && isLoading) || isValidating
+            ? [...Array(8)].map((_, i) => <ConvoItemSkeleton key={i} />)
+            : conversationItems.length
+            ? conversationItems
+            : null} */}
+          {conversationItems.length ? (
+            conversationItems
+          ) : !isLoading ? (
+            <li className="flex items-center justify-center text-center text-gray-200">
+              No Messages
+            </li>
+          ) : null}
+        </InfiniteScroll>
+      </ul>
     </div>
   );
 }

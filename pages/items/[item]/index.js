@@ -108,8 +108,14 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const { socket } = useSocketStore();
-  const { offer, setOffer, setItem, setIsForUpdating, setIsSubmitSuccess } =
-    useUserOfferStore();
+  const {
+    offer,
+    setOffer,
+    setItem,
+    setIsForUpdating,
+    setIsSubmitSuccess,
+    tempOffer,
+  } = useUserOfferStore();
   const { setAcceptedOffer, acceptedOffer: itemAcceptedOffer } =
     useItemOffersStore();
 

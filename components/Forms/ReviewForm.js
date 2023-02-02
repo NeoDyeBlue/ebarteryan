@@ -8,7 +8,7 @@ import useReviewStore from "../../store/useReviewStore";
 import { PopupLoader } from "../Loaders";
 import useSocketStore from "../../store/useSocketStore";
 
-export default function ReviewForm({ onClose }) {
+export default function ReviewForm({ onClose, onReview }) {
   const { reviewee, item } = useReviewStore();
   const { socket } = useSocketStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -27,6 +27,7 @@ export default function ReviewForm({ onClose }) {
         setIsSubmitting(false);
         toast.success("Review submitted!");
         socket.emit("review:create", result.data);
+        onReview();
         onClose();
       } else {
         setIsSubmitting(false);

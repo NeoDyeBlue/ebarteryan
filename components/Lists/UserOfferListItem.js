@@ -96,7 +96,11 @@ export default function UserOfferListItem({ offer, mutate }) {
       onClick={() => offer?.item && router.push(`/items/${offer?.item?._id}`)}
     >
       <div onClick={(e) => e.stopPropagation()} className="absolute">
-        <ReviewModal isOpen={isReviewModalOpen} onClose={hideReviewModal} />
+        <ReviewModal
+          onReview={mutate}
+          isOpen={isReviewModalOpen}
+          onClose={hideReviewModal}
+        />
         <PopupLoader message="Deleting offer..." isOpen={isDeleting} />
         <ConfirmationModal
           onClose={hideDeleteConfirmationOpen}

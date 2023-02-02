@@ -36,12 +36,11 @@ export default function OfferForm({ onClose }) {
     setOffer,
     setIsSubmitting,
     setIsSubmitSuccess,
-    mode,
     oldOffer,
     setOfferRetryBody,
     setOldOffer,
     isForUpdating,
-    setIsForUpdating,
+    setTempOffer,
   } = useUserOfferStore();
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const { socket } = useSocketStore();
@@ -57,7 +56,7 @@ export default function OfferForm({ onClose }) {
   async function handleFormSubmit(values) {
     onClose();
     router.push("#offers");
-    setOffer(values);
+    setTempOffer(values);
     let formBody;
     try {
       if (isForUpdating) {
@@ -114,6 +113,7 @@ export default function OfferForm({ onClose }) {
           });
         }
         setOffer(result.data);
+        setTempOffer(null);
         setOfferRetryBody(null);
         toast.success(isForUpdating ? "Offer updated" : "Offer added");
       } else {

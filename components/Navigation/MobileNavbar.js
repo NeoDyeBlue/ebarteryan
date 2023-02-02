@@ -1,22 +1,20 @@
 import BadgedIcon from "../Icons/BadgedIcon";
 import {
-  Notification,
   Bookmark,
   ArrowsHorizontal,
   Chat,
   Home,
+  AddAlt,
 } from "@carbon/icons-react";
 import IconLink from "./IconLink";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import useNotificationStore from "../../store/useNotificationStore";
 import useSocketStore from "../../store/useSocketStore";
-import { toast } from "react-hot-toast";
+import { LinkButton } from "../Buttons";
 
 export default function MobileNavbar({ className }) {
   const [hasUnread, setHasUnread] = useState(false);
   const { data: session, status } = useSession();
-  const { unreadCount } = useNotificationStore();
   const { socket } = useSocketStore();
 
   useEffect(() => {
@@ -43,7 +41,7 @@ export default function MobileNavbar({ className }) {
             <Home size={24} />
           </IconLink>
         </li>
-        {session && status == "authenticated" && session.user?.verified && (
+        {session && status == "authenticated" && (
           <>
             <li>
               <IconLink to="/offers">
@@ -53,16 +51,14 @@ export default function MobileNavbar({ className }) {
               </IconLink>
             </li>
             <li>
-              <IconLink to="/saved">
-                <BadgedIcon hasBadge={false}>
-                  <Bookmark size={24} />
-                </BadgedIcon>
+              <IconLink to="/create">
+                <AddAlt size={24} />
               </IconLink>
             </li>
             <li>
-              <IconLink to="/notifications">
-                <BadgedIcon hasBadge={unreadCount > 0} count={unreadCount}>
-                  <Notification size={24} />
+              <IconLink to="/saved">
+                <BadgedIcon hasBadge={false}>
+                  <Bookmark size={24} />
                 </BadgedIcon>
               </IconLink>
             </li>

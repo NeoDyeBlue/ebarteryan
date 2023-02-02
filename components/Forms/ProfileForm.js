@@ -51,12 +51,14 @@ export default function ProfileForm() {
       },
       false
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [session]);
 
   useEffect(() => {
     if (filesContent.length) {
       profileFormik.setFieldValue("image", filesContent[0].content);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filesContent]);
 
   async function handleProfileFormSubmit(values) {

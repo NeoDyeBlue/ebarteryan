@@ -5,7 +5,7 @@ import ReactModal from "react-modal";
 import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 import { useEffect, useRef } from "react";
 
-export default function ReviewModal({ onClose, isOpen }) {
+export default function ReviewModal({ onClose, isOpen, onReview }) {
   ReactModal.setAppElement("#__next");
   const modalRef = useRef();
   useEffect(() => {
@@ -38,7 +38,7 @@ export default function ReviewModal({ onClose, isOpen }) {
               icon={<Add className="rotate-[135deg]" size={32} />}
             />
           </div>
-          <ReviewForm onClose={() => onClose()} />
+          <ReviewForm onReview={onReview} onClose={() => onClose()} />
         </div>
       </div>
     </ReactModal>

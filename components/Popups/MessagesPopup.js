@@ -72,7 +72,7 @@ export default function MessagesPopup({ className, hasBadge }) {
           </div>
           <div
             className="pointer-events-auto z-10 flex h-[75vh] w-screen overflow-hidden rounded-t-[10px] border
-        border-gray-100 bg-white shadow-lg lg:mb-3 lg:h-[70vh] lg:w-[50vw] lg:rounded-[10px]"
+        border-gray-100 bg-white shadow-lg md:mb-3 md:h-[70vh] md:w-[50vw] md:min-w-[600px] md:rounded-[10px]"
           >
             <div className="hidden w-full max-w-[280px] flex-col border-r border-gray-100 lg:flex">
               <div className="mb-4 flex items-center justify-between px-4 pt-4">

@@ -6,6 +6,7 @@ import { toast } from "react-hot-toast";
 const useUserOfferStore = create((set, get) => ({
   item: "",
   offer: null,
+  tempOffer: null,
   oldOffer: null,
   offerRetryBody: null,
   isSubmitting: false,
@@ -39,6 +40,10 @@ const useUserOfferStore = create((set, get) => ({
     set(() => ({
       isForUpdating: payload,
     })),
+  setTempOffer: (payload) =>
+    set(() => ({
+      tempOffer: payload,
+    })),
   resubmit: async () => {
     try {
       set({ isSubmitting: true });
@@ -66,6 +71,7 @@ const useUserOfferStore = create((set, get) => ({
           });
         }
         set({ offer: result.data });
+        set({ tempOffer: null });
         set({ offerRetryBody: null });
         toast.success(get().isForUpdating ? "Offer updated" : "Offer added");
       } else {
