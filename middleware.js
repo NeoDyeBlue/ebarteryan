@@ -23,7 +23,6 @@ export async function middleware(req) {
     "/notifications",
     "/create",
   ];
-
   // if going to user protected routes
   if (userProtectedRoutes.includes(pathname)) {
     if (!session) {
@@ -62,17 +61,5 @@ export async function middleware(req) {
 }
 
 export const config = {
-  matcher: [
-    "/((?!api|_next|fonts|examples|[\\w-]+\\.\\w+).*)",
-    // "/admin/:path*",
-    // "/messages",
-    // "/notifications",
-    // "/offers",
-    // "/profile",
-    // "/create",
-    // "/saved",
-    // "/",
-    // "/signup",
-    // "/:path*",
-  ],
+  matcher: ["/((?!api|_next|fonts|examples|[\\w-]+\\.\\w+).*)"],
 };

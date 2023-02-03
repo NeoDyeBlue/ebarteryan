@@ -169,8 +169,8 @@ export default function Profile({ userInfo }) {
             className="flex flex-col gap-4"
             onSelect={(index) => setActiveTab(tabs[index])}
           >
-            <div className="border-t border-t-gray-100">
-              <TabList className="flex gap-4 overflow-x-auto scrollbar-hide md:gap-8">
+            <div className="border-b border-b-gray-100">
+              <TabList className="flex overflow-x-auto scrollbar-hide">
                 <Tab className="tab-full" selectedClassName="tab-active">
                   {/* <Thumbnail_2 itemsSize={24} /> */}
                   <p>Listings</p>

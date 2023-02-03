@@ -27,20 +27,12 @@ export default function ChatContainer() {
     size,
   } = usePaginate(`/api/messages/${conversation?._id}`, 20);
 
-  const reversedChats = useMemo(() => chats.reverse(), [chats]);
+  const reversedChats = useMemo(() => chatList.reverse(), [chatList]);
 
   //effects
   useEffect(() => {
-    if (reversedChats.length) {
-      setChatList(reversedChats);
-      // chatsContainer?.current?.scrollTo(
-      //   0,
-      //   chatsContainer?.current?.scrollHeight
-      // );
-    }
-  }, [reversedChats, setChatList]);
-
-  // useEffect(() => scrollToEnd(), [chatList]);
+    setChatList(chats.reverse());
+  }, [chats, setChatList]);
 
   useEffect(() => {
     if (socket) {
@@ -70,86 +62,87 @@ export default function ChatContainer() {
     }
   }, [socket, chatList, setChatList, conversation, session]);
 
-  const chatBubbles = chatList.reverse().map((message, index) => {
-    let isFromUser = message.sender.id == session?.user?.id ? true : false;
-    const prevMessage = chatList[index - 1];
-    const showSeparator = prevMessage
-      ? new Date(message.createdAt).setHours(0, 0, 0, 0) >
-        new Date(prevMessage.createdAt).setHours(0, 0, 0, 0)
-      : true;
-    if (index + 1 <= chatList.length - 1) {
-      if (
-        message.sender.id == chatList[index + 1].sender.id ||
-        message.sender._id == chatList[index + 1].sender._id
-      ) {
-        return (
-          <>
-            <ChatBubble
-              key={message?._id || message?.tempId}
-              isFromUser={isFromUser}
-              consecutive={true}
-              images={message.images}
-              offer={message?.offer}
-              text={message.body}
-              type={message.type}
-              sent={message?.sent}
-            />
-            {showSeparator && (
-              <p className="my-1 text-center text-xs text-gray-200">
-                {format(new Date(message.createdAt), "PPp")}
-              </p>
-            )}
-          </>
-        );
-      } else {
-        return (
-          <>
-            <ChatBubble
-              key={message?._id || message?.tempId}
-              isFromUser={isFromUser}
-              consecutive={false}
-              userPic={message.sender.image.url}
-              images={message.images}
-              offer={message?.offer}
-              text={message.body}
-              type={message.type}
-              sent={message?.sent}
-            />
-            {showSeparator && (
-              <p className="my-1 text-center text-xs text-gray-200">
-                {format(new Date(message.createdAt), "PPp")}
-              </p>
-            )}
-          </>
-        );
-      }
-    } else {
-      return (
-        <>
-          <ChatBubble
-            key={message?._id || message?.tempId}
-            isFromUser={isFromUser}
-            consecutive={false}
-            images={message.images}
-            offer={message?.offer}
-            text={message.body}
-            type={message.type}
-            userPic={message.sender.image.url}
-            sent={message?.sent}
-          />
-          {showSeparator && (
-            <p className="my-1 text-center text-xs text-gray-200">
-              {format(new Date(message.createdAt), "PPp")}
-            </p>
-          )}
-        </>
-      );
-    }
-  });
-
-  function scrollToEnd() {
-    messagesEnd.current.scrollIntoView({ behavior: "smooth" });
-  }
+  const chatBubbles = useMemo(
+    () =>
+      reversedChats.reverse().map((message, index) => {
+        let isFromUser = message.sender.id == session?.user?.id ? true : false;
+        const prevMessage = chatList[index - 1];
+        const showSeparator = prevMessage
+          ? new Date(message.createdAt).setHours(0, 0, 0, 0) >
+            new Date(prevMessage.createdAt).setHours(0, 0, 0, 0)
+          : true;
+        if (index + 1 <= chatList.length - 1) {
+          if (
+            message.sender.id == chatList[index + 1].sender.id ||
+            message.sender._id == chatList[index + 1].sender._id
+          ) {
+            return (
+              <>
+                <ChatBubble
+                  key={message?._id || message?.tempId}
+                  isFromUser={isFromUser}
+                  consecutive={true}
+                  images={message.images}
+                  offer={message?.offer}
+                  text={message.body}
+                  type={message.type}
+                  sent={message?.sent}
+                />
+                {showSeparator && (
+                  <p className="my-1 text-center text-xs text-gray-200">
+                    {format(new Date(message.createdAt), "PPp")}
+                  </p>
+                )}
+              </>
+            );
+          } else {
+            return (
+              <>
+                <ChatBubble
+                  key={message?._id || message?.tempId}
+                  isFromUser={isFromUser}
+                  consecutive={false}
+                  userPic={message.sender.image.url}
+                  images={message.images}
+                  offer={message?.offer}
+                  text={message.body}
+                  type={message.type}
+                  sent={message?.sent}
+                />
+                {showSeparator && (
+                  <p className="my-1 text-center text-xs text-gray-200">
+                    {format(new Date(message.createdAt), "PPp")}
+                  </p>
+                )}
+              </>
+            );
+          }
+        } else {
+          return (
+            <>
+              <ChatBubble
+                key={message?._id || message?.tempId}
+                isFromUser={isFromUser}
+                consecutive={false}
+                images={message.images}
+                offer={message?.offer}
+                text={message.body}
+                type={message.type}
+                userPic={message.sender.image.url}
+                sent={message?.sent}
+              />
+              {showSeparator && (
+                <p className="my-1 text-center text-xs text-gray-200">
+                  {format(new Date(message.createdAt), "PPp")}
+                </p>
+              )}
+            </>
+          );
+        }
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [reversedChats]
+  );
 
   return (
     <ul

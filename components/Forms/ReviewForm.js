@@ -61,10 +61,7 @@ export default function ReviewForm({ onClose, onReview }) {
     <FormikProvider value={reviewFormik}>
       <PopupLoader isOpen={isSubmitting} message="Submitting review" />
       <Form className="flex flex-col gap-4">
-        <p>
-          Rate your experience with the barterer before setting the item as
-          received.
-        </p>
+        <p>Rate your experience with the barterer</p>
         <div className="mx-auto">
           <Rating
             className="flex flex-col align-middle"

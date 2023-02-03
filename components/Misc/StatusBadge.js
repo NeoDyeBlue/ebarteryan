@@ -10,7 +10,7 @@ export default function StatusBadge({ status, statusText, type }) {
     case "accepted":
       color = "bg-success-500 text-white";
       break;
-    case "received":
+    case "reviewed":
       color = "bg-info-500 text-white";
       break;
     case "failed":

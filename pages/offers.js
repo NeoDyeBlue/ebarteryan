@@ -9,7 +9,7 @@ import { Button } from "../components/Buttons";
 import { FacePendingFilled } from "@carbon/icons-react";
 
 export default function Offers() {
-  const tabs = ["all", "accepted", "waiting", "failed", "received"];
+  const tabs = ["all", "accepted", "waiting", "failed", "reviewed"];
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const {
     data: offers,
@@ -60,7 +60,7 @@ export default function Offers() {
               <p>Failed</p>
             </Tab>
             <Tab className="tab-varying" selectedClassName="tab-active">
-              <p>Received</p>
+              <p>Reviewed</p>
             </Tab>
           </TabList>
           <div>

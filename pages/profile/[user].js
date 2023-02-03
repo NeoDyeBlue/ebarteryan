@@ -189,13 +189,13 @@ export default function OtherProfile({ userInfo }) {
             className="flex flex-col gap-4"
             onSelect={(index) => setActiveTab(tabs[index])}
           >
-            <div className="border-t border-t-gray-100">
-              <TabList className="flex gap-4 md:gap-8">
-                <Tab className="tab" selectedClassName="tab-active">
+            <div className="border-b border-b-gray-100">
+              <TabList className="flex">
+                <Tab className="tab-full" selectedClassName="tab-active">
                   {/* <Thumbnail_2 size={24} /> */}
                   <p>Listings</p>
                 </Tab>
-                <Tab className="tab" selectedClassName="tab-active">
+                <Tab className="tab-full" selectedClassName="tab-active">
                   {/* <Thumbnail_2 size={24} /> */}
                   <p>Ended</p>
                 </Tab>

@@ -61,8 +61,8 @@
 
   .tab-full {
     @apply relative flex h-[60px] w-full cursor-pointer items-center justify-center gap-3 whitespace-nowrap text-center 
-    font-display font-medium capitalize text-gray-300 outline-none before:absolute before:bottom-0 before:block
-    before:h-[4px] before:w-3/4 before:rounded-full before:transition-colors hover:text-black-light hover:before:bg-gray-300;
+    font-display font-medium capitalize text-gray-300 outline-none before:absolute before:bottom-0 before:block before:h-[4px]
+    before:w-3/4 before:max-w-[100px] before:rounded-full before:transition-colors hover:text-black-light hover:before:bg-gray-300;
   }
 
   .tab-varying {

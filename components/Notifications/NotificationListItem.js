@@ -70,7 +70,7 @@ export default function NotificationListItem({ read, type, data }) {
     ${isRead ? "hover:bg-gray-100/30" : "bg-green-200/50"}`}
     >
       <div className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
-        <Image src={image} layout="fill" alt="notif image" />
+        <Image src={image} layout="fill" objectFit="cover" alt="notif image" />
       </div>
       <div className="max-h-full overflow-hidden">
         <p className="overflow-ellipsis">

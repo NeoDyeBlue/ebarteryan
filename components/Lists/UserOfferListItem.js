@@ -3,7 +3,7 @@ import Image from "next/image";
 import { StatusBadge } from "../Misc";
 import { ItemMiniCard } from "../Cards";
 import { Checkmark, TrashCan } from "@carbon/icons-react";
-// import { CircleButton } from "../Buttons";
+import { Button } from "../Buttons";
 import { useRouter } from "next/router";
 import { KebabMenu, KebabMenuItem } from "../Navigation";
 import { useState } from "react";
@@ -18,10 +18,10 @@ export default function UserOfferListItem({ offer, mutate }) {
   const router = useRouter();
   let colors = "";
   let status;
-  if (offer.accepted && !offer.received) {
+  if (offer.accepted && !offer.reviewed) {
     status = "accepted";
-  } else if (offer.accepted && offer.received) {
-    status = "received";
+  } else if (offer.accepted && offer.reviewed) {
+    status = "reviewed";
   } else if (!offer?.item?.ended && offer?.item?.available) {
     status = "waiting";
   } else if (!offer?.item || offer?.item?.ended || !offer?.item?.available) {
@@ -38,7 +38,7 @@ export default function UserOfferListItem({ offer, mutate }) {
     case "accepted":
       colors = "bg-success-500 text-white";
       break;
-    case "received" || isReviewDone:
+    case "reviewed" || isReviewDone:
       colors = "bg-info-500 text-white";
       break;
     case "failed":
@@ -71,7 +71,8 @@ export default function UserOfferListItem({ offer, mutate }) {
     }
   }
 
-  function showDeleteConfirmation() {
+  function showDeleteConfirmation(event) {
+    event.stopPropagation();
     setIsDeleteConfirmationOpen(true);
   }
 
@@ -79,7 +80,8 @@ export default function UserOfferListItem({ offer, mutate }) {
     setIsDeleteConfirmationOpen(false);
   }
 
-  function showReviewModal() {
+  function showReviewModal(event) {
+    event.stopPropagation();
     setReviewee(offer?.item?.user?._id);
     setItem(offer?.item?._id);
     setIsReviewModalOpen(true);
@@ -129,20 +131,16 @@ export default function UserOfferListItem({ offer, mutate }) {
           )}
           <StatusBadge status={status} statusText={status} />
         </div>
-        <KebabMenu>
-          {offer?.accepted && !offer?.received && (
+        {/* <KebabMenu>
+          {offer?.accepted && !offer?.reviewed && (
             <KebabMenuItem onClick={showReviewModal}>
-              <Checkmark size={24} /> Set as Received
+              <Checkmark size={24} /> Add a Review
             </KebabMenuItem>
           )}
           <KebabMenuItem onClick={showDeleteConfirmation}>
             <TrashCan size={24} /> Delete Offer
           </KebabMenuItem>
-        </KebabMenu>
-        {/* <CircleButton
-          icon={<OverflowMenuVertical size={24} />}
-          onClick={menuClickHandler}
-        /> */}
+        </KebabMenu> */}
       </div>
       {/* items */}
       <div className="relative flex flex-col items-center gap-2">
@@ -152,16 +150,6 @@ export default function UserOfferListItem({ offer, mutate }) {
           image={offer?.image?.url}
           createdAt={offer?.createdAt}
         />
-        {/* <div
-          className={`absolute top-[50%] right-0 z-20 flex h-[36px] w-[36px] translate-y-[-50%] items-center
-         justify-center rounded-full ${colors} shadow-lg`}
-        >
-          <ArrowsHorizontal
-            size={24}
-            className="flex-shrink-0 rotate-[90deg]"
-          />
-        </div> */}
-        {/* <p className="text-sm text-gray-200">Exchange for</p> */}
         {offer?.item ? (
           <ItemMiniCard
             from={`${offer?.item?.user?.firstName}'s item`}
@@ -172,6 +160,18 @@ export default function UserOfferListItem({ offer, mutate }) {
         ) : (
           <ItemMiniCard isNull />
         )}
+        <div className="h-[37.5px] self-end">
+          {status == "accepted" && (
+            <Button small autoWidth onClick={showReviewModal}>
+              Review
+            </Button>
+          )}
+          {status !== "accepted" && status !== "reviewed" && (
+            <Button small autoWidth secondary onClick={showDeleteConfirmation}>
+              Delete
+            </Button>
+          )}
+        </div>
       </div>
     </li>
   );
