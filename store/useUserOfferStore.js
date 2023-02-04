@@ -69,6 +69,7 @@ const useUserOfferStore = create((set, get) => ({
             offer: result.data,
             room: result.data.item,
           });
+          useSocketStore.getState().socket.emit("offer:count", get().item);
         }
         set({ offer: result.data });
         set({ tempOffer: null });

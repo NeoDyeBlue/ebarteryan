@@ -45,12 +45,12 @@ export default function Footer() {
             )}
           </FooterLinkList>
           <div className="flex items-center gap-4 self-end lg:self-start">
-            <Link href="/">
+            <Link href="https://facebook.com">
               <a>
                 <LogoFacebook size={36} />
               </a>
             </Link>
-            <Link href="/">
+            <Link href="https://twitter.com">
               <a>
                 <LogoTwitter size={36} />
               </a>

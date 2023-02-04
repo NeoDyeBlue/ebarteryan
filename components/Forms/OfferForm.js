@@ -29,6 +29,8 @@ export default function OfferForm({ onClose }) {
     listingRegion,
     setCreationLocation,
     clearPositionRegion,
+    region,
+    position,
   } = useMapStore();
   const {
     item,
@@ -111,6 +113,7 @@ export default function OfferForm({ onClose }) {
             offer: result.data,
             room: result.data.item,
           });
+          socket.emit("offer:count", item);
         }
         setOffer(result.data);
         setTempOffer(null);
@@ -129,6 +132,7 @@ export default function OfferForm({ onClose }) {
       toast.error(isForUpdating ? "Can't update offer" : "Can't add offer");
     }
   }
+
   return (
     <Formik
       initialValues={{
@@ -138,20 +142,18 @@ export default function OfferForm({ onClose }) {
         condition: isForUpdating ? offer?.condition : "",
         location: {
           region: isForUpdating
-            ? offer?.region
-            : creationRegion
-            ? creationRegion
-            : listingRegion,
+            ? offer?.region || creationRegion
+            : creationRegion || listingRegion,
           lat: isForUpdating
-            ? offer?.location?.lat || offer?.location?.coordinates[1]
-            : creationPosition.lat
-            ? creationPosition.lat
-            : listingPosition.lat,
+            ? offer?.location?.lat ||
+              offer?.location?.coordinates[1] ||
+              creationPosition.lat
+            : creationPosition.lat || listingPosition.lat,
           lng: isForUpdating
-            ? offer?.location?.lng || offer?.location?.coordinates[0]
-            : creationPosition.lng
-            ? creationPosition.lng
-            : listingPosition.lng,
+            ? offer?.location?.lng ||
+              offer?.location?.coordinates[0] ||
+              creationPosition.lng
+            : creationPosition.lng || listingPosition.lng,
         },
       }}
       validationSchema={offerSchema}
@@ -227,6 +229,15 @@ export default function OfferForm({ onClose }) {
                   }}
                   onApply={() => {
                     setCreationLocation();
+                    props.setFieldValue(
+                      "location",
+                      {
+                        region: region,
+                        lat: position.lat,
+                        lng: position.lng,
+                      },
+                      true
+                    );
                     closeLocationModal();
                     // handleLocationChange();
                   }}

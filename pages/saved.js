@@ -5,8 +5,10 @@ import usePaginate from "../lib/hooks/usePaginate";
 import { toast } from "react-hot-toast";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { SavedItemSkeleton } from "../components/Loaders";
+import { useState, useEffect } from "react";
 
 export default function Saved() {
+  const [savedList, setSavedList] = useState([]);
   const {
     data: items,
     isEndReached,
@@ -15,7 +17,11 @@ export default function Saved() {
     setSize,
   } = usePaginate("/api/items/saved", 10);
 
-  const savedItems = items.map((item) => (
+  useEffect(() => {
+    setSavedList(items);
+  }, [items]);
+
+  const savedItems = savedList.map((item) => (
     <SavedListItem
       image={item.images[0].url}
       onDelete={() => removeItem(item._id)}

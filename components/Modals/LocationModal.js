@@ -11,7 +11,7 @@ import { disableBodyScroll, enableBodyScroll } from "body-scroll-lock";
 
 export default function LocationModal({
   onClose,
-  applyInListing,
+  applyInListing=false,
   onApply,
   isOpen,
 }) {

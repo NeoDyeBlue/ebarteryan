@@ -223,35 +223,34 @@ export default function ItemPageTabs({
       </TabList>
       <div>
         <TabPanel className="flex flex-col gap-10">
-          {tempOffer ||
-            (offer && (
-              <div className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4">
-                <p className="font-display text-xl font-semibold">
-                  {offer && acceptedOffer && offer._id == acceptedOffer._id
-                    ? "Yours & Accepted Offer"
-                    : "Your Offer"}
-                </p>
-                <UserOfferCard
-                  offer={tempOffer || offer}
-                  isLoading={
-                    offer && !isForUpdating
-                      ? false
-                      : isSubmitting && !isSubmitSuccess
-                    // ? true
-                    // : false
-                  }
-                  isSubmitSuccess={
-                    offer && !isForUpdating ? true : isSubmitSuccess
-                  }
-                  retryHandler={resubmit}
-                  itemLister={itemLister}
-                  onEdit={onUserOfferEdit}
-                  isAccepted={
-                    offer && acceptedOffer && offer._id == acceptedOffer._id
-                  }
-                />
-              </div>
-            ))}
+          {(tempOffer || offer) && (
+            <div className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4">
+              <p className="font-display text-xl font-semibold">
+                {offer && acceptedOffer && offer._id == acceptedOffer._id
+                  ? "Yours & Accepted Offer"
+                  : "Your Offer"}
+              </p>
+              <UserOfferCard
+                offer={tempOffer || offer}
+                isLoading={
+                  offer && !isForUpdating
+                    ? false
+                    : isSubmitting && !isSubmitSuccess
+                  // ? true
+                  // : false
+                }
+                isSubmitSuccess={
+                  offer && !isForUpdating ? true : isSubmitSuccess
+                }
+                retryHandler={resubmit}
+                itemLister={itemLister}
+                onEdit={onUserOfferEdit}
+                isAccepted={
+                  offer && acceptedOffer && offer._id == acceptedOffer._id
+                }
+              />
+            </div>
+          )}
           {acceptedOffer && !offer && (
             <div className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4">
               <p className="font-display text-xl font-semibold">

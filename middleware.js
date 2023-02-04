@@ -28,9 +28,9 @@ export async function middleware(req) {
     if (!session) {
       return NextResponse.redirect(new URL("/login", req.url));
     }
-    if (session && !verified) {
-      return NextResponse.redirect(new URL("/verification", req.url));
-    }
+    // if (session && !verified) {
+    //   return NextResponse.redirect(new URL("/verification", req.url));
+    // }
   }
 
   // if going to password reset page

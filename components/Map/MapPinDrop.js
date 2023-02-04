@@ -61,7 +61,7 @@ export default function MapPinDrop({ pinPosition, onPositionChange }) {
 
   const handleRevGeoCoding = useCallback(() => {
     if (revGeoCoding?.addresses?.length) {
-      console.log(revGeoCoding);
+      // console.log(revGeoCoding);
       const city = revGeoCoding.addresses[0].address.municipality;
       const state =
         revGeoCoding.addresses[0].address.countrySecondarySubdivision;
