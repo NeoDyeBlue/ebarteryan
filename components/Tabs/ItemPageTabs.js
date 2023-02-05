@@ -16,7 +16,6 @@ import { toast } from "react-hot-toast";
 import { FormikProvider, Form, useFormik } from "formik";
 import useQuestionAnswerStore from "../../store/useQuestionAnswerStore";
 import useItemOffersStore from "../../store/useItemOffersStore";
-import useItemIdStore from "../../store/useItemIdStore";
 
 export default function ItemPageTabs({
   itemId,
@@ -25,7 +24,7 @@ export default function ItemPageTabs({
   questionsPaginated,
   showUserControls,
   available,
-  onOfferAccept,
+  onOfferAcceptChange,
   onUserOfferEdit,
 }) {
   //swr
@@ -73,10 +72,8 @@ export default function ItemPageTabs({
     setOffers,
     totalOffers,
     setTotalOffers,
-    setAcceptedOffer,
     acceptedOffer,
   } = useItemOffersStore();
-  const { item, setItem } = useItemIdStore();
 
   //elements
   const itemQuestions =
@@ -96,7 +93,7 @@ export default function ItemPageTabs({
         <OfferListItem
           key={offer._id}
           offer={offer}
-          onAccept={handleOfferAccept}
+          onAcceptChange={handleOfferAcceptChange}
           withButtons={showUserControls && available}
         />
       );
@@ -191,13 +188,13 @@ export default function ItemPageTabs({
     }
   }
 
-  function handleOfferAccept(accepted, offer) {
-    onOfferAccept(accepted);
-    setAcceptedOffer(offer);
-    const updatedOffers = storedOffers.filter(
-      (storedOffer) => storedOffer._id !== offer._id
-    );
-    setOffers(updatedOffers);
+  function handleOfferAcceptChange(accepted) {
+    onOfferAcceptChange(accepted);
+    // const updatedOffers = storedOffers.filter(
+    //   (storedOffer) => storedOffer._id !== offer._id
+    // );
+    // setOffers(updatedOffers);
+    offersPaginated.mutate();
   }
 
   // console.log({ isSubmitting, isSubmitSuccess, isForUpdating });
@@ -257,6 +254,7 @@ export default function ItemPageTabs({
                 Accepted Offer
               </p>
               <OfferListItem
+                onAcceptChange={handleOfferAcceptChange}
                 offer={acceptedOffer}
                 withButtons={showUserControls}
                 withoutBorder

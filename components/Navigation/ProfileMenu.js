@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Warning } from "@carbon/icons-react";
 import { signOut, useSession } from "next-auth/react";
 import Marquee from "react-fast-marquee";
 import { useRef, useState, useCallback } from "react";
@@ -38,7 +39,12 @@ export default function ProfileMenu() {
               </p>
             </Marquee>
             {!session.user.verified && (
-              <p className="text-xs text-gray-300">not verified</p>
+              <p className="text-xs text-gray-300">
+                <Warning size={12} /> Not verified |{" "}
+                <Link href="/verification">
+                  <a className="text-green-500">verify</a>
+                </Link>
+              </p>
             )}
           </div>
           <ul className="flex flex-col border-y border-gray-100 py-2">

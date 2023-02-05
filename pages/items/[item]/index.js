@@ -283,7 +283,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
     setIsViewerOpen(false);
   }
 
-  function handleOfferAccept(value) {
+  function handleOfferAcceptChange(value) {
     setEnded(value);
   }
 
@@ -663,7 +663,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
             hasUserOffer={userOffer ? true : false}
             available={available && !ended}
             onUserOfferEdit={openOfferModal}
-            onOfferAccept={(value) => handleOfferAccept(value)}
+            onOfferAcceptChange={(value) => handleOfferAcceptChange(value)}
           />
         )}
       </div>

@@ -17,6 +17,7 @@ import { PopupLoader } from "../Loaders";
 import { ConfirmationModal } from "../Modals";
 import useSocketStore from "../../store/useSocketStore";
 import useMessagesStore from "../../store/useMessagesStore";
+import useItemOffersStore from "../../store/useItemOffersStore";
 import { useSession } from "next-auth/react";
 import { DotLoader } from "react-spinners";
 // import { KebabMenu, KebabMenuItem } from "../Navigation";
@@ -24,7 +25,7 @@ import { DotLoader } from "react-spinners";
 export default function OfferListItem({
   offer,
   withButtons,
-  onAccept,
+  onAcceptChange,
   withoutBorder,
 }) {
   //states
@@ -33,6 +34,7 @@ export default function OfferListItem({
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isConvoLoading, setIsConvoLoading] = useState(false);
+  const [isAccepted, setIsAccepted] = useState(offer?.accepted);
 
   const { data: session } = useSession();
 
@@ -40,6 +42,7 @@ export default function OfferListItem({
   const { socket } = useSocketStore();
   const { setIsMessagesOpen, setConversation, conversation, setOfferChatData } =
     useMessagesStore();
+  const { setAcceptedOffer, acceptedOffer } = useItemOffersStore();
 
   //elements
   const itemImages = offer?.images?.map((image, index) => (
@@ -91,24 +94,6 @@ export default function OfferListItem({
       if (result && result.success) {
         joinConversation(result.data.convo);
         setOfferChatData(result.data?.newOffer ? offer : null);
-        // if (result.data?.newOffer) {
-        //   setOfferChatData(offer);
-        //   // const receiver = result.data.convo.members.find(
-        //   //   (member) => member.user._id !== (session && session.user.id)
-        //   // ).user._id;
-        //   // socket.emit("conversation:create", {
-        //   //   conversation: result.data.convo,
-        //   //   receiver,
-        //   // });
-        //   // const newOfferChat = {
-        //   //   sender: session && session.user.id,
-        //   //   receiver: receiver,
-        //   //   conversation: result.data.convo,
-        //   //   type: "offer",
-        //   //   offer: offer?._id,
-        //   // };
-        //   // socket.emit("chat:create", newOfferChat);
-        // }
         setIsMessagesOpen(true);
       } else if (!result.success) {
         toast.error("Can't intialize conversation");
@@ -130,30 +115,41 @@ export default function OfferListItem({
     }
   }
 
-  async function handleAcceptConfirm() {
+  console.log(isAccepted);
+
+  async function handleAcceptConfirmChange() {
     try {
       setIsLoading(true);
       const res = await fetch(`/api/items/${offer.item}/offers/${offer._id}`, {
         method: "PATCH",
-        body: JSON.stringify({ accepted: true }),
+        body: JSON.stringify({ accepted: !isAccepted }),
         headers: { "Content-Type": "application/json" },
       });
       const result = await res.json();
       if (result && result.success) {
-        onAccept(true, offer);
+        if (!isAccepted) {
+          setAcceptedOffer({ ...offer, accepted: true });
+          socket.emit("offer:accept", {
+            accepter: session && session.user.id,
+            item: offer.item,
+          });
+          toast.success("Offer accepted");
+        } else {
+          setAcceptedOffer(null);
+        }
+        onAcceptChange(!isAccepted);
         setIsLoading(false);
-        socket.emit("offer:accept", {
-          accepter: session && session.user.id,
-          item: offer.item,
-        });
-        toast.success("Offer accepted");
+        setIsAccepted((prev) => !prev);
       } else if (!result.success) {
         setIsLoading(false);
         toast.error(result.errorMessage);
       }
     } catch (error) {
+      console.log(error);
       setIsLoading(false);
-      toast.error("Can't accept offer");
+      toast.error(
+        isAccepted ? "Can't unaccept the offer" : "Can't accept the offer"
+      );
     }
   }
 
@@ -163,13 +159,22 @@ export default function OfferListItem({
      ${withoutBorder ? "" : "border-b border-gray-100"} bg-white pb-4 md:gap-6
      `}
     >
-      <PopupLoader message="Accepting Offer" isOpen={isLoading} />
+      <PopupLoader
+        message={isAccepted ? "Removing accepted" : "Accepting offer"}
+        isOpen={isLoading}
+      />
       <ConfirmationModal
         isOpen={acceptConfirmationOpen}
-        label="Accept Offer?"
+        label={isAccepted ? "Remove as the accepted offer?" : "Accept offer?"}
         onClose={() => setAcceptConfirmationOpen(false)}
-        onConfirm={handleAcceptConfirm}
-        message="Once the offer was accepted your item will not accept any more offers unless the offer was removed or deleted"
+        onConfirm={handleAcceptConfirmChange}
+        message={
+          isAccepted
+            ? "Your item will be available for accepting offers again, unless you set it as unavailable."
+            : acceptedOffer
+            ? "This will now be the accepted offer."
+            : "Once you accept the offer, your item won't take any more offers unless the offer was removed or deleted."
+        }
       />
       {isViewerOpen && (
         <ImageViewer
@@ -215,7 +220,7 @@ export default function OfferListItem({
               src={offer?.user?.image?.url}
               layout="fill"
               alt="user image"
-              // objectFit="cover"
+              objectFit="cover"
             />
           </div>
           <div className="flex w-full items-center justify-between">
@@ -254,17 +259,24 @@ export default function OfferListItem({
                 </>
               )}
             </Button>
-            {!offer.accepted && (
-              <Button
-                autoWidth
-                small
-                onClick={showConfirmation}
-                disabled={isLoading}
-              >
-                <Checkmark size={20} />
-                <p>Accept</p>
-              </Button>
-            )}
+            <Button
+              autoWidth
+              small
+              onClick={showConfirmation}
+              disabled={isLoading}
+            >
+              {isAccepted ? (
+                <>
+                  <Add className="rotate-[135deg]" size={20} />
+                  <p>Remove Accepted</p>
+                </>
+              ) : (
+                <>
+                  <Checkmark size={20} />
+                  <p>Accept</p>
+                </>
+              )}
+            </Button>
           </div>
         )}
       </div>

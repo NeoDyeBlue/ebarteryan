@@ -77,3 +77,18 @@ export async function destroy(public_ids) {
     throw error;
   }
 }
+
+export async function destroyFolder(folder) {
+  try {
+    cloudinary.api
+      .delete_folder(folder)
+      .then((result) => {
+        return result;
+      })
+      .catch((error) => {
+        throw error;
+      });
+  } catch (error) {
+    throw error;
+  }
+}
