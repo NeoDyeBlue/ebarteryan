@@ -2,14 +2,11 @@ import "../styles/globals.css";
 import { SWRConfig } from "swr";
 import { SessionProvider } from "next-auth/react";
 import NextNProgress from "nextjs-progressbar";
-// import { ToastContainer, Slide } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import useSocketStore from "../store/useSocketStore";
 import { UserSocketInitializer } from "../components/Misc";
 import { io } from "socket.io-client";
-import { getSession } from "next-auth/react";
 
 const socket = io({
   reconnection: true,
