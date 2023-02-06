@@ -267,7 +267,7 @@ export default function ItemPageTabs({
               <OfferList>{itemOffers}</OfferList>
             </div>
           )}
-          {!offersEndReached && (
+          {(!offersEndReached || offersLoading) && (
             <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
               <DotLoader color="#C7EF83" size={32} />
             </div>
@@ -277,11 +277,11 @@ export default function ItemPageTabs({
               No Offers
             </p>
           )}
-          {offersLoading && (
+          {/* {offersLoading && (
             <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
               <DotLoader color="#C7EF83" size={32} />
             </div>
-          )}
+          )} */}
           {!offersEndReached && !offersLoading ? (
             <div className="mx-auto mb-8 w-full max-w-[200px]">
               <Button
@@ -322,12 +322,13 @@ export default function ItemPageTabs({
                 </Form>
               </FormikProvider>
             )}
-            {itemQuestions?.length ? (
+            {itemQuestions?.length && (
               <div className="flex flex-col gap-2 pb-4">
                 <p className="font-display text-xl font-semibold">Questions</p>
                 <QuestionAnswerList>{itemQuestions}</QuestionAnswerList>
               </div>
-            ) : !questionsEndReached ? (
+            )}{" "}
+            {!questionsEndReached || questionsLoading ? (
               <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
                 <DotLoader color="#C7EF83" size={32} />
               </div>
@@ -336,11 +337,11 @@ export default function ItemPageTabs({
                 No Questions
               </p>
             )}
-            {questionsLoading && (
+            {/* {questionsLoading && (
               <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
                 <DotLoader color="#C7EF83" size={32} />
               </div>
-            )}
+            )} */}
             {!questionsEndReached && !questionsLoading ? (
               <div className="mx-auto mb-8 w-full max-w-[200px]">
                 <Button

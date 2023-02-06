@@ -201,7 +201,7 @@ export default function Profile({ userInfo }) {
                 >
                   {items?.length ? (
                     itemCards
-                  ) : !itemsEndReached ? (
+                  ) : !itemsEndReached || itemsLoading ? (
                     [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
                   ) : (
                     <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
@@ -209,8 +209,8 @@ export default function Profile({ userInfo }) {
                       Nothing to show
                     </p>
                   )}
-                  {itemsLoading &&
-                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
+                  {/* {itemsLoading &&
+                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)} */}
                 </div>
                 {!itemsEndReached && !itemsLoading ? (
                   <div className="mx-auto mb-8 w-full max-w-[300px]">
@@ -234,7 +234,7 @@ export default function Profile({ userInfo }) {
                 >
                   {items?.length ? (
                     itemCards
-                  ) : !itemsEndReached ? (
+                  ) : !itemsEndReached || itemsLoading ? (
                     [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
                   ) : (
                     <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
@@ -242,8 +242,8 @@ export default function Profile({ userInfo }) {
                       Nothing to show
                     </p>
                   )}
-                  {itemsLoading &&
-                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
+                  {/* {itemsLoading &&
+                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)} */}
                 </div>
                 {!itemsEndReached && !itemsLoading ? (
                   <div className="mx-auto mb-8 w-full max-w-[300px]">
@@ -267,7 +267,7 @@ export default function Profile({ userInfo }) {
                 >
                   {items?.length ? (
                     itemCards
-                  ) : !itemsEndReached ? (
+                  ) : !itemsEndReached || itemsLoading ? (
                     [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
                   ) : (
                     <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
@@ -275,8 +275,8 @@ export default function Profile({ userInfo }) {
                       Nothing to show
                     </p>
                   )}
-                  {itemsLoading &&
-                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
+                  {/* {itemsLoading &&
+                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)} */}
                 </div>
                 {!itemsEndReached && !itemsLoading ? (
                   <div className="mx-auto mb-8 w-full max-w-[300px]">
@@ -300,7 +300,7 @@ export default function Profile({ userInfo }) {
                 >
                   {items?.length ? (
                     itemCards
-                  ) : !itemsEndReached ? (
+                  ) : !itemsEndReached || itemsLoading ? (
                     [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
                   ) : (
                     <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
@@ -308,8 +308,8 @@ export default function Profile({ userInfo }) {
                       Nothing to show
                     </p>
                   )}
-                  {itemsLoading &&
-                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
+                  {/* {itemsLoading &&
+                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)} */}
                 </div>
                 {!itemsEndReached && !itemsLoading ? (
                   <div className="mx-auto mb-8 w-full max-w-[300px]">
@@ -395,21 +395,21 @@ export default function Profile({ userInfo }) {
           </div>
           <div className="w-full md:w-[65%]">
             {reviews?.length ? <ReviewList>{userReviews}</ReviewList> : null}
-            {/* {!reviewsEndReached && (
+            {(!reviewsEndReached || reviewsLoading) && (
               <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
                 <DotLoader color="#C7EF83" size={32} />
               </div>
-            )} */}
+            )}
             {!reviews.length && !reviewsLoading && reviewsEndReached && (
               <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
                 No Reviews
               </p>
             )}
-            {reviewsLoading && (
+            {/* {reviewsLoading && (
               <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
                 <DotLoader color="#C7EF83" size={32} />
               </div>
-            )}
+            )} */}
             {!reviewsEndReached && !reviewsLoading ? (
               <div className="mx-auto mb-8 w-full max-w-[200px]">
                 <Button
