@@ -46,6 +46,7 @@ export default function ItemPageTabs({
     size: offersSize,
     setSize: setOffersSize,
     mutate: mutateOffers,
+    isValidating: offersValidating,
   } = offersPaginated;
 
   //states
@@ -272,11 +273,14 @@ export default function ItemPageTabs({
               <DotLoader color="#C7EF83" size={32} />
             </div>
           )}
-          {!itemOffers.length && !acceptedOffer && !offer && (
-            <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
-              No Offers
-            </p>
-          )}
+          {!itemOffers.length &&
+            !acceptedOffer &&
+            !offer &&
+            !offersValidating && (
+              <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                No Offers
+              </p>
+            )}
           {/* {offersLoading && (
             <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
               <DotLoader color="#C7EF83" size={32} />

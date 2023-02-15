@@ -11,9 +11,9 @@ export async function middleware(req) {
   const session = await getToken({
     req,
     secret: process.env.NEXTAUTH_SECRET,
-    secureCookie: process.env.NODE_ENV === "production",
+    // secureCookie: process.env.NODE_ENV === "production",
   });
-  const { verified, role } = session || {};
+  const { verified } = session || {};
   const pathname = req.nextUrl.pathname;
   const userProtectedRoutes = [
     "/messages",
@@ -23,6 +23,7 @@ export async function middleware(req) {
     "/notifications",
     "/create",
   ];
+
   // if going to user protected routes
   if (userProtectedRoutes.includes(pathname)) {
     if (!session) {

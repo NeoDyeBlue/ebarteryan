@@ -37,7 +37,7 @@ export default function MessagesPopup({ className, hasBadge }) {
   return (
     <div className={className} ref={popupRef}>
       <div
-        className={`mx-auto flex justify-end transition-transform duration-500 lg:container ${
+        className={`mx-auto flex justify-end transition-transform duration-500 md:container ${
           isMessagesOpen
             ? "translate-3d-0"
             : "translate-y-[75vh] lg:translate-y-[calc(70vh-0.75rem*-1)]"

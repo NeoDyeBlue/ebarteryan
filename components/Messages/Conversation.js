@@ -14,13 +14,16 @@ export default function Conversation({ onClose, forPopup = false }) {
           className="grid max-h-full min-h-full w-full grid-cols-1 
 grid-rows-[auto_1fr_auto] overflow-hidden"
         >
-          <div className="w-full border-b border-gray-100 px-4">
+          <div className="w-full border-b border-gray-100">
             <ChatHeader showClose={forPopup} onClose={onClose} />
           </div>
           <div className="custom-scrollbar min-h-full overflow-y-auto">
             <ChatContainer />
           </div>
-          <div className="w-full border-t border-gray-100 px-4">
+          <div
+            className="container mx-auto w-full border-t border-gray-100
+          md:mx-0 md:px-4"
+          >
             <ChatInput />
           </div>
         </div>

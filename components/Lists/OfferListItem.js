@@ -92,6 +92,7 @@ export default function OfferListItem({
       });
       const result = await res.json();
       if (result && result.success) {
+        console.log(result.data)
         joinConversation(result.data.convo);
         setOfferChatData(result.data?.newOffer ? offer : null);
         setIsMessagesOpen(true);
@@ -114,8 +115,6 @@ export default function OfferListItem({
       setConversation(room);
     }
   }
-
-  console.log(isAccepted);
 
   async function handleAcceptConfirmChange() {
     try {

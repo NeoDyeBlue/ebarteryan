@@ -20,7 +20,7 @@ export default function ChatHeader({ showClose = false, onClose }) {
 
   return (
     <div
-      className={`flex items-center gap-4 py-3 ${
+      className={`container mx-auto flex items-center gap-4 py-3 md:mx-0 md:px-4 ${
         showClose ? "justify-between" : ""
       }`}
     >

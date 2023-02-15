@@ -10,7 +10,6 @@ import { useEffect, useRef, useMemo } from "react";
 import format from "date-fns/format";
 
 export default function ChatContainer() {
-  const chatsContainer = useRef(null);
   const messagesEnd = useRef(null);
 
   //stores
@@ -79,7 +78,7 @@ export default function ChatContainer() {
             return (
               <>
                 <ChatBubble
-                  key={message?._id || message?.tempId}
+                  key={message?._id || message?.tempId || index}
                   isFromUser={isFromUser}
                   consecutive={true}
                   images={message.images}
@@ -99,7 +98,7 @@ export default function ChatContainer() {
             return (
               <>
                 <ChatBubble
-                  key={message?._id || message?.tempId}
+                  key={message?._id || message?.tempId || index}
                   isFromUser={isFromUser}
                   consecutive={false}
                   userPic={message.sender.image.url}
@@ -121,7 +120,7 @@ export default function ChatContainer() {
           return (
             <>
               <ChatBubble
-                key={message?._id || message?.tempId}
+                key={message?._id || message?.tempId || index}
                 isFromUser={isFromUser}
                 consecutive={false}
                 images={message.images}
@@ -147,7 +146,8 @@ export default function ChatContainer() {
   return (
     <ul
       id="chatsContainer"
-      className="custom-scrollbar relative flex h-full w-full flex-col-reverse overflow-auto p-4"
+      className="custom-scrollbar container relative mx-auto flex h-full w-full
+      flex-col-reverse overflow-auto py-4 md:mx-0 md:px-4"
     >
       {chatList.length ? (
         <InfiniteScroll
