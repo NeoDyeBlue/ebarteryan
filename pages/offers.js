@@ -24,7 +24,11 @@ export default function Offers() {
     offers.length &&
     offers.map((offer, index) => {
       return (
-        <UserOfferListItem mutate={mutate} key={offer?._id} offer={offer} />
+        <UserOfferListItem
+          mutate={() => mutate()}
+          key={offer?._id}
+          offer={offer}
+        />
       );
     });
 

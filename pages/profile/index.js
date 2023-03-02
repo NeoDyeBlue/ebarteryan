@@ -170,20 +170,20 @@ export default function Profile({ userInfo }) {
             onSelect={(index) => setActiveTab(tabs[index])}
           >
             <div className="border-b border-b-gray-100">
-              <TabList className="flex overflow-x-auto scrollbar-hide">
-                <Tab className="tab-full" selectedClassName="tab-active">
+              <TabList className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                <Tab className="tab-box" selectedClassName="tab-box-active">
                   {/* <Thumbnail_2 itemsSize={24} /> */}
                   <p>Listings</p>
                 </Tab>
-                <Tab className="tab-full" selectedClassName="tab-active">
+                <Tab className="tab-box" selectedClassName="tab-box-active">
                   {/* <LicenseDraft itemsSize={24} /> */}
                   <p>Drafts</p>
                 </Tab>
-                <Tab className="tab-full" selectedClassName="tab-active">
+                <Tab className="tab-box" selectedClassName="tab-box-active">
                   {/* <LicenseDraft itemsSize={24} /> */}
                   <p>Unavailable</p>
                 </Tab>
-                <Tab className="tab-full" selectedClassName="tab-active">
+                <Tab className="tab-box" selectedClassName="tab-box-active">
                   {/* <LicenseDraft itemsSize={24} /> */}
                   <p>Ended</p>
                 </Tab>

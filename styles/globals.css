@@ -76,6 +76,15 @@
     @apply text-black-light before:bg-green-500 hover:before:bg-green-500;
   }
 
+  .tab-box {
+    @apply relative flex w-full cursor-pointer items-center justify-center gap-3 whitespace-nowrap rounded-lg bg-white px-4 
+    py-3 text-center font-display text-sm capitalize text-black-light outline-none transition-colors hover:bg-gray-100/50;
+  }
+
+  .tab-box-active {
+    @apply bg-green-200 font-semibold text-green-700 hover:bg-green-200;
+  }
+
   .custom-scrollbar::-webkit-scrollbar {
     @apply h-[8px] w-[8px];
   }

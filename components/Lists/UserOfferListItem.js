@@ -99,7 +99,7 @@ export default function UserOfferListItem({ offer, mutate }) {
     >
       <div onClick={(e) => e.stopPropagation()} className="absolute">
         <ReviewModal
-          onReview={mutate}
+          onReview={() => mutate()}
           isOpen={isReviewModalOpen}
           onClose={hideReviewModal}
         />

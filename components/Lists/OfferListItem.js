@@ -20,6 +20,7 @@ import useMessagesStore from "../../store/useMessagesStore";
 import useItemOffersStore from "../../store/useItemOffersStore";
 import { useSession } from "next-auth/react";
 import { DotLoader } from "react-spinners";
+import Link from "next/link";
 // import { KebabMenu, KebabMenuItem } from "../Navigation";
 
 export default function OfferListItem({
@@ -92,7 +93,6 @@ export default function OfferListItem({
       });
       const result = await res.json();
       if (result && result.success) {
-        console.log(result.data)
         joinConversation(result.data.convo);
         setOfferChatData(result.data?.newOffer ? offer : null);
         setIsMessagesOpen(true);
@@ -214,14 +214,16 @@ export default function OfferListItem({
       </div>
       <div className="flex w-full flex-col items-start gap-2 self-start md:flex-row md:items-center">
         <div className="flex w-full items-center gap-4">
-          <div className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
-            <Image
-              src={offer?.user?.image?.url}
-              layout="fill"
-              alt="user image"
-              objectFit="cover"
-            />
-          </div>
+          <Link href={`/profile/${offer?.user?._id}`}>
+            <a className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
+              <Image
+                src={offer?.user?.image?.url}
+                layout="fill"
+                alt="user image"
+                objectFit="cover"
+              />
+            </a>
+          </Link>
           <div className="flex w-full items-center justify-between">
             <div className="flex flex-col">
               <p className="min-w-[150px] font-display">

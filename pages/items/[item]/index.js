@@ -592,14 +592,16 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
           >
             <p className="font-display text-xl font-medium">Listed By</p>
             <div className="flex items-center justify-center gap-4">
-              <div className="relative h-16 w-16 overflow-hidden rounded-full">
-                <Image
-                  src={itemData.user.image.url}
-                  layout="fill"
-                  objectFit="cover"
-                  alt="user image"
-                />
-              </div>
+              <Link href={`/profile/${itemData?.user?._id}`}>
+                <a className="relative h-16 w-16 overflow-hidden rounded-full">
+                  <Image
+                    src={itemData.user.image.url}
+                    layout="fill"
+                    objectFit="cover"
+                    alt="user image"
+                  />
+                </a>
+              </Link>
               <div>
                 <p className="font-display font-medium">
                   {itemData.user.firstName} {itemData.user.lastName}

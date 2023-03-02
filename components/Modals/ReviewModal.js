@@ -38,7 +38,7 @@ export default function ReviewModal({ onClose, isOpen, onReview }) {
               icon={<Add className="rotate-[135deg]" size={32} />}
             />
           </div>
-          <ReviewForm onReview={onReview} onClose={() => onClose()} />
+          <ReviewForm onReview={() => onReview()} onClose={() => onClose()} />
         </div>
       </div>
     </ReactModal>

@@ -190,12 +190,18 @@ export default function OtherProfile({ userInfo }) {
             onSelect={(index) => setActiveTab(tabs[index])}
           >
             <div className="border-b border-b-gray-100">
-              <TabList className="flex">
-                <Tab className="tab-full" selectedClassName="tab-active">
+              <TabList className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                <Tab
+                  className="tab-box max-w-[200px]"
+                  selectedClassName="tab-box-active"
+                >
                   {/* <Thumbnail_2 size={24} /> */}
                   <p>Listings</p>
                 </Tab>
-                <Tab className="tab-full" selectedClassName="tab-active">
+                <Tab
+                  className="tab-box max-w-[200px]"
+                  selectedClassName="tab-box-active"
+                >
                   {/* <Thumbnail_2 size={24} /> */}
                   <p>Ended</p>
                 </Tab>

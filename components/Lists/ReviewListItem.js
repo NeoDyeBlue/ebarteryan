@@ -1,6 +1,7 @@
 import Image from "next/image";
 import format from "date-fns/format";
 import Link from "next/link";
+import { Rating } from "react-simple-star-rating";
 
 export default function ReviewListItem({ review }) {
   return (
@@ -45,10 +46,23 @@ export default function ReviewListItem({ review }) {
               >
                 {review?.item?.name}
               </p>
-              <p className="text-sm text-gray-200">
-                {review?.item?.createdAt &&
-                  format(new Date(review?.item?.createdAt), "PP")}
-              </p>
+              <div className="flex items-center gap-2">
+                <Rating
+                  className="align-middle"
+                  transition
+                  // allowHalfIcon
+                  fillColor="#85CB33"
+                  emptyColor="#D2D2D2"
+                  initialValue={review?.rate}
+                  // ratingValue={5}
+                  readonly
+                  size={18}
+                />
+                <p className="text-sm text-gray-200">
+                  {review?.item?.createdAt &&
+                    format(new Date(review?.item?.createdAt), "PP")}
+                </p>
+              </div>
             </div>
           </div>
         </div>
