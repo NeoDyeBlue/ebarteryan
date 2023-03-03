@@ -10,7 +10,7 @@ import { useRouter } from "next/router";
 import { FacePendingFilled } from "@carbon/icons-react";
 import InfiniteScroll from "react-infinite-scroll-component";
 
-export default function Home() {
+export default function Search() {
   const { listingPosition, listingRadius, listingRegion } = useMapStore();
   const router = useRouter();
   const { search_query } = router.query;
@@ -83,7 +83,7 @@ export default function Home() {
   );
 }
 
-Home.getLayout = function getLayout(page) {
+Search.getLayout = function getLayout(page) {
   return (
     <NavLayout>
       <CategoryLayout />
