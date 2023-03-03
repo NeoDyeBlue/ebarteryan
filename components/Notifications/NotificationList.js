@@ -23,7 +23,7 @@ export default function NotificationList({
     isEndReached,
     setSize,
     size,
-  } = usePaginate("/api/notifications", 5, { unread });
+  } = usePaginate("/api/notifications", 10, { unread });
 
   useEffect(() => {
     setNotificationList(notifications);
