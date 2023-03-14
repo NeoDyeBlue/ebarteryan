@@ -75,13 +75,11 @@ export default function ProfileMenu() {
       <div className="flex flex-col gap-4">
         {!session && status == "unauthenticated" ? (
           <div className="flex flex-col pt-2">
-            <li>
-              <Link href="/about">
-                <a className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100/30">
-                  About
-                </a>
-              </Link>
-            </li>
+            <Link href="/about">
+              <a className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100/30">
+                About
+              </a>
+            </Link>
             <Link href="/signup">
               <a className="flex items-center gap-2 px-4 py-3 font-display font-medium text-green-500 hover:bg-gray-100/30">
                 Sign Up

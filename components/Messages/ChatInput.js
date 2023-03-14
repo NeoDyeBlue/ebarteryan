@@ -122,6 +122,13 @@ export default function ChatInput() {
     }
   }
 
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" && !event.shiftKey) {
+      event.preventDefault();
+      chatFormik.submitForm();
+    }
+  };
+
   return (
     <FormikProvider value={chatFormik}>
       <Form className="flex flex-col">
@@ -167,6 +174,7 @@ export default function ChatInput() {
             className="custom-scrollbar w-full resize-none overflow-y-auto break-all
       rounded-[10px] bg-gray-100/50 px-3 py-2 focus:outline-none"
             placeholder="Type message here"
+            onKeyDown={handleKeyDown}
           />
           <button type="submit" className="h-[40px] text-green-500">
             <Send size={32} />
