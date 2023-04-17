@@ -25,11 +25,6 @@ export default function Home() {
       ? { ...listingPosition, radius: listingRadius }
       : {}),
   });
-
-  console.log(size);
-
-  console.log(items);
-
   const itemCards =
     items.length &&
     items.map((item) => (
