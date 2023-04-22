@@ -237,7 +237,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
   async function handleSaveClick() {
     try {
       const res = await fetch(`/api/items/saved?item=${itemData._id}`, {
-        method: saved ? "DELETE" : "POST",
+        method: "POST",
       });
       const result = await res.json();
       console.log(result);

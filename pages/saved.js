@@ -15,7 +15,15 @@ export default function Saved() {
     isLoading,
     size,
     setSize,
-  } = usePaginate("/api/items/saved", 10);
+  } = usePaginate(
+    "/api/items/saved",
+    10,
+    {},
+    {
+      revalidateOnMount: true,
+      revalidateOnFocus: true,
+    }
+  );
 
   useEffect(() => {
     setSavedList(items);
