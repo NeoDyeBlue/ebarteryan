@@ -95,11 +95,11 @@ export default function LoginForm() {
           }
           text="Login with Google"
         />
-        <ThirdPartyButton
+        {/* <ThirdPartyButton
           onClick={handleFacebookSignIn}
           icon={<Icon icon="logos:facebook" className="h-[24px] w-[24px]" />}
           text="Login with Facebook"
-        />
+        /> */}
       </div>
     </div>
   );

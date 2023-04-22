@@ -112,10 +112,10 @@ export default function SignUpForm() {
           }
           text="Sign Up with Google"
         />
-        <ThirdPartyButton
+        {/* <ThirdPartyButton
           icon={<Icon icon="logos:facebook" className="h-[24px] w-[24px]" />}
           text="Sign Up with Facebook"
-        />
+        /> */}
       </div>
     </div>
   );
