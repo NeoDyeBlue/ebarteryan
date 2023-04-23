@@ -42,7 +42,7 @@ export default async function handler(req, res) {
         if (!sockets.has(socket.id)) {
           sockets.set(socket.id, userId);
           io.sockets.emit("user:connected", userId);
-          console.log(`${userId} connected`);
+          // console.log(`${userId} connected`);
           socket.join(userId);
         }
       });
