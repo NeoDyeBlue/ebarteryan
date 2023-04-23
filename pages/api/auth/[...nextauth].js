@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import {
   signIn,
-  getUserInfo,
+  getUserBasicInfo,
   handleGoogleAuth,
 } from "../../../lib/controllers/user-controller";
 import GoogleProvider from "next-auth/providers/google";
@@ -95,7 +95,7 @@ export const authOptions = (req) => ({
     async jwt({ token, user, profile }) {
       // update
       if (req.url == "/api/auth/session?update" && token) {
-        const updatedUser = await getUserInfo(token.sub);
+        const updatedUser = await getUserBasicInfo({ id: token.sub });
         if (updatedUser) {
           token.name = updatedUser.fullName;
           token.picture = updatedUser.image.url;
@@ -107,7 +107,7 @@ export const authOptions = (req) => ({
       }
       //google or fb
       else if (profile) {
-        const userProfile = await getUserInfo(token.sub);
+        const userProfile = await getUserBasicInfo({ email: token.email });
         token.sub = userProfile._id;
         token.name = userProfile.fullName;
         token.role = userProfile.role;

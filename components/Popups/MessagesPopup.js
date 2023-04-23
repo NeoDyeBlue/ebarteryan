@@ -15,11 +15,35 @@ export default function MessagesPopup({ className, hasBadge }) {
   const [hasUnread, setHasUnread] = useState(false);
   //stores
   const popupRef = useRef();
-  const { isMessagesOpen, setIsMessagesOpen } = useMessagesStore();
+  const {
+    isMessagesOpen,
+    setIsMessagesOpen,
+    prevConversation,
+    setPrevConversation,
+    setConversation,
+    conversation,
+  } = useMessagesStore();
   const { socket } = useSocketStore();
 
   function handleCloseClick() {
     setIsMessagesOpen(false);
+    if (conversation) {
+      setPrevConversation(conversation);
+      socket.emit("conversation:leave", conversation._id);
+      setConversation(null);
+    }
+  }
+
+  function handleMessagesOpen() {
+    setIsMessagesOpen(true);
+    if (prevConversation) {
+      setConversation(prevConversation);
+      socket.emit("conversation:join", {
+        oldRoom: null,
+        newRoom: prevConversation._id,
+      });
+      setPrevConversation(null);
+    }
   }
 
   useOnClickOutside(popupRef, () => handleCloseClick());
@@ -58,7 +82,7 @@ export default function MessagesPopup({ className, hasBadge }) {
                     }
                   : {}),
               }}
-              onClick={() => setIsMessagesOpen(true)}
+              onClick={handleMessagesOpen}
               className="relative flex origin-bottom cursor-pointer 
         items-center gap-3 rounded-t-[10px] border border-b-0 border-gray-100 bg-white px-4 py-3
         font-display font-medium text-black-light shadow-lg transition-all delay-300 duration-300

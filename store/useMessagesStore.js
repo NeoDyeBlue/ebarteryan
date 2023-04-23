@@ -5,6 +5,7 @@ const useMessagesStore = create((set) => ({
   isPageConversationOpen: false,
   isImageViewerOpen: false,
   conversation: null,
+  prevConversation: null,
   offerChatData: null,
   messageList: [],
   chatList: [],
@@ -28,6 +29,10 @@ const useMessagesStore = create((set) => ({
   setConversation: (payload) =>
     set(() => ({
       conversation: payload,
+    })),
+  setPrevConversation: (payload) =>
+    set(() => ({
+      prevConversation: payload,
     })),
   setMessageList: (payload) =>
     set(() => ({

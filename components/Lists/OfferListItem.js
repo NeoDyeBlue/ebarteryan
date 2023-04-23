@@ -281,6 +281,7 @@ export default function OfferListItem({
           </div>
         )}
       </div>
+      <div>{offer.reviewed}</div>
     </li>
   );
 }

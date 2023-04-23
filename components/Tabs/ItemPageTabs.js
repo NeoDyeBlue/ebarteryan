@@ -36,6 +36,7 @@ export default function ItemPageTabs({
     size: questionsSize,
     setSize: setQuestionsSize,
     mutate: mutateQuestions,
+    isValidating: questionsValidating,
   } = questionsPaginated;
 
   const {
@@ -336,7 +337,8 @@ export default function ItemPageTabs({
               <div className="flex h-[48px] flex-shrink-0 items-center justify-center">
                 <DotLoader color="#C7EF83" size={32} />
               </div>
-            ) : (
+            ) : null}
+            {!itemQuestions.length && !questionsValidating && (
               <p className="m-auto flex min-h-[300px] max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
                 No Questions
               </p>

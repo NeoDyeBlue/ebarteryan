@@ -4,6 +4,7 @@ import { Add } from "@carbon/icons-react";
 import ImageViewer from "react-simple-image-viewer";
 import { useState, useCallback, useEffect } from "react";
 import useMessagesStore from "../../store/useMessagesStore";
+import { ProgressBarRound } from "@carbon/icons-react";
 
 export default function ChatBubble({
   isFromUser,
@@ -17,7 +18,7 @@ export default function ChatBubble({
 }) {
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
-  const [isSent, setIsSent] = useState(true);
+  const [isSent, setIsSent] = useState(sent);
 
   const { setIsImageViewerOpen } = useMessagesStore();
 
@@ -70,7 +71,7 @@ export default function ChatBubble({
           : "max-w-[70%]"
       } items-end gap-2 ${
         isFromUser ? "flex-row-reverse self-end" : "self-start"
-      } ${consecutive ? "mb-1" : "mb-4"} ${!isSent ? "opacity-50" : ""}`}
+      } ${consecutive ? "mb-1" : "mb-4"}`}
     >
       {isViewerOpen && (
         <ImageViewer

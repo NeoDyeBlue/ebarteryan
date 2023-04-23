@@ -2,6 +2,7 @@ import { Server } from "socket.io";
 import {
   joinConversation,
   addConversation,
+  leaveConversation,
 } from "../../lib/sockets/conversation-room-handler";
 import { sendChat } from "../../lib/sockets/chat-handler";
 import {
@@ -71,6 +72,10 @@ export default async function handler(req, res) {
 
       socket.on("conversation:join", (rooms) => {
         joinConversation(rooms, socket);
+      });
+
+      socket.on("conversation:leave", (room) => {
+        leaveConversation(room, socket);
       });
 
       socket.on("conversation:check-has-unread", async (user) => {

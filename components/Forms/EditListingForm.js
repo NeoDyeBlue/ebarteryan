@@ -363,6 +363,7 @@ export default function EditListingForm({ item }) {
               <div className="flex items-center gap-4">
                 {item?.draft && (
                   <Button
+                    type="button"
                     onClick={() => {
                       props.setFieldValue("draft", true);
                       props.submitForm();
@@ -373,6 +374,7 @@ export default function EditListingForm({ item }) {
                   </Button>
                 )}
                 <Button
+                  type="button"
                   onClick={() => {
                     props.setFieldValue("draft", false);
                     props.submitForm();

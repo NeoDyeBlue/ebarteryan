@@ -8,7 +8,7 @@ import {
   Edit,
   TrashCan,
 } from "@carbon/icons-react";
-import { BarLoader } from "react-spinners";
+import { BarLoader, DotLoader } from "react-spinners";
 import { Button } from "../Buttons";
 import { ConditionBadge } from "../Misc";
 import { useSession } from "next-auth/react";
@@ -21,6 +21,7 @@ import { KebabMenu, KebabMenuItem } from "../Navigation";
 import { toast } from "react-hot-toast";
 import { PopupLoader } from "../Loaders";
 import { ConfirmationModal } from "../Modals";
+import useMessagesStore from "../../store/useMessagesStore";
 
 export default function UserOfferCard({
   offer,
@@ -37,10 +38,13 @@ export default function UserOfferCard({
   const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] =
     useState(false);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
+  const [isConvoLoading, setIsConvoLoading] = useState(false);
 
   //stores
   const { setOffer, setOldOffer, oldOffer, setTempOffer } = useUserOfferStore();
   const { socket } = useSocketStore();
+  const { setIsMessagesOpen, setConversation, conversation, setOfferChatData } =
+    useMessagesStore();
   const itemImages = offer?.images?.map((image, index) => (
     <div
       key={image.cloudId || index}
@@ -113,6 +117,43 @@ export default function UserOfferCard({
     } else {
       setOffer(null);
       setTempOffer(null);
+    }
+  }
+
+  function joinConversation(room) {
+    if (conversation?._id !== room._id) {
+      socket.emit("conversation:join", {
+        newRoom: room._id,
+        oldRoom: conversation?._id,
+      });
+      setConversation(room);
+    }
+  }
+
+  async function openChat() {
+    try {
+      setIsConvoLoading(true);
+      const res = await fetch("/api/messages", {
+        method: "POST",
+        body: JSON.stringify({
+          receiver: itemLister?._id,
+          item: offer?.item,
+          offer: offer?._id,
+        }),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (result && result.success) {
+        joinConversation(result.data.convo);
+        setOfferChatData(result.data?.newOffer ? offer : null);
+        setIsMessagesOpen(true);
+      } else if (!result.success) {
+        toast.error("Can't intialize conversation");
+      }
+      setIsConvoLoading(false);
+    } catch (error) {
+      toast.error("Can't initialize conversation");
+      setIsConvoLoading(false);
     }
   }
 
@@ -227,7 +268,7 @@ export default function UserOfferCard({
         </div>
         {isAccepted && (
           <div className="flex w-full justify-end gap-2">
-            <Button underlined autoWidth small>
+            <Button underlined autoWidth small onClick={openChat}>
               <div className="relative mr-1 h-[20px] w-[20px] overflow-hidden rounded-full">
                 <Image
                   src={itemLister?.image?.url}
@@ -235,8 +276,17 @@ export default function UserOfferCard({
                   layout="fill"
                 />
               </div>
-              <Chat size={20} />
-              <p className="hidden lg:block">Chat {itemLister?.firstName}</p>
+              {/* <Chat size={20} /> */}
+              {isConvoLoading ? (
+                <DotLoader size={20} color="#85CB33" />
+              ) : (
+                <>
+                  <Chat size={20} />
+                  <p className="hidden lg:block">
+                    Chat {itemLister?.firstName}
+                  </p>
+                </>
+              )}
             </Button>
           </div>
         )}
