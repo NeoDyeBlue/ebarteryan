@@ -1,61 +1,12 @@
-import { Timer, Need } from "@carbon/icons-react";
+import { Need } from "@carbon/icons-react";
 import Image from "next/image";
 import Link from "next/link";
-import useCountdown from "../../lib/hooks/useCountdown";
-import { AnimatePresence, motion } from "framer-motion";
 
-export default function ItemCard({
-  image,
-  name,
-  exchangeFor,
-  duration,
-  offers,
-  to,
-}) {
-  const countdown = duration ? useCountdown(duration.endDate) : null;
+export default function ItemCard({ image, name, exchangeFor, offers, to }) {
   return (
     <Link href={to}>
       <a className="flex max-h-[400px] flex-col gap-2">
         <div className="relative aspect-square min-h-[150px] w-full overflow-hidden rounded-[10px]">
-          <AnimatePresence>
-            {countdown && (
-              <motion.div
-                className="justify-centers absolute top-0 right-0 z-10 m-2 flex items-center gap-1 rounded-[10px]
-               bg-gray-400 px-2 py-1 text-white shadow-md"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-              >
-                <Timer size={16} />
-                <p className="text-sm">
-                  {countdown.days ? `${countdown.days}d` : ""}
-                  {countdown.hours && !countdown.days
-                    ? `${countdown.hours}h`
-                    : ""}
-                  {countdown.minutes && !countdown.hours && !countdown.days
-                    ? `${countdown.minutes}m`
-                    : ""}
-                  {countdown.seconds &&
-                  !countdown.minutes &&
-                  !countdown.hours &&
-                  !countdown.days
-                    ? `${countdown.seconds}s`
-                    : ""}
-                  {countdown.seconds &&
-                  !countdown.minutes &&
-                  !countdown.hours &&
-                  !countdown.days
-                    ? `${countdown.seconds}s`
-                    : ""}
-                  {!countdown.seconds &&
-                  !countdown.minutes &&
-                  !countdown.hours &&
-                  !countdown.days
-                    ? "ended"
-                    : ""}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
           <Image
             src={
               image
@@ -66,6 +17,7 @@ export default function ItemCard({
             objectFit="cover"
             placeholder="blur"
             blurDataURL="/images/placeholder.png"
+            alt="item image"
           />
         </div>
         <div className="flex flex-col gap-1 text-gray-400">

@@ -1,11 +1,12 @@
 import { Tab, Tabs, TabList, TabPanel } from "react-tabs";
 import NotificationList from "./NotificationList";
-import NotificationListItem from "./NotificationListItem";
-import Link from "next/link";
 
-export default function NotificationTabs() {
+export default function NotificationTabs({
+  useParentScroll = false,
+  forPage = false,
+}) {
   return (
-    <div className="w-full">
+    <div className="w-full" onClick={(e) => e.stopPropagation()}>
       <Tabs className="flex flex-col">
         <TabList className="flex gap-4 px-4">
           <Tab className="tab" selectedClassName="tab-active">
@@ -17,19 +18,19 @@ export default function NotificationTabs() {
         </TabList>
         <div>
           <TabPanel>
-            <NotificationList>
-              <NotificationListItem />
-              <NotificationListItem unread={true} />
-              <NotificationListItem />
-              <NotificationListItem />
-              <NotificationListItem />
-              <NotificationListItem />
-            </NotificationList>
+            <NotificationList
+              useParentScroll={useParentScroll}
+              forPage={forPage}
+              scrollableTargetId={"notificationsPopup"}
+            />
           </TabPanel>
           <TabPanel>
-            <NotificationList>
-              <NotificationListItem unread={true} />
-            </NotificationList>
+            <NotificationList
+              useParentScroll={useParentScroll}
+              forPage={forPage}
+              scrollableTargetId={"notificationsPopup"}
+              unread
+            />
           </TabPanel>
         </div>
       </Tabs>

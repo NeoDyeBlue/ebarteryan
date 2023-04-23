@@ -14,18 +14,17 @@ import { Collaborate, Delivery, Chat, Location } from "@carbon/icons-react";
 import { Button } from "../Buttons";
 import ReactModal from "react-modal";
 import useMapStore from "../../store/useMapStore";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useMemo, useEffect, memo } from "react";
 import dynamic from "next/dynamic";
 const DropdownSelect = dynamic(() => import("../Inputs/DropdownSelect"), {
   ssr: false,
 });
-import { memo } from "react";
 import { listingCreationSchema } from "../../lib/validators/item-validator";
 import useSWR from "swr";
 // import { toast } from "react-toastify";
 import toast from "react-hot-toast";
 import { useRouter } from "next/router";
-import useCreationStore from "../../store/useCreationStore";
+import useUrlCallbackStore from "../../store/useUrlCallbackStore";
 import { PopupLoader } from "../Loaders";
 
 const MemoizedImageSelector = memo(ImageSelector);
@@ -41,9 +40,11 @@ export default function CreateListingForm() {
     listingRegion,
     setCreationLocation,
     clearPositionRegion,
+    position,
+    region,
   } = useMapStore();
 
-  const { path, host } = useCreationStore();
+  const { path, host } = useUrlCallbackStore();
   const callbackUrl = useMemo(() => {
     if (
       window &&
@@ -76,6 +77,8 @@ export default function CreateListingForm() {
   }
 
   async function handleFormSubmit(values) {
+    // console.log(values);
+    // return;
     try {
       setIsLoading(true);
       const res = await fetch("/api/items", {
@@ -85,19 +88,17 @@ export default function CreateListingForm() {
       });
       const data = await res.json();
       if (data && data.success) {
-        toast.success("Item Posted");
+        toast.success(!values.draft ? "Item posted" : "Saved in drafts");
         router.push(callbackUrl);
       } else {
         setIsLoading(false);
-        toast.error("Can't post the item");
+        toast.error(!values.draft ? "Can't post item" : "Can't save to drafts");
       }
     } catch (error) {
       setIsLoading(false);
-      toast.error("Can't post the item");
+      toast.error(!values.draft ? "Can't post item" : "Can't save to drafts");
     }
   }
-
-  function showToast() {}
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-4 py-6 md:mb-6">
@@ -112,31 +113,21 @@ export default function CreateListingForm() {
           claimingOptions: [],
           category: "",
           condition: "",
-          duration: "",
-          customDuration: "",
+          draft: false,
           location: {
-            region: listingRegion,
-            lat: listingPosition.lat,
-            lng: listingPosition.lng,
+            region: creationRegion ? creationRegion : listingRegion,
+            lat: creationPosition.lat
+              ? creationPosition.lat
+              : listingPosition.lat,
+            lng: creationPosition.lng
+              ? creationPosition.lng
+              : listingPosition.lng,
           },
         }}
         validationSchema={listingCreationSchema}
         onSubmit={handleFormSubmit}
       >
         {(props) => {
-          // this effect is needed to actually change the values for location
-          useEffect(() => {
-            props.setFieldValue(
-              "location",
-              {
-                region: creationRegion,
-                lat: creationPosition.lat,
-                lng: creationPosition.lng,
-              },
-              true
-            );
-          }, [creationRegion]);
-
           return (
             <Form className="flex flex-col gap-6">
               <div className="flex flex-col gap-4">
@@ -205,37 +196,27 @@ export default function CreateListingForm() {
                 </RadioSelect>
               </div>
               <div className="flex flex-col gap-4">
-                <ReactModal
-                  contentLabel="Location Modal"
+                <LocationModal
                   isOpen={locationModalOpen}
-                  // closeTimeoutMS={300}
-                  overlayClassName={`bg-black/20 fixed top-0 z-50 flex h-full w-full items-end`}
-                  preventScroll={true}
-                  onRequestClose={() => {
+                  onClose={() => {
                     closeLocationModal();
                     props.setFieldTouched("location", true, true);
                   }}
-                  bodyOpenClassName="modal-open-body"
-                  className={`relative h-[90vh] w-full overflow-hidden rounded-t-[10px] bg-white
-         py-6 shadow-lg md:m-auto md:max-w-[580px] md:rounded-[10px]`}
-                >
-                  <div
-                    className={`custom-scrollbar container flex max-h-full min-h-full overflow-y-auto md:px-6`}
-                  >
-                    <LocationModal
-                      onClose={() => {
-                        console.log("closed");
-                        closeLocationModal();
-                        props.setFieldTouched("location", true, true);
-                      }}
-                      onApply={() => {
-                        setCreationLocation();
-                        closeLocationModal();
-                        // handleLocationChange();
-                      }}
-                    />
-                  </div>
-                </ReactModal>
+                  onApply={() => {
+                    setCreationLocation();
+                    props.setFieldValue(
+                      "location",
+                      {
+                        region: region,
+                        lat: position.lat,
+                        lng: position.lng,
+                      },
+                      true
+                    );
+                    closeLocationModal();
+                    // handleLocationChange();
+                  }}
+                />
                 <p className="border-b border-gray-100 pb-2 text-sm text-gray-300">
                   Location
                 </p>
@@ -243,11 +224,11 @@ export default function CreateListingForm() {
                   <div className="flex items-center gap-1">
                     <Location size={20} />
                     <p className="font-medium">
-                      {!listingRegion && !creationRegion
-                        ? "Choose Location"
-                        : ""}
-                      {listingRegion && !creationRegion ? listingRegion : ""}
-                      {creationRegion ? creationRegion : ""}
+                      {props.values.location.region
+                        ? props.values.location.region
+                        : "Choose Location"}
+                      {/* {listingRegion && !creationRegion ? listingRegion : ""}
+                      {creationRegion ? creationRegion : ""} */}
                     </p>
                   </div>
                   <span>|</span>
@@ -265,33 +246,6 @@ export default function CreateListingForm() {
                   <p className="flex gap-1 text-sm text-danger-500">
                     Please set your location correctly
                   </p>
-                )}
-              </div>
-              <div className="flex flex-col gap-4">
-                <p className="border-b border-gray-100 pb-2 text-sm text-gray-300">
-                  Duration
-                </p>
-                <MemoizedDropdownSelect
-                  name="duration"
-                  items={[
-                    { name: "I accept an offer", value: "0" },
-                    { name: "1 Day", value: 1 },
-                    { name: "3 Days", value: 3 },
-                    { name: "7 Days", value: 7 },
-                    { name: "30 days", value: 30 },
-                    { name: "Custom", value: "custom" },
-                  ]}
-                  placeholder="Select a duration"
-                  label="Offering will end until..."
-                  tabIndex={0}
-                />
-                {props.values.duration == "custom" && (
-                  <InputField
-                    type="number"
-                    min="1"
-                    name="customDuration"
-                    label="Enter days"
-                  />
                 )}
               </div>
               <div className="flex flex-col gap-4">
@@ -353,10 +307,23 @@ export default function CreateListingForm() {
                 </MultiSelect>
               </div>
               <div className="flex items-center gap-4">
-                <Button secondary={true} onClick={() => showToast()}>
+                <Button
+                  onClick={() => {
+                    props.setFieldValue("draft", true);
+                    props.submitForm();
+                  }}
+                  secondary={true}
+                >
                   Save to Drafts
                 </Button>
-                <Button type="submit">Post</Button>
+                <Button
+                  onClick={() => {
+                    props.setFieldValue("draft", false);
+                    props.submitForm();
+                  }}
+                >
+                  Post
+                </Button>
               </div>
             </Form>
           );

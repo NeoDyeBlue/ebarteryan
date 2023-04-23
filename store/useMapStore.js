@@ -67,13 +67,21 @@ const useMapStore = create(
           listingRegion: state.region ? state.region : state.listingRegion,
           listingRadius: state.radius,
         })),
-      setCreationLocation: () =>
-        set((state) => ({
-          creationPosition: Object.keys(state.position).length
-            ? state.position
-            : state.creationPosition,
-          creationRegion: state.region ? state.region : state.listingRegion,
-        })),
+      setCreationLocation: (payload) => {
+        if (payload && payload.region && payload.position) {
+          set(() => ({
+            creationPosition: payload.position,
+            creationRegion: payload.region,
+          }));
+        } else {
+          set((state) => ({
+            creationPosition: Object.keys(state.position).length
+              ? state.position
+              : state.creationPosition,
+            creationRegion: state.region ? state.region : state.listingRegion,
+          }));
+        }
+      },
       clearPositionRegion: () =>
         set(() => ({
           position: {},

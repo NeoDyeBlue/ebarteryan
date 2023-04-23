@@ -19,7 +19,7 @@ export default function ConditionBadge({ condition }) {
   }
   return (
     <span
-      className={`text-center text-xs ${color} whitespace-nowrap rounded-[10px] px-2 py-[0.2rem] font-medium text-black-light`}
+      className={`text-center text-xs ${color} w-fit whitespace-nowrap rounded-[10px] px-2 py-[0.1rem] align-middle font-medium text-black-light`}
     >
       {condition}
     </span>

@@ -1,8 +1,7 @@
 import { useSelect } from "downshift";
-import { CaretDown, CaretUp } from "@carbon/icons-react";
-// import "react-dropdown/style.css";
+import { CaretDown, CaretUp, Information } from "@carbon/icons-react";
 import { useField } from "formik";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 export default function DropdownSelect({
   items,
@@ -13,22 +12,29 @@ export default function DropdownSelect({
 }) {
   const [field, meta, helpers] = useField(name);
   const [selectedItem, setSelectedItem] = useState(
-    meta.value
-      ? items.find((item) =>
-          item?.value ? item.value == meta.value : item == meta.value
-        )
-      : ""
+    items.find((item) => item?.value == meta.value || item == meta.value)
   );
+
+  // useEffect(() => {
+  //   if (items.length) {
+  //     setSelectedItem(
+  //       items.find((item) => item?.value == meta.value || item == meta.value)
+  //     );
+  //   }
+  // }, [items, meta.value]);
+
   const {
     isOpen,
     getToggleButtonProps,
     getLabelProps,
     getMenuProps,
     highlightedIndex,
+    // selectedItem,
     getItemProps,
   } = useSelect({
     items,
     selectedItem,
+    // defaultSelectedItem: initialSelected,
     onSelectedItemChange: ({ selectedItem: newSelectedItem }) => {
       setSelectedItem(newSelectedItem);
     },
@@ -36,11 +42,12 @@ export default function DropdownSelect({
 
   useEffect(() => {
     helpers.setValue(selectedItem?.value ? selectedItem.value : selectedItem);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItem]);
 
   return (
-    <div className="relative" id={name} onBlur={field.onBlur}>
-      <div className="flex flex-col gap-2">
+    <div className="relative">
+      <div className="flex flex-col gap-2" id={name} onBlur={field.onBlur}>
         {label && (
           <label {...getLabelProps()} className="font-display font-medium">
             {label}
@@ -101,7 +108,11 @@ export default function DropdownSelect({
             <li
               className={`
                 ${highlightedIndex === index && "bg-green-300"}
-                ${selectedItem === item && "font-bold"}
+                ${
+                  (selectedItem === item ||
+                    selectedItem?.value == item?.value) &&
+                  "font-bold"
+                }
                 flex cursor-pointer flex-col p-4 font-body capitalize shadow-sm
               `}
               key={index}

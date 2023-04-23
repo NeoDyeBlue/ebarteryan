@@ -16,7 +16,7 @@ export default function CategoryListItem({ to, name, aka }) {
           }
             relative flex h-full w-full items-center justify-center whitespace-nowrap 
             text-center font-display text-sm font-medium capitalize text-gray-300
-            before:absolute before:bottom-0 before:block before:h-[4px] before:w-full before:rounded-full before:transition-colors`}
+            before:absolute before:bottom-0 before:block before:h-[4px] before:w-3/4 before:rounded-full before:transition-colors`}
         >
           {name}
         </a>

@@ -5,15 +5,14 @@ import {
   RadioSelect,
   RadioSelectItem,
 } from "../Inputs";
-import { Location, Router } from "@carbon/icons-react";
+import { Location } from "@carbon/icons-react";
 import { Button } from "../Buttons";
 import { memo } from "react";
 import { Formik, Form } from "formik";
 import { offerSchema } from "../../lib/validators/item-validator";
 import { LocationModal } from "../Modals";
-import ReactModal from "react-modal";
 import useMapStore from "../../store/useMapStore";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import useUserOfferStore from "../../store/useUserOfferStore";
 import { toast } from "react-hot-toast";
 import useSocketStore from "../../store/useSocketStore";
@@ -30,9 +29,21 @@ export default function OfferForm({ onClose }) {
     listingRegion,
     setCreationLocation,
     clearPositionRegion,
+    region,
+    position,
   } = useMapStore();
-  const { item, setOffer, setIsSubmitting, setIsSubmitSuccess } =
-    useUserOfferStore();
+  const {
+    item,
+    offer,
+    setOffer,
+    setIsSubmitting,
+    setIsSubmitSuccess,
+    oldOffer,
+    setOfferRetryBody,
+    setOldOffer,
+    isForUpdating,
+    setTempOffer,
+  } = useUserOfferStore();
   const [locationModalOpen, setLocationModalOpen] = useState(false);
   const { socket } = useSocketStore();
   function openLocationModal() {
@@ -47,53 +58,102 @@ export default function OfferForm({ onClose }) {
   async function handleFormSubmit(values) {
     onClose();
     router.push("#offers");
-    setOffer(values);
+    setTempOffer(values);
+    let formBody;
     try {
+      if (isForUpdating) {
+        const newImages = values.images.filter(
+          (image) => !Object.keys(image).includes("url")
+        );
+        const toRemoveImages = oldOffer?.images?.filter(
+          (image) => !values.images.includes(image)
+        );
+        const newLocation =
+          oldOffer?.location?.coordinates[1] != values?.location?.lat &&
+          oldOffer?.location?.coordinates[0] != values?.location?.lng
+            ? {
+                region: values.location.region,
+                location: {
+                  type: "Point",
+                  coordinates: [values.location.lng, values.location.lat],
+                },
+              }
+            : null;
+
+        let { location, images, ...newFormBody } = values;
+        if (newLocation) {
+          newFormBody = { ...newLocation, ...newFormBody };
+        }
+        newFormBody.newImages = newImages;
+        newFormBody.toRemoveImages = toRemoveImages;
+        formBody = newFormBody;
+      } else {
+        formBody = values;
+      }
       setIsSubmitting(true);
-      const res = await fetch(`/api/offers/${item}`, {
-        method: "POST",
-        body: JSON.stringify(values),
-        headers: { "Content-Type": "application/json" },
-      });
+      setIsSubmitSuccess(false);
+      const res = await fetch(
+        isForUpdating
+          ? `/api/offers/${oldOffer?._id}`
+          : `/api/items/${item}/offers`,
+        {
+          method: isForUpdating ? "PATCH" : "POST",
+          body: JSON.stringify(formBody),
+          headers: { "Content-Type": "application/json" },
+        }
+      );
       const result = await res.json();
       if (result && result.success) {
         setIsSubmitting(false);
         setIsSubmitSuccess(true);
-        socket.emit("offer", {
-          offer: result,
-          room: result.data.docs[0].item,
-        });
-        toast.success("Offer Added");
+        if (isForUpdating) {
+          setOldOffer(null);
+        } else {
+          socket.emit("offer:create", {
+            offer: result.data,
+            room: result.data.item,
+          });
+          socket.emit("offer:count", item);
+        }
+        setOffer(result.data);
+        setTempOffer(null);
+        setOfferRetryBody(null);
+        toast.success(isForUpdating ? "Offer updated" : "Offer added");
       } else {
         setIsSubmitting(false);
         setIsSubmitSuccess(false);
-        // setOffer(null);
-        toast.error("Can't add offer");
+        setOfferRetryBody(formBody);
+        toast.error(isForUpdating ? "Can't update offer" : "Can't add offer");
       }
     } catch (error) {
       setIsSubmitting(false);
       setIsSubmitSuccess(false);
-      // setOffer(null);
-      toast.error("Can't add offer");
+      setOfferRetryBody(formBody);
+      toast.error(isForUpdating ? "Can't update offer" : "Can't add offer");
     }
-    // onClose();
-    // setOffer(values);
-    // setIsSubmitting(true);
-    // await stall(5000);
-    // // setIsSubmitSuccess(true);
-    // toast.success("Offer Added");
   }
+
   return (
     <Formik
       initialValues={{
-        images: [],
-        name: "",
-        description: "",
-        condition: "",
+        images: isForUpdating ? offer?.images : [],
+        name: isForUpdating ? offer?.name : "",
+        description: isForUpdating ? offer?.description : "",
+        condition: isForUpdating ? offer?.condition : "",
         location: {
-          region: listingRegion,
-          lat: listingPosition.lat,
-          lng: listingPosition.lng,
+          region: isForUpdating
+            ? offer?.region || creationRegion
+            : creationRegion || listingRegion,
+          lat: isForUpdating
+            ? offer?.location?.lat ||
+              offer?.location?.coordinates[1] ||
+              creationPosition.lat
+            : creationPosition.lat || listingPosition.lat,
+          lng: isForUpdating
+            ? offer?.location?.lng ||
+              offer?.location?.coordinates[0] ||
+              creationPosition.lng
+            : creationPosition.lng || listingPosition.lng,
         },
       }}
       validationSchema={offerSchema}
@@ -102,19 +162,6 @@ export default function OfferForm({ onClose }) {
       }}
     >
       {(props) => {
-        // this effect is needed to actually change the values for location
-        useEffect(() => {
-          props.setFieldValue(
-            "location",
-            {
-              region: creationRegion,
-              lat: creationPosition.lat,
-              lng: creationPosition.lng,
-            },
-            true
-          );
-        }, [creationRegion]);
-
         return (
           <Form>
             <div className="flex flex-col gap-4">
@@ -174,36 +221,27 @@ export default function OfferForm({ onClose }) {
                 </RadioSelectItem>
               </RadioSelect>
               <div className="flex flex-col gap-4">
-                <ReactModal
-                  contentLabel="Location Modal"
+                <LocationModal
                   isOpen={locationModalOpen}
-                  // closeTimeoutMS={300}
-                  overlayClassName={`bg-black/20 fixed top-0 z-50 flex h-full w-full items-end`}
-                  preventScroll={true}
-                  onRequestClose={() => {
+                  onClose={() => {
                     closeLocationModal();
                     props.setFieldTouched("location", true, true);
                   }}
-                  bodyOpenClassName="modal-open-body"
-                  className={`relative h-[90vh] w-full overflow-hidden rounded-t-[10px] bg-white
-         py-6 shadow-lg md:m-auto md:max-w-[580px] md:rounded-[10px]`}
-                >
-                  <div
-                    className={`custom-scrollbar container flex max-h-full min-h-full overflow-y-auto md:px-6`}
-                  >
-                    <LocationModal
-                      onClose={() => {
-                        closeLocationModal();
-                        props.setFieldTouched("location", true, true);
-                      }}
-                      onApply={() => {
-                        setCreationLocation();
-                        closeLocationModal();
-                        // handleLocationChange();
-                      }}
-                    />
-                  </div>
-                </ReactModal>
+                  onApply={() => {
+                    setCreationLocation();
+                    props.setFieldValue(
+                      "location",
+                      {
+                        region: region,
+                        lat: position.lat,
+                        lng: position.lng,
+                      },
+                      true
+                    );
+                    closeLocationModal();
+                    // handleLocationChange();
+                  }}
+                />
                 <p className="border-b border-gray-100 pb-2 text-sm text-gray-300">
                   Location
                 </p>
@@ -238,7 +276,7 @@ export default function OfferForm({ onClose }) {
                 </div>
               </div>
               <Button type="submit">
-                <p>Offer</p>
+                <p>{isForUpdating ? "Save" : "Offer"}</p>
               </Button>
             </div>
           </Form>

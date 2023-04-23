@@ -18,10 +18,14 @@ import useUiSizesStore from "../../store/useUiSizesStore";
 import { useSession } from "next-auth/react";
 import ProfileMenu from "./ProfileMenu";
 import IconLink from "./IconLink";
+import { Tooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css";
+import useNotificationStore from "../../store/useNotificationStore";
 
 export default function Navbar({ sticky }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showSearchBox, setShowSearchBox] = useState(false);
   const notificationsPopupRef = useRef(null);
   const profileMenuRef = useRef(null);
   const navbarRef = useRef(null);
@@ -29,6 +33,7 @@ export default function Navbar({ sticky }) {
   const currentRoute = router.asPath;
   const { setNavbarHeight } = useUiSizesStore();
   const { data: session, status } = useSession();
+  const { unreadCount } = useNotificationStore();
 
   useOnClickOutside(notificationsPopupRef, hideNotificationsPopup);
   useOnClickOutside(profileMenuRef, hideProfileMenu);
@@ -40,7 +45,7 @@ export default function Navbar({ sticky }) {
     window.addEventListener("resize", handleResize);
     handleResize();
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  }, [setNavbarHeight]);
 
   function showNotificationsPopup() {
     if (currentRoute != "/notifications") {
@@ -76,20 +81,32 @@ export default function Navbar({ sticky }) {
             </p>
           </a>
         </Link>
-        <SearchBox className="container absolute top-0 left-0 z-10 mx-auto hidden h-full w-full max-w-[500px] px-4 lg:relative lg:block" />
+        <SearchBox
+          onClose={() => setShowSearchBox(false)}
+          className={`${
+            showSearchBox ? "block" : "hidden"
+          } container absolute top-0 left-0 z-10 mx-auto h-full w-full max-w-[500px] lg:relative lg:block`}
+        />
         <div className="relative flex items-center gap-3">
           <ul className="hidden items-center gap-2 md:flex">
             <li>
-              <IconLink to="/" aka={["/items"]}>
+              <IconLink to="/" tooltipMessage="Home" id="home">
                 <Home size={24} />
               </IconLink>
             </li>
-            {session && session.user.verified && status == "authenticated" ? (
+            {session && status == "authenticated" ? (
               <>
                 <li>
-                  <IconLink to="/offers">
-                    <BadgedIcon hasBadge={true}>
+                  <IconLink to="/offers" tooltipMessage="Offers" id="offers">
+                    <BadgedIcon hasBadge={false}>
                       <ArrowsHorizontal size={24} />
+                    </BadgedIcon>
+                  </IconLink>
+                </li>
+                <li>
+                  <IconLink to="/saved" tooltipMessage="Saved" id="saved">
+                    <BadgedIcon hasBadge={false}>
+                      <Bookmark size={24} />
                     </BadgedIcon>
                   </IconLink>
                 </li>
@@ -99,29 +116,40 @@ export default function Navbar({ sticky }) {
                   onClick={showNotificationsPopup}
                 >
                   <button
-                    className={`flex h-[40px] w-[40px] items-center justify-center rounded-full ${
+                    className={`group flex h-[40px] w-[40px] items-center justify-center rounded-full ${
                       showNotifications || currentRoute == "/notifications"
                         ? "bg-gray-100/30"
                         : "hover:bg-gray-100/30"
                     }`}
+                    id="notifications"
+                    data-tooltip-content="Notifications"
                   >
-                    <BadgedIcon hasBadge={true}>
+                    <BadgedIcon
+                      hasBadge={unreadCount > 0}
+                      count={unreadCount}
+                      tooltipMessage="Notifications"
+                      id="notifications"
+                    >
                       <Notification size={24} />
                     </BadgedIcon>
                   </button>
-                  {showNotifications && <NotificationsPopup />}
-                </li>
-                <li>
-                  <IconLink to="/saved">
-                    <BadgedIcon hasBadge={true}>
-                      <Bookmark size={24} />
-                    </BadgedIcon>
-                  </IconLink>
+                  <Tooltip className="z-[100]" anchorId="notifications" />
+                  <NotificationsPopup isOpen={showNotifications} />
                 </li>
               </>
             ) : null}
           </ul>
-          <button className="flex cursor-pointer items-center justify-center md:hidden">
+          <div className="block md:hidden">
+            <IconLink to="/notifications">
+              <BadgedIcon hasBadge={unreadCount > 0} count={unreadCount}>
+                <Notification size={24} />
+              </BadgedIcon>
+            </IconLink>
+          </div>
+          <button
+            onClick={() => setShowSearchBox(true)}
+            className="flex cursor-pointer items-center justify-center md:hidden"
+          >
             <Search size={24} />
           </button>
           <div
@@ -137,7 +165,8 @@ export default function Navbar({ sticky }) {
                 <Image
                   src={session && session.user.image}
                   layout="fill"
-                  // objectFit="cover"
+                  alt="user image"
+                  objectFit="cover"
                 />
               </button>
             ) : (

@@ -56,18 +56,33 @@
   .tab {
     @apply relative flex h-[60px] cursor-pointer items-center justify-center gap-3 whitespace-nowrap text-center 
     font-display font-medium capitalize text-gray-300 outline-none before:absolute before:bottom-0 before:block
-    before:h-[4px] before:w-full before:rounded-full before:transition-colors hover:text-black-light hover:before:bg-gray-300;
+    before:h-[4px] before:w-3/4 before:rounded-full before:transition-colors hover:text-black-light hover:before:bg-gray-300;
+  }
+
+  .tab-full {
+    @apply relative flex h-[60px] w-full cursor-pointer items-center justify-center gap-3 whitespace-nowrap text-center 
+    font-display font-medium capitalize text-gray-300 outline-none before:absolute before:bottom-0 before:block before:h-[4px]
+    before:w-3/4 before:max-w-[100px] before:rounded-full before:transition-colors hover:text-black-light hover:before:bg-gray-300;
   }
 
   .tab-varying {
     @apply relative flex h-[60px] cursor-pointer items-center justify-center gap-3 whitespace-nowrap text-center 
     font-display font-medium capitalize text-gray-300 outline-none before:absolute before:bottom-0 before:block
-    before:h-[4px] before:w-full before:rounded-full before:transition-colors hover:text-black-light hover:before:bg-gray-300
+    before:h-[4px] before:w-3/4 before:rounded-full before:transition-colors hover:text-black-light hover:before:bg-gray-300
     sm:h-[30px] sm:px-4 sm:before:left-0 sm:before:top-1/2 sm:before:h-full sm:before:w-[4px] sm:before:-translate-y-1/2;
   }
 
   .tab-active {
     @apply text-black-light before:bg-green-500 hover:before:bg-green-500;
+  }
+
+  .tab-box {
+    @apply relative flex w-full cursor-pointer items-center justify-center gap-3 whitespace-nowrap rounded-lg bg-white px-4 
+    py-3 text-center font-display text-sm capitalize text-black-light outline-none transition-colors hover:bg-gray-100/50;
+  }
+
+  .tab-box-active {
+    @apply bg-green-200 font-semibold text-green-700 hover:bg-green-200;
   }
 
   .custom-scrollbar::-webkit-scrollbar {
@@ -82,8 +97,8 @@
     @apply rounded-[10px] bg-gray-100;
   }
 
-  .modal-open-body {
-    @apply h-full overflow-hidden;
+  .scroll-disabled {
+    @apply fixed w-full overflow-y-scroll;
   }
 }
 
@@ -102,12 +117,48 @@ a {
   box-sizing: border-box;
 }
 
-/* @media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
+.ReactModal__Content {
+  transform: translateY(100%);
+  opacity: 0;
+  transition: transform 150ms ease-in-out, opacity 150ms ease-in-out;
+}
+
+.ReactModal__Content--after-open {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.ReactModal__Content--before-close {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
+@media only screen and (min-width: 768px) {
+  .ReactModal__Content {
+    transform: scale(0.8);
+    opacity: 0;
   }
-  body {
-    color: white;
-    background: black;
+
+  .ReactModal__Content--after-open {
+    transform: scale(1);
+    opacity: 1;
   }
-} */
+
+  .ReactModal__Content--before-close {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+}
+
+.ReactModal__Overlay {
+  opacity: 0;
+  transition: opacity 150ms ease-in-out;
+}
+
+.ReactModal__Overlay--after-open {
+  opacity: 1;
+}
+
+.ReactModal__Overlay--before-close {
+  opacity: 0;
+}

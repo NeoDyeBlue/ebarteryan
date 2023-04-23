@@ -1,8 +1,84 @@
 import { NavLayout } from "../components/Layouts";
 import Head from "next/head";
 import { Email } from "@carbon/icons-react";
+// import { ResendOTP } from "otp-input-react";
+import { FormikProvider, Form, useFormik } from "formik";
+import { Button } from "../components/Buttons";
+import { DotLoader } from "react-spinners";
+import { useState } from "react";
+import AuthCode from "react-auth-code-input";
+import { useRouter } from "next/router";
+import { useSession } from "next-auth/react";
+import dynamic from "next/dynamic";
+import { toast } from "react-hot-toast";
+// import { ResendOTP } from "otp-input-react";
+const ResendOTP = dynamic(
+  () => import("otp-input-react").then((mod) => mod.ResendOTP),
+  {
+    ssr: false,
+  }
+);
 
 export default function Verification() {
+  const router = useRouter();
+  const { data: session, status } = useSession();
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [showCountdown, setShowCountdown] = useState(false);
+  const verificationFormik = useFormik({
+    initialValues: {
+      otp: "",
+    },
+    onSubmit: handleVerificationSubmit,
+  });
+
+  async function handleVerificationSubmit(values) {
+    console.log(values);
+    try {
+      setIsVerifying(true);
+      const res = await fetch(`/api/verification/verify`, {
+        method: "PATCH",
+        body: JSON.stringify(values),
+        headers: { "Content-Type": "application/json" },
+      });
+      const result = await res.json();
+      if (
+        result &&
+        result.success &&
+        result.data.verified &&
+        status == "authenticated"
+      ) {
+        await fetch("/api/auth/session?update");
+        const event = new Event("visibilitychange");
+        document.dispatchEvent(event);
+        router.push("/");
+      } else {
+        toast.error(result.errorMessage);
+      }
+      setIsVerifying(false);
+    } catch (error) {
+      console.log(error);
+      setIsVerifying(false);
+    }
+  }
+
+  async function verificationResend() {
+    setShowCountdown(true);
+    await fetch("/api/verification/resend");
+  }
+
+  const renderButton = (buttonProps) => {
+    return (
+      <button
+        {...buttonProps}
+        className="bg-transparent font-display font-medium text-green-500 hover:underline"
+      >
+        {buttonProps.remainingTime !== 0
+          ? `Resend (${buttonProps.remainingTime})`
+          : "Resend"}
+      </button>
+    );
+  };
+
   return (
     <div className="w-full">
       <Head>
@@ -15,17 +91,61 @@ export default function Verification() {
           className="m-auto flex max-w-[480px] flex-col items-center justify-center gap-6
         rounded-[10px] border border-gray-100 bg-white p-6 shadow-lg"
         >
-          <Email size={100} className="text-green-500" />
+          <Email size={100} className="text-gray-100" />
           <h1 className="text-4xl font-semibold">Verification</h1>
-          <p className="text-center">
-            We've sent an email containing a verification link. Click the link
-            to finish setting up your account.
-          </p>
-          <p>
-            Did'nt receive it?{" "}
-            <span className="font-display font-medium text-green-500 hover:underline">
-              Resend
-            </span>
+          <div className="flex flex-col gap-4 text-center">
+            <FormikProvider value={verificationFormik}>
+              <Form className="flex w-full flex-col items-center gap-4">
+                <div className="flex w-full flex-col items-center gap-4">
+                  <AuthCode
+                    // inputClassName="otp-input"
+                    inputClassName=" w-full rounded-[10px] border bg-white w-[40px] h-[40px] font-body
+                  placeholder-gray-300 focus:outline-none focus:ring-1 focus:ring-green-500 flex-shrink-0 text-center font-semibold"
+                    containerClassName="flex gap-2 w-full justify-center"
+                    onChange={(value) =>
+                      verificationFormik.setFieldValue("otp", value)
+                    }
+                    allowedCharacters="numeric"
+                    autoFocus
+                  />
+                  <Button
+                    autoWidth={true}
+                    type="submit"
+                    disabled={
+                      isVerifying || verificationFormik.values.otp.length < 6
+                    }
+                    small
+                  >
+                    {isVerifying ? (
+                      <DotLoader color="#fff" size={24} />
+                    ) : (
+                      <p>Verify</p>
+                    )}
+                  </Button>
+                </div>
+              </Form>
+            </FormikProvider>
+            <p>
+              Enter the 6 digit code we sent to your email to verify your
+              account.
+            </p>
+          </div>
+          <p className="flex gap-1">
+            Did&apos;nt receive it?
+            {showCountdown ? (
+              <ResendOTP
+                renderButton={renderButton}
+                onResendClick={() => verificationResend()}
+                renderTime={() => <></>}
+              />
+            ) : (
+              <button
+                onClick={() => verificationResend()}
+                className="bg-transparent font-display font-medium text-green-500 hover:underline"
+              >
+                Resend
+              </button>
+            )}
           </p>
         </div>
       </div>

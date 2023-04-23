@@ -35,7 +35,7 @@ export async function upload(folder, files) {
             quality: "auto:best",
           })
           .then((result) => {
-            uploadResults.push({ id: result.public_id, url: result.url });
+            uploadResults.push({ cloudId: result.public_id, url: result.url });
           })
           .catch((error) => {
             console.log(error);
@@ -47,6 +47,47 @@ export async function upload(folder, files) {
     return await Promise.all(uploadPromises).then(() => {
       return uploadResults;
     });
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function destroy(public_ids) {
+  try {
+    let destroyResults = [];
+    let destroyPromises = [];
+
+    public_ids.forEach((public_id) => {
+      destroyPromises.push(
+        cloudinary.uploader
+          .destroy(public_id)
+          .then(() => {
+            destroyResults.push(public_id);
+          })
+          .catch((error) => {
+            throw error;
+          })
+      );
+    });
+
+    return await Promise.all(destroyPromises).then(() => {
+      return destroyResults;
+    });
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function destroyFolder(folder) {
+  try {
+    cloudinary.api
+      .delete_folder(folder)
+      .then((result) => {
+        return result;
+      })
+      .catch((error) => {
+        throw error;
+      });
   } catch (error) {
     throw error;
   }

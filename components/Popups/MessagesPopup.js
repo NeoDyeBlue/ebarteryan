@@ -1,114 +1,80 @@
 import { BadgedIcon } from "../Icons";
-import { Chat } from "@carbon/icons-react";
-import { useState } from "react";
-import {
-  ChatHeader,
-  ChatContainer,
-  ChatInput,
-  ChatBubble,
-  MessageList,
-  MessageListItem,
-  MessageSearchBox,
-} from "../Messages";
-
-import { OverflowMenuVertical } from "@carbon/icons-react";
+import { Chat, Launch } from "@carbon/icons-react";
+import { useRouter } from "next/router";
+import { MessageList, Conversation } from "../Messages";
+import useMessagesStore from "../../store/useMessagesStore";
 import { CircleButton } from "../Buttons/";
+import useOnClickOutside from "../../lib/hooks/useOnClickOutside";
+import useSocketStore from "../../store/useSocketStore";
+import { useRef, useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 
 export default function MessagesPopup({ className, hasBadge }) {
-  const userId = 1;
-  const chats = [
-    {
-      id: 1,
-      sender: {
-        id: 1,
-        name: "User Name",
-        image: {
-          url: "https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg",
-        },
-      },
-      type: "text",
-      content: "Hello",
-    },
-    {
-      id: 2,
-      sender: {
-        id: 2,
-        name: "User Name",
-        image: {
-          url: "https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg",
-        },
-      },
-      type: "text",
-      content: "Hello",
-    },
-    {
-      id: 3,
-      sender: {
-        id: 2,
-        name: "User Name",
-        image: {
-          url: "https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg",
-        },
-      },
-      type: "text",
-      content: "Hello",
-    },
-  ];
+  const router = useRouter();
+  const { data: session } = useSession();
+  const [hasUnread, setHasUnread] = useState(false);
+  //stores
+  const popupRef = useRef();
+  const {
+    isMessagesOpen,
+    setIsMessagesOpen,
+    prevConversation,
+    setPrevConversation,
+    setConversation,
+    conversation,
+  } = useMessagesStore();
+  const { socket } = useSocketStore();
 
-  const chatBubbles = chats.map((message, index) => {
-    // console.log(message);
-    let isFromUser = message.sender.id == userId ? true : false;
-    if (index + 1 <= chats.length - 1) {
-      if (message.sender.id == chats[index + 1].sender.id) {
-        return (
-          <ChatBubble
-            key={index}
-            isFromUser={isFromUser}
-            consecutive={true}
-            content={message.content}
-            type={message.type}
-          />
-        );
-      } else {
-        return (
-          <ChatBubble
-            key={index}
-            isFromUser={isFromUser}
-            consecutive={false}
-            content={message.content}
-            userPic={message.sender.image.url}
-            type={message.type}
-          />
-        );
-      }
-    } else {
-      return (
-        <ChatBubble
-          key={index}
-          isFromUser={isFromUser}
-          consecutive={false}
-          content={message.content}
-          userPic={message.sender.image.url}
-          type={message.type}
-        />
-      );
+  function handleCloseClick() {
+    setIsMessagesOpen(false);
+    if (conversation) {
+      setPrevConversation(conversation);
+      socket.emit("conversation:leave", conversation._id);
+      setConversation(null);
     }
-  });
+  }
 
-  const [isOpen, setIsOpen] = useState(false);
+  function handleMessagesOpen() {
+    setIsMessagesOpen(true);
+    if (prevConversation) {
+      setConversation(prevConversation);
+      socket.emit("conversation:join", {
+        oldRoom: null,
+        newRoom: prevConversation._id,
+      });
+      setPrevConversation(null);
+    }
+  }
+
+  useOnClickOutside(popupRef, () => handleCloseClick());
+
+  useEffect(() => {
+    if (socket) {
+      socket.emit("conversation:check-has-unread", session && session.user.id);
+
+      socket.on("conversation:has-unread", (hasUnread) => {
+        setHasUnread(hasUnread);
+      });
+    }
+  }, [socket, session]);
 
   return (
-    <div className={className}>
+    <div className={className} ref={popupRef}>
       <div
-        className={`container mx-auto flex justify-end transition-transform duration-500 ${
-          isOpen ? "translate-y-0" : "translate-y-[calc(70vh-0.75rem*-1)]"
+        className={`mx-auto flex justify-end transition-transform duration-500 md:container ${
+          isMessagesOpen
+            ? "translate-3d-0"
+            : "translate-y-[75vh] lg:translate-y-[calc(70vh-0.75rem*-1)]"
         }`}
       >
         <div className="pointer-events-none flex flex-col items-end">
-          <div style={{ perspective: "100px" }} className="pointer-events-auto">
+          <div
+            style={{ perspective: "100px" }}
+            className="pointer-events-auto hidden lg:block"
+          >
             <button
               style={{
-                ...(isOpen
+                ...(isMessagesOpen
                   ? {
                       transform:
                         "rotateX(180deg) translateX(-1rem) translateY(-1px)",
@@ -116,75 +82,33 @@ export default function MessagesPopup({ className, hasBadge }) {
                     }
                   : {}),
               }}
-              onClick={() => setIsOpen(true)}
+              onClick={handleMessagesOpen}
               className="relative flex origin-bottom cursor-pointer 
         items-center gap-3 rounded-t-[10px] border border-b-0 border-gray-100 bg-white px-4 py-3
         font-display font-medium text-black-light shadow-lg transition-all delay-300 duration-300
         "
             >
-              <BadgedIcon hasBadge={true}>
+              <BadgedIcon hasBadge={hasUnread}>
                 <Chat size={24} />
               </BadgedIcon>
               <p>Messages</p>
             </button>
           </div>
           <div
-            className="pointer-events-auto z-10 mb-3 flex h-[70vh] w-[50vw]
-        overflow-hidden rounded-[10px] border border-gray-100 bg-white shadow-lg"
+            className="pointer-events-auto z-10 flex h-[75vh] w-screen overflow-hidden rounded-t-[10px] border
+        border-gray-100 bg-white shadow-lg md:mb-3 md:h-[70vh] md:w-[50vw] md:min-w-[600px] md:rounded-[10px]"
           >
-            <div className="flex w-full max-w-[280px] flex-col gap-4 border-r border-gray-100">
-              <div className="flex items-center justify-between gap-4 px-4 pt-4">
+            <div className="hidden w-full max-w-[280px] flex-col border-r border-gray-100 lg:flex">
+              <div className="mb-4 flex items-center justify-between px-4 pt-4">
                 <h1 className="text-lg font-semibold">Messages</h1>
-                <CircleButton icon={<OverflowMenuVertical size={24} />} />
+                <CircleButton
+                  onClick={() => router.push("/messages")}
+                  icon={<Launch size={20} />}
+                />
               </div>
-              <div className="px-4">
-                <MessageSearchBox />
-              </div>
-              <div className="custom-scrollbar overflow-y-auto overflow-x-hidden px-4">
-                <MessageList>
-                  <MessageListItem
-                    photo="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-                    sender="Other Userassssss"
-                    subtitle="Other: Good work!"
-                  />
-                  <MessageListItem
-                    photo="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-                    sender="OtherLong UserNamesss"
-                    subtitle="Other: Good work!"
-                    unread={true}
-                  />
-                  <MessageListItem
-                    photo="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-                    sender="Other User"
-                    subtitle="Other: Good work!"
-                  />
-                  <MessageListItem
-                    photo="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-                    sender="Other User"
-                    subtitle="Other: Good work!"
-                  />
-                  <MessageListItem
-                    photo="https://res.cloudinary.com/dppgyhery/image/upload/v1639759887/idiary/users/1005/xoyowlqk13x4znkcu63p.jpg"
-                    sender="Other User"
-                    subtitle="Other: Good work!"
-                  />
-                </MessageList>
-              </div>
+              <MessageList />
             </div>
-            <div
-              className="grid max-h-full min-h-full w-full grid-cols-1 
-            grid-rows-[auto_1fr_auto] overflow-hidden"
-            >
-              <div className="w-full border-b border-gray-100 px-4">
-                <ChatHeader showClose={true} onClose={() => setIsOpen(false)} />
-              </div>
-              <div className="custom-scrollbar min-h-full overflow-y-auto px-4">
-                <ChatContainer>{chatBubbles}</ChatContainer>
-              </div>
-              <div className="w-full border-t border-gray-100 px-4">
-                <ChatInput />
-              </div>
-            </div>
+            <Conversation forPopup onClose={() => handleCloseClick()} />
           </div>
         </div>
       </div>

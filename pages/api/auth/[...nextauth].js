@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import {
   signIn,
-  getUserInfo,
+  getUserBasicInfo,
   handleGoogleAuth,
 } from "../../../lib/controllers/user-controller";
 import GoogleProvider from "next-auth/providers/google";
@@ -93,29 +93,9 @@ export const authOptions = (req) => ({
       return session;
     },
     async jwt({ token, user, profile }) {
-      //google or fb
-      if (profile) {
-        const userProfile = await getUserInfo({ email: profile.email });
-        token.sub = userProfile._id;
-        token.name = userProfile.fullName;
-        token.role = userProfile.role;
-        token.picture = userProfile.image.url;
-        token.verified = userProfile.verified;
-        token.firstName = userProfile.firstName;
-        token.lastName = userProfile.lastName;
-      }
-      //credentials
-      if (user && !profile) {
-        token.sub = user.id || user._id;
-        token.name = user.fullName;
-        token.role = user.role;
-        token.picture = user.image.url;
-        token.verified = user.verified;
-        token.firstName = user.firstName;
-        token.lastName = user.lastName;
-      }
+      // update
       if (req.url == "/api/auth/session?update" && token) {
-        const updatedUser = await getUserInfo({ email: token.email });
+        const updatedUser = await getUserBasicInfo({ id: token.sub });
         if (updatedUser) {
           token.name = updatedUser.fullName;
           token.picture = updatedUser.image.url;
@@ -125,13 +105,34 @@ export const authOptions = (req) => ({
           token.email = updatedUser.email;
         }
       }
+      //google or fb
+      else if (profile) {
+        const userProfile = await getUserBasicInfo({ email: token.email });
+        token.sub = userProfile._id;
+        token.name = userProfile.fullName;
+        token.role = userProfile.role;
+        token.picture = userProfile.image.url;
+        token.verified = userProfile.verified;
+        token.firstName = userProfile.firstName;
+        token.lastName = userProfile.lastName;
+      }
+      //credentials
+      else if (user && !profile) {
+        token.sub = user.id || user._id;
+        token.name = user.fullName;
+        token.role = user.role;
+        token.picture = user.image.url;
+        token.verified = user.verified;
+        token.firstName = user.firstName;
+        token.lastName = user.lastName;
+      }
       return token;
     },
   },
 });
 
-export default async (req, res) => {
+export default async function handler(req, res) {
   return NextAuth(req, res, authOptions(req));
-};
+}
 
 // export default NextAuth(authOptions);

@@ -46,14 +46,14 @@ export default function LoginForm() {
             <InputField type="email" label="Email" name="email" />
             <div className="flex flex-col gap-2">
               <InputField type="password" label="Password" name="password" />
-              <Link href="/forgotpassword">
+              <Link href="/password/reset">
                 <a className="self-end font-display text-sm font-medium text-green-500 hover:underline">
                   Forgot Password?
                 </a>
               </Link>
             </div>
             <p className="text-center">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link href="/signup">
                 <a className="font-display font-medium text-green-500 hover:underline">
                   Sign Up
@@ -95,11 +95,11 @@ export default function LoginForm() {
           }
           text="Login with Google"
         />
-        <ThirdPartyButton
+        {/* <ThirdPartyButton
           onClick={handleFacebookSignIn}
           icon={<Icon icon="logos:facebook" className="h-[24px] w-[24px]" />}
           text="Login with Facebook"
-        />
+        /> */}
       </div>
     </div>
   );

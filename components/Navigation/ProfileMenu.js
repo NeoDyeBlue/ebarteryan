@@ -1,20 +1,19 @@
 import Link from "next/link";
-import { LinkButton } from "../Buttons";
+import { Warning } from "@carbon/icons-react";
 import { signOut, useSession } from "next-auth/react";
 import Marquee from "react-fast-marquee";
 import { useRef, useState, useCallback } from "react";
-import useMapStore from "../../store/useMapStore";
+import useSocketStore from "../../store/useSocketStore";
 
 export default function ProfileMenu() {
   const { data: session, status } = useSession();
   const containerRef = useRef(null);
   const [isTextOverflowing, setIsTextOverflowing] = useState(false);
+  const { socket } = useSocketStore();
 
   const textRef = useCallback((node) => {
     if (node !== null) {
       const container = containerRef.current;
-      console.log(node.offsetWidth, container.clientWidth);
-      console.log(node.offsetWidth > container.scrollWidth);
       setIsTextOverflowing(node.offsetWidth > container.scrollWidth);
     }
   }, []);
@@ -40,7 +39,12 @@ export default function ProfileMenu() {
               </p>
             </Marquee>
             {!session.user.verified && (
-              <p className="text-xs text-gray-300">not verified</p>
+              <p className="text-xs text-gray-300">
+                <Warning size={12} /> Not verified |{" "}
+                <Link href="/verification">
+                  <a className="text-green-500">verify</a>
+                </Link>
+              </p>
             )}
           </div>
           <ul className="flex flex-col border-y border-gray-100 py-2">
@@ -52,7 +56,14 @@ export default function ProfileMenu() {
               </Link>
             </li>
             <li>
-              <Link href="/profile/edit">
+              <Link href="/about">
+                <a className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100/30">
+                  About
+                </a>
+              </Link>
+            </li>
+            <li>
+              <Link href="/profile/settings">
                 <a className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100/30">
                   Settings
                 </a>
@@ -64,6 +75,11 @@ export default function ProfileMenu() {
       <div className="flex flex-col gap-4">
         {!session && status == "unauthenticated" ? (
           <div className="flex flex-col pt-2">
+            <Link href="/about">
+              <a className="flex items-center gap-2 px-4 py-3 hover:bg-gray-100/30">
+                About
+              </a>
+            </Link>
             <Link href="/signup">
               <a className="flex items-center gap-2 px-4 py-3 font-display font-medium text-green-500 hover:bg-gray-100/30">
                 Sign Up
@@ -79,6 +95,7 @@ export default function ProfileMenu() {
           <button
             className="mt-2 flex items-center gap-2 px-4 py-3 hover:bg-gray-100/30"
             onClick={() => {
+              socket.disconnect();
               signOut();
             }}
           >

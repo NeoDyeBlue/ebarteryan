@@ -2,21 +2,24 @@ export default function StatusBadge({ status, statusText, type }) {
   let color = "";
   switch (status) {
     case "info":
-      color = "bg-info-200";
+      color = "bg-info-500 text-white";
       break;
     case "waiting":
-      color = "bg-warning-200";
+      color = "bg-warning-500 text-black-light";
       break;
-    case "success":
-      color = "bg-success-200";
+    case "accepted":
+      color = "bg-success-500 text-white";
+      break;
+    case "reviewed":
+      color = "bg-info-500 text-white";
       break;
     case "failed":
-      color = "bg-danger-200";
+      color = "bg-danger-500 text-white";
       break;
   }
   return (
     <span
-      className={`text-center text-xs capitalize ${color} rounded-[10px] px-2 py-1 font-medium text-black-light`}
+      className={`text-center text-xs capitalize leading-none ${color} ml-auto rounded-[10px] px-2 py-1 font-medium`}
     >
       {statusText}
     </span>

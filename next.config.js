@@ -5,14 +5,6 @@ const nextConfig = {
   images: {
     domains: ["res.cloudinary.com", "lh3.googleusercontent.com"],
   },
-  async rewrites() {
-    return [
-      {
-        source: "/items",
-        destination: "/",
-      },
-    ];
-  },
   // experimental: { images: { allowFutureImage: true } },
 };
 

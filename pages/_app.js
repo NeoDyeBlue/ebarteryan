@@ -2,14 +2,17 @@ import "../styles/globals.css";
 import { SWRConfig } from "swr";
 import { SessionProvider } from "next-auth/react";
 import NextNProgress from "nextjs-progressbar";
-// import { ToastContainer, Slide } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { Toaster } from "react-hot-toast";
 import { useEffect } from "react";
 import useSocketStore from "../store/useSocketStore";
+import { UserSocketInitializer } from "../components/Misc";
 import { io } from "socket.io-client";
 
-const socket = io();
+const socket = io({
+  reconnection: true,
+  reconnectionAttempts: Infinity,
+  reconnectionDelay: 1000,
+});
 
 /**
  * different _app.js for next-auth useSession()
@@ -31,16 +34,26 @@ export default function MyApp({
 }) {
   const { setSocket } = useSocketStore();
   useEffect(() => {
-    fetch("/api/socket").then(() => {
-      setSocket(socket);
-    });
+    async function handleSocket() {
+      fetch("/api/socket").then(() => {
+        setSocket(socket);
+      });
 
+      //   const session = await getSession();
+      //   if (session) {
+      //     socket.emit("user:connect", session.user.id);
+      //   }
+      if (!socket.connected) {
+        socket.connect();
+      }
+
+      return () => {
+        socket.disconnect();
+      };
+    }
     console.log(socket);
-
-    // return () => {
-    //   socket.disconnect();
-    // };
-  }, []);
+    handleSocket();
+  }, [setSocket]);
   const getLayout = Component.getLayout ?? ((page) => page);
   const layout = getLayout(<Component {...pageProps} />);
   return (
@@ -65,19 +78,6 @@ export default function MyApp({
             "relative flex p-1 min-h-10 rounded-full justify-between overflow-hidden cursor-pointer border border-green font-body"
           }
         />
-        {/* <ToastContainer
-          position="bottom-center"
-          autoClose={5000}
-          hideProgressBar
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover={false}
-          theme="dark"
-          transition={Slide}
-        /> */}
         <Toaster
           position="bottom-center"
           containerStyle={{
@@ -96,7 +96,7 @@ export default function MyApp({
             },
           }}
         />
-        {layout}
+        <UserSocketInitializer>{layout}</UserSocketInitializer>
       </SWRConfig>
     </SessionProvider>
   );
