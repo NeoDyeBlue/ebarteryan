@@ -6,7 +6,7 @@ import {
   getSavedItems,
   addToSavedList,
   removeItemFromSaved,
-} from "../../../../lib/controllers/user-controller";
+} from "../../../../lib/data-access/user";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(req, res) {

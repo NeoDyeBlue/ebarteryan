@@ -95,7 +95,10 @@ export default function UserOfferListItem({ offer, mutate }) {
     <li
       className="relative flex h-fit cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 bg-white
     p-3 hover:shadow-md"
-      onClick={() => offer?.item && router.push(`/items/${offer?.item?._id}`)}
+      onClick={() =>
+        offer?.item &&
+        router.push(`/items/${offer?.item?._id}#offers-questions`)
+      }
     >
       <div onClick={(e) => e.stopPropagation()} className="absolute">
         <ReviewModal

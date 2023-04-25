@@ -2,7 +2,7 @@ import {
   successResponse,
   errorResponse,
 } from "../../../../utils/response-utils";
-import { getUserItems } from "../../../../lib/controllers/item-controller";
+import { getUserItems } from "../../../../lib/data-access/item";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(req, res) {

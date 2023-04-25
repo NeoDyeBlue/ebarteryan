@@ -44,7 +44,7 @@ export default function Footer() {
               )
             )}
           </FooterLinkList>
-          <div className="flex items-center gap-4 self-end lg:self-start">
+          {/* <div className="flex items-center gap-4 self-end lg:self-start">
             <Link href="https://facebook.com">
               <a>
                 <LogoFacebook size={36} />
@@ -55,7 +55,7 @@ export default function Footer() {
                 <LogoTwitter size={36} />
               </a>
             </Link>
-          </div>
+          </div> */}
         </div>
         <p className="mx-auto text-xs text-gray-400">
           © 2023 EBarterYan. All Rights Reserved

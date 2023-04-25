@@ -2,7 +2,7 @@ import {
   askQuestion,
   answerQuestion,
   getQuestions,
-} from "../../../lib/controllers/question-controller";
+} from "../../../lib/data-access/question";
 import { getToken } from "next-auth/jwt";
 import { successResponse, errorResponse } from "../../../utils/response-utils";
 

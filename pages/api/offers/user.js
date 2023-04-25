@@ -1,4 +1,4 @@
-import { getUserOffers } from "../../../lib/controllers/offer-controller";
+import { getUserOffers } from "../../../lib/data-access/offer";
 import { successResponse, errorResponse } from "../../../utils/response-utils";
 import { getToken } from "next-auth/jwt";
 

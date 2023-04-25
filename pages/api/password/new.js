@@ -1,4 +1,4 @@
-import { resetPassword } from "../../../lib/controllers/user-controller";
+import { resetPassword } from "../../../lib/data-access/user";
 import { successResponse, errorResponse } from "../../../utils/response-utils";
 
 export default async function handler(req, res) {

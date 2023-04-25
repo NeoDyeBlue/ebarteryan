@@ -1,4 +1,4 @@
-import { sendPasswordResetRequest } from "../../../lib/controllers/user-controller";
+import { sendPasswordResetRequest } from "../../../lib/data-access/user";
 import { successResponse, errorResponse } from "../../../utils/response-utils";
 import absoluteUrl from "next-absolute-url";
 export default async function handler(req, res) {

@@ -1,4 +1,4 @@
-import { updateProfile } from "../../../lib/controllers/user-controller";
+import { updateProfile } from "../../../lib/data-access/user";
 import { successResponse, errorResponse } from "../../../utils/response-utils";
 import { getToken } from "next-auth/jwt";
 

@@ -1,6 +1,6 @@
 import { NavLayout, CategoryLayout } from "../../components/Layouts";
 import { LocationBarterButtons, Button } from "../../components/Buttons";
-import { getAllCategories } from "../../lib/controllers/category-controller";
+import { getAllCategories } from "../../lib/data-access/category";
 // import { getSession } from "next-auth/react";
 // import { getItems } from "../../../lib/controllers/item-controller";
 import useMapStore from "../../store/useMapStore";
@@ -18,7 +18,7 @@ export async function getServerSideProps(context) {
   // const session = await getSession(context);
   const categories = await getAllCategories();
   const categoryNames = categories.map((category) =>
-    category.name.split(" ").join("-").toLowerCase()
+    category.name.split(" ").join("+").toLowerCase()
   );
 
   if (!categoryNames.includes(params.category)) {
@@ -90,8 +90,9 @@ export default function Category({ data }) {
         <title className="capitalize">
           {category
             ? `${category
-                .split(" ")
-                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))}`
+                .split("+")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")}`
             : "Loading..."}{" "}
           | Barter Items at your Town
         </title>

@@ -1,5 +1,5 @@
 import { successResponse, errorResponse } from "../../../utils/response-utils";
-import { getAllCategories } from "../../../lib/controllers/category-controller";
+import { getAllCategories } from "../../../lib/data-access/category";
 
 export default async function handler(req, res) {
   if (req.method == "GET") {

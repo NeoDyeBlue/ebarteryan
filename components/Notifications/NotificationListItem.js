@@ -59,7 +59,7 @@ export default function NotificationListItem({ read, type, data }) {
     if (type == "review") {
       router.push(`/profile`);
     } else {
-      router.push(`/items/${data?.item?._id}`);
+      router.push(`/items/${data?.item?._id}#offers-questions`);
     }
   }
 

@@ -18,7 +18,7 @@ import { ItemCardSkeleton } from "../../components/Loaders";
 import usePaginate from "../../lib/hooks/usePaginate";
 import { useSession, getSession } from "next-auth/react";
 import { DotLoader } from "react-spinners";
-import { getUserInfo } from "../../lib/controllers/user-controller";
+import { getUserInfo } from "../../lib/data-access/user";
 import { useState } from "react";
 import { useRouter } from "next/router";
 

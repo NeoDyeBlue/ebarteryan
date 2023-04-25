@@ -2,7 +2,7 @@ import {
   successResponse,
   errorResponse,
 } from "../../../../utils/response-utils";
-import { getReviews } from "../../../../lib/controllers/review-controller";
+import { getReviews } from "../../../../lib/data-access/review";
 
 export default async function handler(req, res) {
   try {

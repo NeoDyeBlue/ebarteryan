@@ -20,7 +20,7 @@ export default function SearchBox({ className, onClose }) {
   return (
     <div className={className}>
       <div className="flex h-full items-center gap-2 bg-white">
-        <div className="lg:hidden">
+        <div className="md:hidden">
           <CircleButton icon={<ArrowLeft size={24} />} onClick={onClose} />
         </div>
         <form

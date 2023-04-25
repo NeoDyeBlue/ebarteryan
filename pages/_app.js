@@ -7,6 +7,7 @@ import { useEffect } from "react";
 import useSocketStore from "../store/useSocketStore";
 import { UserSocketInitializer } from "../components/Misc";
 import { io } from "socket.io-client";
+import Script from "next/script";
 
 const socket = io({
   reconnection: true,
@@ -57,47 +58,57 @@ export default function MyApp({
   const getLayout = Component.getLayout ?? ((page) => page);
   const layout = getLayout(<Component {...pageProps} />);
   return (
-    <SessionProvider session={session}>
-      <SWRConfig
-        value={{
-          // refreshInterval: 3000,
-          revalidateOnFocus: false,
-          fetcher: (resource, init) =>
-            fetch(resource, init).then((res) => res.json()),
+    <>
+      <Script
+        id="Adsense-id"
+        async
+        onError={(e) => {
+          console.error("Ad Script failed to load", e);
         }}
-      >
-        <NextNProgress
-          color="#85CB33"
-          startPosition={0.3}
-          stopDelayMs={200}
-          height={3}
-          showOnShallow={true}
-          options={{ showSpinner: false, easing: "ease", speed: 500 }}
-          toastClassName={({ type }) =>
-            contextClass[type || "default"] +
-            "relative flex p-1 min-h-10 rounded-full justify-between overflow-hidden cursor-pointer border border-green font-body"
-          }
-        />
-        <Toaster
-          position="bottom-center"
-          containerStyle={{
-            top: 40,
-            left: 40,
-            bottom: 40,
-            right: 40,
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8971407658577008"
+      />
+      <SessionProvider session={session}>
+        <SWRConfig
+          value={{
+            // refreshInterval: 3000,
+            revalidateOnFocus: false,
+            fetcher: (resource, init) =>
+              fetch(resource, init).then((res) => res.json()),
           }}
-          toastOptions={{
-            duration: 5000,
-            className:
-              "min-w-[200px] bg-black font-body text-white rounded-[10px] shadow-md p-3",
-            style: {
-              background: "#000",
-              color: "#fff",
-            },
-          }}
-        />
-        <UserSocketInitializer>{layout}</UserSocketInitializer>
-      </SWRConfig>
-    </SessionProvider>
+        >
+          <NextNProgress
+            color="#85CB33"
+            startPosition={0.3}
+            stopDelayMs={200}
+            height={3}
+            showOnShallow={true}
+            options={{ showSpinner: false, easing: "ease", speed: 500 }}
+            toastClassName={({ type }) =>
+              contextClass[type || "default"] +
+              "relative flex p-1 min-h-10 rounded-full justify-between overflow-hidden cursor-pointer border border-green font-body"
+            }
+          />
+          <Toaster
+            position="bottom-center"
+            containerStyle={{
+              top: 40,
+              left: 40,
+              bottom: 40,
+              right: 40,
+            }}
+            toastOptions={{
+              duration: 5000,
+              className:
+                "min-w-[200px] bg-black font-body text-white rounded-[10px] shadow-md p-3",
+              style: {
+                background: "#000",
+                color: "#fff",
+              },
+            }}
+          />
+          <UserSocketInitializer>{layout}</UserSocketInitializer>
+        </SWRConfig>
+      </SessionProvider>
+    </>
   );
 }

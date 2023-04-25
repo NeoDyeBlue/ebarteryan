@@ -1,4 +1,4 @@
-import { changeAccountPassword } from "../../../lib/controllers/user-controller";
+import { changeAccountPassword } from "../../../lib/data-access/user";
 import { successResponse, errorResponse } from "../../../utils/response-utils";
 import { getToken } from "next-auth/jwt";
 
