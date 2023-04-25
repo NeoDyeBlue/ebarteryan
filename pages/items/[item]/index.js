@@ -33,10 +33,7 @@ import { useRouter } from "next/router";
 import { format } from "date-fns";
 import { ConditionBadge } from "../../../components/Misc";
 import useUserOfferStore from "../../../store/useUserOfferStore";
-import {
-  getUserOffer,
-  getAcceptedOffer,
-} from "../../../lib/controllers/offer-controller";
+import { getUserOffer, getAcceptedOffer } from "../../../lib/data-access/offer";
 import usePaginate from "../../../lib/hooks/usePaginate";
 import useSocketStore from "../../../store/useSocketStore";
 import ImageViewer from "react-simple-image-viewer";
