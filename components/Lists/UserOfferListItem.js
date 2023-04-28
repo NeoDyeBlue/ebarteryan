@@ -16,7 +16,7 @@ import { toast } from "react-hot-toast";
 export default function UserOfferListItem({ offer, mutate }) {
   const { setReviewee, setItem, isReviewDone } = useReviewStore();
   const router = useRouter();
-  let colors = "";
+  let colors;
   let status;
   if (offer.accepted && !offer.reviewed) {
     status = "accepted";
@@ -91,91 +91,114 @@ export default function UserOfferListItem({ offer, mutate }) {
     setIsReviewModalOpen(false);
   }
 
-  return (
-    <li
-      className="relative flex h-fit cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 bg-white
-    p-3 hover:shadow-md"
-      onClick={() =>
-        offer?.item &&
-        router.push(`/items/${offer?.item?._id}#offers-questions`)
-      }
-    >
-      <div onClick={(e) => e.stopPropagation()} className="absolute">
-        <ReviewModal
-          onReview={() => mutate()}
-          isOpen={isReviewModalOpen}
-          onClose={hideReviewModal}
-        />
-        <PopupLoader message="Deleting offer..." isOpen={isDeleting} />
+  if (!offer.isRemoved) {
+    return (
+      <li
+        className="relative flex h-full max-h-[325px] cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 bg-white
+      p-3 hover:shadow-md"
+        onClick={() =>
+          offer?.item &&
+          router.push(`/items/${offer?.item?._id}#offers-questions`)
+        }
+      >
+        <div onClick={(e) => e.stopPropagation()} className="absolute">
+          <ReviewModal
+            onReview={() => mutate()}
+            isOpen={isReviewModalOpen}
+            onClose={hideReviewModal}
+          />
+          <PopupLoader message="Deleting offer..." isOpen={isDeleting} />
+          <ConfirmationModal
+            onClose={hideDeleteConfirmationOpen}
+            isOpen={isDeleteConfirmationOpen}
+            label="Delete Offer"
+            message="Deleting your offer will be gone forever!"
+            onConfirm={handleDeletelick}
+          />
+        </div>
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex w-full items-center gap-2 overflow-hidden">
+            {offer?.item && (
+              <>
+                <div className="relative h-[36px] w-[36px] flex-shrink-0 overflow-hidden rounded-full">
+                  <Image
+                    src={offer?.item?.user?.image?.url}
+                    layout="fill"
+                    objectFit="cover"
+                    alt="user image"
+                  />
+                </div>
+                <p className="overflow-hidden overflow-ellipsis whitespace-nowrap font-display text-sm font-medium">
+                  {offer?.item?.user?.firstName} {offer?.item?.user?.lastName}
+                </p>
+              </>
+            )}
+            <StatusBadge status={status} statusText={status} />
+          </div>
+        </div>
+        {/* items */}
+        <div className="relative flex flex-col items-center gap-2">
+          <ItemMiniCard
+            from="Your item"
+            itemName={offer?.name}
+            image={offer?.image?.url}
+            createdAt={offer?.createdAt}
+          />
+          {offer?.item || !offer?.item?.isRemoved ? (
+            <ItemMiniCard
+              from={`${offer?.item?.user?.firstName}'s item`}
+              itemName={offer?.item?.name}
+              image={offer?.item?.image?.url}
+              createdAt={offer?.item?.createdAt}
+            />
+          ) : (
+            <ItemMiniCard isNull />
+          )}
+          <div className="h-[37.5px] self-end">
+            {status == "accepted" && (
+              <Button small autoWidth onClick={showReviewModal}>
+                Review
+              </Button>
+            )}
+            {status !== "accepted" && status !== "reviewed" && (
+              <Button
+                small
+                autoWidth
+                secondary
+                onClick={showDeleteConfirmation}
+              >
+                Delete
+              </Button>
+            )}
+          </div>
+        </div>
+      </li>
+    );
+  } else {
+    return (
+      <>
+        <PopupLoader message="Deleting offer" isOpen={isDeleting} />
         <ConfirmationModal
           onClose={hideDeleteConfirmationOpen}
           isOpen={isDeleteConfirmationOpen}
-          label="Delete Offer"
-          message="Deleting your offer will be gone forever!"
+          label="Delete Unavailable Offer"
           onConfirm={handleDeletelick}
         />
-      </div>
-      <div className="flex items-center justify-between gap-2">
-        <div className="flex w-full items-center gap-2 overflow-hidden">
-          {offer?.item && (
-            <>
-              <div className="relative h-[36px] w-[36px] flex-shrink-0 overflow-hidden rounded-full">
-                <Image
-                  src={offer?.item?.user?.image?.url}
-                  layout="fill"
-                  objectFit="cover"
-                  alt="user image"
-                />
-              </div>
-              <p className="overflow-hidden overflow-ellipsis whitespace-nowrap font-display text-sm font-medium">
-                {offer?.item?.user?.firstName} {offer?.item?.user?.lastName}
-              </p>
-            </>
-          )}
-          <StatusBadge status={status} statusText={status} />
-        </div>
-        {/* <KebabMenu>
-          {offer?.accepted && !offer?.reviewed && (
-            <KebabMenuItem onClick={showReviewModal}>
-              <Checkmark size={24} /> Add a Review
-            </KebabMenuItem>
-          )}
-          <KebabMenuItem onClick={showDeleteConfirmation}>
-            <TrashCan size={24} /> Delete Offer
-          </KebabMenuItem>
-        </KebabMenu> */}
-      </div>
-      {/* items */}
-      <div className="relative flex flex-col items-center gap-2">
-        <ItemMiniCard
-          from="Your item"
-          itemName={offer?.name}
-          image={offer?.image?.url}
-          createdAt={offer?.createdAt}
-        />
-        {offer?.item ? (
-          <ItemMiniCard
-            from={`${offer?.item?.user?.firstName}'s item`}
-            itemName={offer?.item?.name}
-            image={offer?.item?.image?.url}
-            createdAt={offer?.item?.createdAt}
-          />
-        ) : (
-          <ItemMiniCard isNull />
-        )}
-        <div className="h-[37.5px] self-end">
-          {status == "accepted" && (
-            <Button small autoWidth onClick={showReviewModal}>
-              Review
-            </Button>
-          )}
-          {status !== "accepted" && status !== "reviewed" && (
-            <Button small autoWidth secondary onClick={showDeleteConfirmation}>
-              Delete
-            </Button>
-          )}
-        </div>
-      </div>
-    </li>
-  );
+        <li
+          className="relative flex h-full max-h-[325px] cursor-pointer flex-col items-center justify-center gap-3 rounded-[10px] border border-gray-100 bg-white
+  p-3 hover:shadow-md"
+          onClick={showDeleteConfirmation}
+        >
+          <TrashCan size={32} />
+          <div className="text-center">
+            <p className="font-display font-semibold">{offer.name}</p>
+            <p className="text-sm">
+              This offer was removed for its violations. Please refrain from
+              offering inappropriate items.
+            </p>
+          </div>
+        </li>
+      </>
+    );
+  }
 }

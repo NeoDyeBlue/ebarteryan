@@ -226,14 +226,16 @@ export default function UserOfferCard({
             </p>
           </div>
           {/* <CircleButton icon={<OverflowMenuVertical size={24} />} /> */}
-          <KebabMenu>
-            <KebabMenuItem onClick={handleEditClick}>
-              <Edit size={24} /> Edit Offer
-            </KebabMenuItem>
-            <KebabMenuItem onClick={showDeleteConfirmation}>
-              <TrashCan size={24} /> Delete Offer
-            </KebabMenuItem>
-          </KebabMenu>
+          {!isAccepted && (
+            <KebabMenu>
+              <KebabMenuItem onClick={handleEditClick}>
+                <Edit size={24} /> Edit Offer
+              </KebabMenuItem>
+              <KebabMenuItem onClick={showDeleteConfirmation}>
+                <TrashCan size={24} /> Delete Offer
+              </KebabMenuItem>
+            </KebabMenu>
+          )}
         </div>
         <p>{offer?.description || "Description"}</p>
         <div className="grid max-w-[calc((0.25rem*2+300px))] grid-cols-[repeat(auto-fill,_minmax(100px,_100px))] gap-1 overflow-hidden">

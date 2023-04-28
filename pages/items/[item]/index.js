@@ -60,7 +60,7 @@ export async function getServerSideProps(context) {
     let acceptedOffer = null;
     let fromUser = false;
 
-    if (!item) {
+    if (!item || item.isRemoved) {
       return { notFound: true };
     }
 

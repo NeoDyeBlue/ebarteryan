@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import format from "date-fns/format";
 import { useState, useEffect } from "react";
 import useSocketStore from "../../store/useSocketStore";
+import { Warning } from "@carbon/icons-react";
 import useNotificationStore from "../../store/useNotificationStore";
 
 export default function NotificationListItem({ read, type, data }) {
@@ -38,6 +39,11 @@ export default function NotificationListItem({ read, type, data }) {
     case "offer-accepted":
       message = "accepted your offer on item";
       break;
+    case "offer-accepted-removed":
+      message = `Your accepted offer on item ${(
+        <span className="font-semibold">{data?.item?.name}</span>
+      )} was removed due to the offer's violations`;
+      break;
     case "review":
       message = `wrote you a review for your item`;
       break;
@@ -70,14 +76,30 @@ export default function NotificationListItem({ read, type, data }) {
     ${isRead ? "hover:bg-gray-100/30" : "bg-green-200/50"}`}
     >
       <div className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
-        <Image src={image} layout="fill" objectFit="cover" alt="notif image" />
+        {type !== "offer-accepted-removed" ? (
+          <Image
+            src={image}
+            layout="fill"
+            objectFit="cover"
+            alt="notif image"
+          />
+        ) : (
+          <Warning size={48} className="text-warning-700" />
+        )}
       </div>
       <div className="max-h-full overflow-hidden">
         <p className="overflow-ellipsis">
-          <span className="font-semibold">
-            {data?.users[userCount - 1]?.fullName}
-          </span>{" "}
-          {message} <span className="font-semibold">{data?.item?.name}</span>
+          {type !== "offer-accepted-removed" ? (
+            <>
+              <span className="font-semibold">
+                {data?.users[userCount - 1]?.fullName}
+              </span>{" "}
+              {message}{" "}
+              <span className="font-semibold">{data?.item?.name}</span>
+            </>
+          ) : (
+            { message }
+          )}
         </p>
         <p
           className={`mt-1 text-xs ${

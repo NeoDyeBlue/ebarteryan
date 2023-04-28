@@ -25,7 +25,7 @@ export async function getServerSideProps(context) {
   }
   try {
     const item = await getItem(params.item, session && session.user.id);
-    if (!item) {
+    if (!item || item.isRemoved) {
       throw new Error();
     }
     if (session && session?.user?.verified) {

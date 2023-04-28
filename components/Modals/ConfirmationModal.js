@@ -12,12 +12,12 @@ import useScrollBlock from "../../lib/hooks/useScrollBlock";
 import { useRef, useEffect } from "react";
 
 export default function ConfirmationModal({
-  onClose,
-  isOpen,
-  label,
-  message,
-  onConfirm,
-  onCancel,
+  onClose = () => {},
+  isOpen = false,
+  label = "",
+  message = "",
+  onConfirm = () => {},
+  onCancel = () => {},
 }) {
   ReactModal.setAppElement("#__next");
   const modalRef = useRef(null);
@@ -49,7 +49,7 @@ export default function ConfirmationModal({
       // htmlOpenClassName="overflow-y-scroll fixed w-full"
       // bodyOpenClassName="h-full overflow-y-scroll fixed w-full"
       className={`relative m-auto w-full overflow-hidden rounded-[10px]
-     bg-white py-6 shadow-lg md:max-w-[480px]`}
+     bg-white py-6 shadow-lg outline-none md:max-w-[480px]`}
     >
       <div
         className={`custom-scrollbar container mx-auto max-h-full overflow-y-auto md:px-6`}
@@ -59,7 +59,7 @@ export default function ConfirmationModal({
             <h1 className="text-2xl font-semibold">{label}</h1>
             <CircleButton
               onClick={() => {
-                onCancel && onCancel();
+                onCancel();
                 onClose();
               }}
               icon={<Add className="rotate-[135deg]" size={32} />}
@@ -80,7 +80,7 @@ export default function ConfirmationModal({
               autoWidth={true}
               secondary={true}
               onClick={() => {
-                onCancel && onCancel();
+                onCancel();
                 onClose();
               }}
             >
