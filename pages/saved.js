@@ -38,6 +38,7 @@ export default function Saved() {
       description={item.description}
       exchangeFor={item.exchangeFor}
       to={`/items/${item._id}`}
+      isRemoved={item.isRemoved}
     />
   ));
 

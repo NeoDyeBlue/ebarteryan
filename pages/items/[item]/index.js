@@ -657,6 +657,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
             itemId={itemData?._id}
             itemLister={itemData?.user}
             offersPaginated={offers}
+            isAcceptedOfferRemoved={itemData?.isAcceptedRemoved}
             questionsPaginated={questions}
             showUserControls={fromUser}
             hasUserOffer={userOffer ? true : false}

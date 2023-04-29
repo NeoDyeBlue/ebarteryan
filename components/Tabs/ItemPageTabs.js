@@ -16,6 +16,7 @@ import { toast } from "react-hot-toast";
 import { FormikProvider, Form, useFormik } from "formik";
 import useQuestionAnswerStore from "../../store/useQuestionAnswerStore";
 import useItemOffersStore from "../../store/useItemOffersStore";
+import { Warning } from "@carbon/icons-react";
 
 export default function ItemPageTabs({
   itemId,
@@ -25,9 +26,13 @@ export default function ItemPageTabs({
   showUserControls,
   available,
   onOfferAcceptChange,
+  isAcceptedOfferRemoved = false,
   onUserOfferEdit,
 }) {
   //swr
+  const [isAcceptedRemoved, setIsAcceptedRemoved] = useState(
+    isAcceptedOfferRemoved
+  );
   const {
     data: questions,
     totalDocs: totalQuestionDocs,
@@ -196,7 +201,8 @@ export default function ItemPageTabs({
     //   (storedOffer) => storedOffer._id !== offer._id
     // );
     // setOffers(updatedOffers);
-    offersPaginated.mutate();
+    setIsAcceptedRemoved(false);
+    mutateOffers();
   }
 
   // console.log({ isSubmitting, isSubmitSuccess, isForUpdating });
@@ -222,6 +228,17 @@ export default function ItemPageTabs({
       </TabList>
       <div>
         <TabPanel className="flex flex-col gap-10">
+          {isAcceptedRemoved && showUserControls && !acceptedOffer ? (
+            <div className="flex w-full items-center gap-2 rounded-[10px] border border-gray-100 p-4">
+              <Warning size={56} className="text-gray-200" />
+              <p className="text-sm text-gray-200">
+                The offer you accepted has been removed for its violations. Your
+                item is now made unavailable but you can toggle it back if you
+                want to accept more offers. Please be reminded to accept offers
+                more carefully!
+              </p>
+            </div>
+          ) : null}
           {(tempOffer || offer) && (
             <div className="flex scroll-mt-40 flex-col gap-2 border-b border-b-gray-100 pb-4">
               <p className="font-display text-xl font-semibold">

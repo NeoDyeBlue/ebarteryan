@@ -22,9 +22,18 @@ export default function UserOfferListItem({ offer, mutate }) {
     status = "accepted";
   } else if (offer.accepted && offer.reviewed) {
     status = "reviewed";
-  } else if (!offer?.item?.ended && offer?.item?.available) {
+  } else if (
+    !offer?.item?.ended &&
+    offer?.item?.available &&
+    !offer?.item?.isRemoved
+  ) {
     status = "waiting";
-  } else if (!offer?.item || offer?.item?.ended || !offer?.item?.available) {
+  } else if (
+    !offer?.item ||
+    offer?.item?.ended ||
+    !offer?.item?.available ||
+    offer?.item?.isRemoved
+  ) {
     status = "failed";
   }
 
@@ -94,7 +103,7 @@ export default function UserOfferListItem({ offer, mutate }) {
   if (!offer.isRemoved) {
     return (
       <li
-        className="relative flex h-full max-h-[325px] cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 bg-white
+        className="relative flex h-full max-h-[325px] min-h-[325px] cursor-pointer flex-col gap-3 rounded-[10px] border border-gray-100 bg-white
       p-3 hover:shadow-md"
         onClick={() =>
           offer?.item &&
@@ -118,7 +127,7 @@ export default function UserOfferListItem({ offer, mutate }) {
         </div>
         <div className="flex items-center justify-between gap-2">
           <div className="flex w-full items-center gap-2 overflow-hidden">
-            {offer?.item && (
+            {offer?.item && !offer?.item?.isRemoved && (
               <>
                 <div className="relative h-[36px] w-[36px] flex-shrink-0 overflow-hidden rounded-full">
                   <Image
@@ -144,7 +153,7 @@ export default function UserOfferListItem({ offer, mutate }) {
             image={offer?.image?.url}
             createdAt={offer?.createdAt}
           />
-          {offer?.item || !offer?.item?.isRemoved ? (
+          {offer?.item && !offer?.item?.isRemoved ? (
             <ItemMiniCard
               from={`${offer?.item?.user?.firstName}'s item`}
               itemName={offer?.item?.name}
@@ -185,7 +194,7 @@ export default function UserOfferListItem({ offer, mutate }) {
           onConfirm={handleDeletelick}
         />
         <li
-          className="relative flex h-full max-h-[325px] cursor-pointer flex-col items-center justify-center gap-3 rounded-[10px] border border-gray-100 bg-white
+          className="relative flex h-full max-h-[325px] min-h-[325px] cursor-pointer flex-col items-center justify-center gap-3 rounded-[10px] border border-gray-100 bg-white
   p-3 hover:shadow-md"
           onClick={showDeleteConfirmation}
         >
