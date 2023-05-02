@@ -67,7 +67,7 @@ export default function MessageList({ isForPage = false }) {
   const conversationItems =
     messageList.length &&
     messageList.map((message) => {
-      let subtitle;
+      let subtitle = "";
       let latestChatSender = "You";
 
       const recipient = message?.members?.find(
@@ -82,9 +82,10 @@ export default function MessageList({ isForPage = false }) {
       }
 
       if (
-        message.latestChat.type == "text" ||
-        message.latestChat.type == "mixed" ||
-        message.latestChat.type == "offer"
+        message.latestChat &&
+        (message.latestChat.type == "text" ||
+          message.latestChat.type == "mixed" ||
+          message.latestChat.type == "offer")
       ) {
         subtitle = `${latestChatSender}: ${message.latestChat.body}`;
       } else if (message.latestChat.type == "image") {

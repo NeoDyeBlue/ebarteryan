@@ -1,4 +1,4 @@
-import { Need } from "@carbon/icons-react";
+import { Need, Bookmark, BookmarkFilled } from "@carbon/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { TrashCan } from "@carbon/icons-react";
@@ -41,7 +41,7 @@ export default function ItemCard({
   }
 
   const children = (
-    <>
+    <a className="flex max-h-[400px] flex-col gap-2">
       <div className="relative aspect-square min-h-[150px] w-full overflow-hidden rounded-[10px]">
         <Image
           src={
@@ -65,19 +65,17 @@ export default function ItemCard({
           {exchangeFor}
         </p>
       </div>
-      <div className="flex items-center gap-1 self-end text-black-light">
-        <Need />
-        <p className="font-display text-sm font-semibold">{offers}</p>
-      </div>
-    </>
+      <Link href={`${to}/#offers-questions`}>
+        <a className="flex w-fit items-center gap-1 self-end rounded-md p-1 text-black-light hover:bg-gray-100/50">
+          <Need />
+          <p className="font-display text-sm font-semibold">{offers}</p>
+        </a>
+      </Link>
+    </a>
   );
 
   if (!isRemoved) {
-    return (
-      <Link href={to}>
-        <a className="flex max-h-[400px] flex-col gap-2">{children}</a>
-      </Link>
-    );
+    return <Link href={to}>{children}</Link>;
   } else {
     return (
       <>

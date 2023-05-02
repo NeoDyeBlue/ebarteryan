@@ -9,13 +9,17 @@ export default function Footer() {
   const { data: session, status } = useSession();
   const categoryListItems =
     categories?.success &&
-    categories.data.map((category, index) => (
-      <FooterLinkListItem
-        key={index}
-        to={`/${category.name}`}
-        name={category.name}
-      />
-    ));
+    categories.data.map((category, index) => {
+      if (category.name !== "others") {
+        return (
+          <FooterLinkListItem
+            key={index}
+            to={`/${category.name}`}
+            name={category.name}
+          />
+        );
+      }
+    });
   return (
     <footer className="border-t border-t-gray-100 bg-white-dark">
       <div className="container mx-auto flex flex-col gap-9 py-10">
@@ -26,6 +30,7 @@ export default function Footer() {
           <FooterLinkList title="Listings">
             <FooterLinkListItem to="/items" name="All Items" />
             {categoryListItems}
+            <FooterLinkListItem to="/others" name="Others" />
           </FooterLinkList>
           <FooterLinkList title="Account">
             {session && status == "authenticated" ? (
