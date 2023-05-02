@@ -18,7 +18,7 @@ import { ItemCardSkeleton } from "../../components/Loaders";
 import usePaginate from "../../lib/hooks/usePaginate";
 import { useSession, getSession } from "next-auth/react";
 import { DotLoader } from "react-spinners";
-import { getUserInfo } from "../../lib/controllers/user-controller";
+import { getUserInfo } from "../../lib/data-access/user";
 import { useState } from "react";
 import { useRouter } from "next/router";
 
@@ -51,6 +51,7 @@ export default function Profile({ userInfo }) {
     totalDocs: itemstotalDocs,
     setSize: setItemsSize,
     error: itemsError,
+    mutate: mutateItems,
   } = usePaginate(`/api/items/user/${session?.user?.id}`, 8, {
     ...(activeTab !== "listings" ? { status: activeTab } : {}),
   });
@@ -76,6 +77,7 @@ export default function Profile({ userInfo }) {
     items.map((item) => (
       <ItemCard
         key={item._id || item.id}
+        id={item._id}
         name={item.name}
         exchangeFor={item.exchangeFor}
         image={item.image.url}
@@ -83,6 +85,8 @@ export default function Profile({ userInfo }) {
         duration={item.duration}
         offers={item.offersCount}
         createdAt={item.createdAt}
+        isRemoved={item?.isRemoved}
+        onAfterRemove={mutateItems}
       />
     ));
   return (

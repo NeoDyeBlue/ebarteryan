@@ -26,17 +26,14 @@ import { IconLabel } from "../../../components/Icons";
 import { OfferModal, ConfirmationModal } from "../../../components/Modals";
 import { useState, useEffect, useCallback, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { getItem } from "../../../lib/controllers/item-controller";
+import { getItem } from "../../../lib/data-access/item";
 import Link from "next/link";
 import { getSession, useSession } from "next-auth/react";
 import { useRouter } from "next/router";
 import { format } from "date-fns";
 import { ConditionBadge } from "../../../components/Misc";
 import useUserOfferStore from "../../../store/useUserOfferStore";
-import {
-  getUserOffer,
-  getAcceptedOffer,
-} from "../../../lib/controllers/offer-controller";
+import { getUserOffer, getAcceptedOffer } from "../../../lib/data-access/offer";
 import usePaginate from "../../../lib/hooks/usePaginate";
 import useSocketStore from "../../../store/useSocketStore";
 import ImageViewer from "react-simple-image-viewer";
@@ -63,7 +60,7 @@ export async function getServerSideProps(context) {
     let acceptedOffer = null;
     let fromUser = false;
 
-    if (!item) {
+    if (!item || item.isRemoved) {
       return { notFound: true };
     }
 
@@ -419,7 +416,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
               {available && !ended && !fromUser && (
                 <div className="flex max-w-[250px] gap-3">
                   {offer ? (
-                    <AnchorLinkButton elementId="offers">
+                    <AnchorLinkButton elementId="offers-questions">
                       See Your Offer
                     </AnchorLinkButton>
                   ) : !itemData.ended || itemData.available ? (
@@ -448,7 +445,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
         )}
       </AnimatePresence>
       {/* Item Info */}
-      <div className="container mx-auto flex flex-col gap-4 md:gap-6 lg:max-w-[1200px]">
+      <div className="container mx-auto flex flex-col gap-4 md:gap-6 xl:max-w-[1200px]">
         {/* Carousel and other info */}
         <motion.div
           className="flex flex-col gap-6 pt-4 md:grid md:grid-cols-2 md:gap-8 md:pt-8"
@@ -556,7 +553,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
               (available && !ended && !fromUser ? (
                 <div className="flex flex-col gap-3 md:flex-row">
                   {offer ? (
-                    <AnchorLinkButton elementId="offers">
+                    <AnchorLinkButton elementId="offers-questions">
                       See Your Offer
                     </AnchorLinkButton>
                   ) : !itemData.ended || itemData.available ? (
@@ -572,7 +569,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                   </Button>
                 </div>
               ) : (
-                <AnchorLinkButton elementId="offers">
+                <AnchorLinkButton elementId="offers-questions">
                   See Offers
                 </AnchorLinkButton>
               ))}
@@ -581,7 +578,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
       </div>
       {/* Description and Barterer*/}
       <div className="border-t border-gray-100">
-        <div className="container mx-auto flex flex-col gap-4 pt-6 md:flex-row md:gap-6 lg:max-w-[1200px]">
+        <div className="container mx-auto flex flex-col gap-4 pt-6 md:flex-row md:gap-6 xl:max-w-[1200px]">
           <div className="flex flex-col gap-3 pb-6 md:w-full md:border-0">
             <h2 className="text-xl font-medium">Description</h2>
             <p className="leading-8">{itemData.description}</p>
@@ -651,7 +648,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
       </div>
       {/* Tabs */}
       <div
-        id="offers"
+        id="offers-questions"
         className="w-full scroll-mt-40 border-t border-t-gray-100
             pb-6 sm:pt-6"
       >
@@ -660,6 +657,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
             itemId={itemData?._id}
             itemLister={itemData?.user}
             offersPaginated={offers}
+            isAcceptedOfferRemoved={itemData?.isAcceptedRemoved}
             questionsPaginated={questions}
             showUserControls={fromUser}
             hasUserOffer={userOffer ? true : false}

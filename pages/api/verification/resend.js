@@ -1,5 +1,5 @@
 import { successResponse, errorResponse } from "../../../utils/response-utils";
-import { verificationResend } from "../../../lib/controllers/user-controller";
+import { verificationResend } from "../../../lib/data-access/user";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(req, res) {

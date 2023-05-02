@@ -1,6 +1,6 @@
 import { successResponse, errorResponse } from "../../../utils/response-utils";
 import { getToken } from "next-auth/jwt";
-import { submitReview } from "../../../lib/controllers/review-controller";
+import { submitReview } from "../../../lib/data-access/review";
 
 export default async function handler(req, res) {
   try {

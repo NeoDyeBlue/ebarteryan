@@ -1,4 +1,4 @@
-import { updateNotificationRead } from "../../../lib/controllers/notification-controller";
+import { updateNotificationRead } from "../../../lib/data-access/notification";
 import { successResponse, errorResponse } from "../../../utils/response-utils";
 import { getToken } from "next-auth/jwt";
 

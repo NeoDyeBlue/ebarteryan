@@ -4,7 +4,7 @@ import { EditListingForm } from "../../../components/Forms";
 import { useEffect } from "react";
 import useUrlCallbackStore from "../../../store/useUrlCallbackStore";
 import { getSession } from "next-auth/react";
-import { getItem } from "../../../lib/controllers/item-controller";
+import { getItem } from "../../../lib/data-access/item";
 import { ErrorScreen } from "../../../components/Misc";
 
 export async function getServerSideProps(context) {
@@ -25,7 +25,7 @@ export async function getServerSideProps(context) {
   }
   try {
     const item = await getItem(params.item, session && session.user.id);
-    if (!item) {
+    if (!item || item.isRemoved) {
       throw new Error();
     }
     if (session && session?.user?.verified) {

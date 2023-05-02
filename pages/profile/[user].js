@@ -16,7 +16,7 @@ import { Button } from "../../components/Buttons";
 import { ItemCardSkeleton } from "../../components/Loaders";
 import usePaginate from "../../lib/hooks/usePaginate";
 import { getSession } from "next-auth/react";
-import { getUserInfo } from "../../lib/controllers/user-controller";
+import { getUserInfo } from "../../lib/data-access/user";
 import { DotLoader } from "react-spinners";
 import { useState } from "react";
 

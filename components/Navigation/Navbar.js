@@ -85,7 +85,7 @@ export default function Navbar({ sticky }) {
           onClose={() => setShowSearchBox(false)}
           className={`${
             showSearchBox ? "block" : "hidden"
-          } container absolute top-0 left-0 z-10 mx-auto h-full w-full max-w-[500px] lg:relative lg:block`}
+          } container absolute top-0 left-0 z-10 mx-auto h-full w-full max-w-[500px] md:relative md:block`}
         />
         <div className="relative flex items-center gap-3">
           <ul className="hidden items-center gap-2 md:flex">

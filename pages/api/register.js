@@ -1,6 +1,6 @@
 import { successResponse, errorResponse } from "../../utils/response-utils";
 import absoluteUrl from "next-absolute-url";
-import { register } from "../../lib/controllers/user-controller";
+import { register } from "../../lib/data-access/user";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(req, res) {

@@ -4,7 +4,7 @@ import {
   signIn,
   getUserBasicInfo,
   handleGoogleAuth,
-} from "../../../lib/controllers/user-controller";
+} from "../../../lib/data-access/user";
 import GoogleProvider from "next-auth/providers/google";
 import FacebookProvider from "next-auth/providers/facebook";
 // import GithubProvider from "next-auth/providers/github";

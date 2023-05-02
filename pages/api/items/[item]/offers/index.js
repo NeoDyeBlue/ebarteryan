@@ -1,7 +1,7 @@
 import {
   getItemOffers,
   createOffer,
-} from "../../../../../lib/controllers/offer-controller";
+} from "../../../../../lib/data-access/offer";
 import {
   successResponse,
   errorResponse,

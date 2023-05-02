@@ -57,7 +57,7 @@ export default function OfferForm({ onClose }) {
 
   async function handleFormSubmit(values) {
     onClose();
-    router.push("#offers");
+    router.push("#offers-questions");
     setTempOffer(values);
     let formBody;
     try {

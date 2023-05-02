@@ -3,7 +3,7 @@ import {
   errorResponse,
 } from "../../../../../utils/response-utils";
 import { getToken } from "next-auth/jwt";
-import { acceptOffer } from "../../../../../lib/controllers/offer-controller";
+import { acceptOffer } from "../../../../../lib/data-access/offer";
 
 export default async function handler(req, res) {
   try {

@@ -25,6 +25,7 @@
     "geolib": "^3.3.3",
     "googleapis": "^108.0.1",
     "leaflet": "^1.9.2",
+    "lodash": "^4.17.21",
     "mongoose": "^6.7.0",
     "mongoose-aggregate-paginate-v2": "^1.0.6",
     "mongoose-lean-virtuals": "^0.9.1",

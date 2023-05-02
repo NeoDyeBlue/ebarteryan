@@ -1,7 +1,4 @@
-import {
-  updateOffer,
-  deleteOffer,
-} from "../../../lib/controllers/offer-controller";
+import { updateOffer, deleteOffer } from "../../../lib/data-access/offer";
 import { successResponse, errorResponse } from "../../../utils/response-utils";
 import { getToken } from "next-auth/jwt";
 

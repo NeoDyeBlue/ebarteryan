@@ -2,7 +2,7 @@ import { successResponse, errorResponse } from "../../../utils/response-utils";
 import {
   createConversation,
   getMessages,
-} from "../../../lib/controllers/message-controller";
+} from "../../../lib/data-access/message";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(req, res) {

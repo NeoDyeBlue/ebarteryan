@@ -6,7 +6,7 @@ import {
   getItem,
   updateItem,
   deleteItem,
-} from "../../../../lib/controllers/item-controller";
+} from "../../../../lib/data-access/item";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(req, res) {

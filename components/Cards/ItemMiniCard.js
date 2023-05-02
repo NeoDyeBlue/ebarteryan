@@ -42,7 +42,7 @@ export default function ItemMiniCard({
               {itemName}
             </p>
             <p className="text-xs text-gray-200">
-              {format(new Date(createdAt), "PP")}
+              {/* {format(new Date(createdAt), "PP")} */}
             </p>
           </>
         )}

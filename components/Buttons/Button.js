@@ -4,9 +4,9 @@ export default function Button({
   children,
   onClick,
   disabled = false,
-  autoWidth,
+  autoWidth = false,
   type,
-  small,
+  small = false,
 }) {
   return (
     <button

@@ -1,5 +1,5 @@
 import { successResponse, errorResponse } from "../../../utils/response-utils";
-import { getItemsAggregate } from "../../../lib/controllers/item-controller";
+import { getItemsAggregate } from "../../../lib/data-access/item";
 import { getToken } from "next-auth/jwt";
 
 export default async function handler(req, res) {

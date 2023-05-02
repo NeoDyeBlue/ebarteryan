@@ -4,6 +4,7 @@ import useUiSizesStore from "../../store/useUiSizesStore";
 import useSWR from "swr";
 import { useRef, useEffect } from "react";
 import { useRouter } from "next/router";
+import _ from "lodash";
 
 export default function CategoryNavbar() {
   const { data: categories, error } = useSWR("/api/categories");
@@ -26,13 +27,17 @@ export default function CategoryNavbar() {
 
   const categoryListItems =
     categories?.success &&
-    categories.data.map((category, index) => (
-      <CategoryListItem
-        key={index}
-        to={`/${category.name}`}
-        name={category.name}
-      />
-    ));
+    _.sortBy(categories.data, "name").map((category, index) => {
+      if (category.name !== "others") {
+        return (
+          <CategoryListItem
+            key={index}
+            to={`/${category.name.split(" ").join("+")}`}
+            name={category.name}
+          />
+        );
+      }
+    });
 
   return (
     <div
@@ -57,6 +62,7 @@ export default function CategoryNavbar() {
             <CategoryList>
               <CategoryListItem to="/" name="All Items" aka={["/items"]} />
               {categoryListItems}
+              <CategoryListItem to="/others" name="Others" />
             </CategoryList>
           </div>
         )}
