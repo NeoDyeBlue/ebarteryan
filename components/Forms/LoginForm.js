@@ -18,8 +18,12 @@ export default function LoginForm() {
     });
     if (res.ok) {
       router.push("/");
+    } else if (
+      res.error &&
+      (res.error.name == "PasswordError" || res.error.name == "UserError")
+    ) {
+      actions.setFieldError("email", res.error);
     }
-    actions.setFieldError("email", res.error);
   }
 
   async function handleGoogleSignIn() {

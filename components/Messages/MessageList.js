@@ -64,9 +64,8 @@ export default function MessageList({ isForPage = false }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchValue]);
 
-  const conversationItems =
-    messageList.length &&
-    messageList.map((message) => {
+  const conversationItems = (messageList.length ? messageList : []).map(
+    (message) => {
       let subtitle = "";
       let latestChatSender = "You";
 
@@ -77,32 +76,33 @@ export default function MessageList({ isForPage = false }) {
         (member) => member.user._id == (session && session.user.id)
       );
 
-      if (message.latestChat.sender !== (session && session.user.id)) {
-        latestChatSender = recipient.user.firstName;
+      if (message?.latestChat?.sender !== (session && session.user.id)) {
+        latestChatSender = recipient?.user?.firstName;
       }
 
       if (
-        message.latestChat &&
+        message?.latestChat &&
         (message.latestChat.type == "text" ||
           message.latestChat.type == "mixed" ||
           message.latestChat.type == "offer")
       ) {
         subtitle = `${latestChatSender}: ${message.latestChat.body}`;
-      } else if (message.latestChat.type == "image") {
+      } else if (message?.latestChat?.type == "image") {
         subtitle = `${latestChatSender}: sent a photo`;
       }
       return (
         <MessageListItem
-          key={message._id}
-          convoId={message._id}
+          key={message?._id}
+          convoId={message?._id}
           onClick={() => joinConversation(message)}
-          image={recipient.user.image.url}
+          image={recipient?.user?.image?.url}
           recipient={recipient}
           subtitle={subtitle}
-          read={sender.read}
+          read={sender?.read}
         />
       );
-    });
+    }
+  );
 
   function joinConversation(room) {
     //delete previous conversation if temporary

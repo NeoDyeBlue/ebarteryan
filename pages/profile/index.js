@@ -72,23 +72,21 @@ export default function Profile({ userInfo }) {
       <ReviewListItem key={review?._id} review={review} />
     ));
 
-  const itemCards =
-    items.length &&
-    items.map((item) => (
-      <ItemCard
-        key={item._id || item.id}
-        id={item._id}
-        name={item.name}
-        exchangeFor={item.exchangeFor}
-        image={item.image.url}
-        to={`/items/${item._id || item.id}`}
-        duration={item.duration}
-        offers={item.offersCount}
-        createdAt={item.createdAt}
-        isRemoved={item?.isRemoved}
-        onAfterRemove={mutateItems}
-      />
-    ));
+  const itemCards = (items.length ? items : []).map((item) => (
+    <ItemCard
+      key={item?._id || item?.id}
+      id={item?._id}
+      name={item?.name}
+      exchangeFor={item?.exchangeFor}
+      image={item?.image?.url}
+      to={`/items/${item?._id || item?.id}`}
+      duration={item?.duration}
+      offers={item?.offersCount}
+      createdAt={item?.createdAt}
+      isRemoved={item?.isRemoved}
+      onAfterRemove={mutateItems}
+    />
+  ));
   return (
     <div className="w-full py-4">
       <Head>

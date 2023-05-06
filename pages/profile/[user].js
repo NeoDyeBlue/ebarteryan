@@ -83,20 +83,18 @@ export default function OtherProfile({ userInfo }) {
       <ReviewListItem key={review?._id} review={review} />
     ));
 
-  const itemCards =
-    items.length &&
-    items.map((item) => (
-      <ItemCard
-        key={item._id || item.id}
-        name={item.name}
-        exchangeFor={item.exchangeFor}
-        image={item.image.url}
-        to={`/items/${item._id || item.id}`}
-        duration={item.duration}
-        offers={item.offersCount}
-        createdAt={item.createdAt}
-      />
-    ));
+  const itemCards = (items.length ? items : []).map((item) => (
+    <ItemCard
+      key={item?._id || item?.id}
+      name={item?.name}
+      exchangeFor={item?.exchangeFor}
+      image={item?.image?.url}
+      to={`/items/${item?._id || item?.id}`}
+      duration={item?.duration}
+      offers={item?.offersCount}
+      createdAt={item?.createdAt}
+    />
+  ));
   return (
     <div className="w-full py-4">
       <Head>

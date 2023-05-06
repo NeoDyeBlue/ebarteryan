@@ -23,7 +23,7 @@ export default function Footer() {
   return (
     <footer className="border-t border-t-gray-100 bg-white-dark">
       <div className="container mx-auto flex flex-col gap-9 py-10">
-        <div className="flex flex-col gap-9 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:justify-between">
           <span className="font-display text-2xl font-semibold md:text-4xl">
             eBarterYan
           </span>

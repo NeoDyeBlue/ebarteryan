@@ -17,6 +17,7 @@ export default function Home() {
     data: items,
     isEndReached,
     isLoading,
+    isValidating,
     size,
     setSize,
   } = usePaginate("/api/categories/all", 8, {
@@ -24,20 +25,18 @@ export default function Home() {
       ? { ...listingPosition, radius: listingRadius }
       : {}),
   });
-  const itemCards =
-    items.length &&
-    items.map((item) => (
-      <ItemCard
-        key={item._id || item.id}
-        name={item.name}
-        exchangeFor={item.exchangeFor}
-        image={item.image.url}
-        to={`/items/${item._id || item.id}`}
-        duration={item.duration}
-        offers={item.offersCount}
-        createdAt={item.createdAt}
-      />
-    ));
+  const itemCards = (items.length ? items : []).map((item) => (
+    <ItemCard
+      key={item?._id || item?.id}
+      name={item?.name}
+      exchangeFor={item?.exchangeFor}
+      image={item?.image?.url}
+      to={`/items/${item?._id || item?.id}`}
+      duration={item?.duration}
+      offers={item?.offersCount}
+      createdAt={item?.createdAt}
+    />
+  ));
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -62,10 +61,15 @@ export default function Home() {
             <ItemCardSkeleton key={i} />
           ))}
         >
+          <div className="col-span-full flex justify-center gap-4">
+            <p className="min-h-[100px] text-sm uppercase text-gray-100">
+              advertisement
+            </p>
+          </div>
           {items.length ? (
             itemCards
           ) : !isLoading ? (
-            <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+            <p className="col-span-full m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
               <FacePendingFilled size={100} />
               Nothing to show{" "}
               <span className="font-semibold">

@@ -20,17 +20,15 @@ export default function Offers() {
     mutate,
   } = usePaginate("/api/offers/user", 8, { status: activeTab });
 
-  const userOffers =
-    offers.length &&
-    offers.map((offer, index) => {
-      return (
-        <UserOfferListItem
-          mutate={() => mutate()}
-          key={offer?._id}
-          offer={offer}
-        />
-      );
-    });
+  const userOffers = (offers.length ? offers : []).map((offer, index) => {
+    return (
+      <UserOfferListItem
+        mutate={() => mutate()}
+        key={offer?._id}
+        offer={offer}
+      />
+    );
+  });
 
   return (
     <div className="container mx-auto w-full">
@@ -50,7 +48,7 @@ export default function Offers() {
           className="grid grid-cols-1 items-start gap-4 sm:grid-cols-[auto_2fr]"
           onSelect={(index) => setActiveTab(tabs[index])}
         >
-          <TabList className="flex w-full items-start gap-4 sm:w-[200px] sm:flex-col sm:gap-6 sm:pb-4">
+          <TabList className="flex w-full items-start gap-4 overflow-x-auto scrollbar-hide sm:w-[200px] sm:flex-col sm:gap-6 sm:pb-4">
             <Tab className="tab-varying" selectedClassName="tab-active">
               <p>All Offers</p>
             </Tab>
