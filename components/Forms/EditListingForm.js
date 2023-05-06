@@ -76,7 +76,6 @@ export default function EditListingForm({ item }) {
   }
 
   async function handleFormSubmit(values) {
-    // console.log(values);
     const newImages = values.images.filter(
       (image) => !Object.keys(image).includes("url")
     );
@@ -366,6 +365,7 @@ export default function EditListingForm({ item }) {
                     type="button"
                     onClick={() => {
                       props.setFieldValue("draft", true);
+                      console.log("here");
                       props.submitForm();
                     }}
                     secondary={true}
