@@ -141,7 +141,11 @@ export default function CreateListingForm() {
                   infoMessage="You can upload up to 10 photos only."
                 />
                 <InputField type="text" name="name" label="Item Name" />
-                <Textarea label="Exchange For" name="exchangeFor" />
+                <Textarea
+                  infoMessage="Please be reasonable for what item do you want to get"
+                  label="Exchange For"
+                  name="exchangeFor"
+                />
                 <Textarea label="Description" name="description" />
                 <MemoizedDropdownSelect
                   name="category"
@@ -273,7 +277,8 @@ export default function CreateListingForm() {
                       label="Meetup"
                       description="
                   After accepting an offer you could ask or decide where do you 
-                  want the items to be claimed."
+                  want the items to be claimed. Please be reminded to 
+                  be careful and prioritize your own safety"
                     />
                   </MultiSelectItem>
                   <MultiSelectItem

@@ -29,7 +29,8 @@ export default function NavLayout({
           {children}
           {currentPath !== "/messages" &&
             session &&
-            status == "authenticated" && (
+            status == "authenticated" &&
+            session.user?.verified && (
               <MessagesPopup
                 hasBadge={true}
                 className="pointer-events-none fixed bottom-0 z-50 w-full lg:block"

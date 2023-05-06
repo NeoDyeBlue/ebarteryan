@@ -69,20 +69,18 @@ export default function Category({ data }) {
     // { initalData: data && data.length ? data : null }
   );
 
-  const itemCards =
-    items.length &&
-    items.map((item) => (
-      <ItemCard
-        key={item._id || item.id}
-        name={item.name}
-        exchangeFor={item.exchangeFor}
-        image={item.image.url}
-        to={`/items/${item._id || item.id}`}
-        duration={item.duration}
-        offers={item.offersCount}
-        createdAt={item.createdAt}
-      />
-    ));
+  const itemCards = (items.length ? items : []).map((item) => (
+    <ItemCard
+      key={item?._id || item?.id}
+      name={item?.name}
+      exchangeFor={item?.exchangeFor}
+      image={item?.image?.url}
+      to={`/items/${item?._id || item?.id}`}
+      duration={item?.duration}
+      offers={item?.offersCount}
+      createdAt={item?.createdAt}
+    />
+  ));
 
   return (
     <div className="flex w-full flex-col gap-4">

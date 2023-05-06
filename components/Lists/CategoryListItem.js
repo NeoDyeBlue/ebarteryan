@@ -4,7 +4,6 @@ import { useRouter } from "next/router";
 export default function CategoryListItem({ to, name, aka }) {
   const router = useRouter();
   const currentRoute = router.asPath;
-  console.log(to, currentRoute);
   return (
     <li>
       <Link href={to}>

@@ -3,11 +3,14 @@ import { SWRConfig } from "swr";
 import { SessionProvider } from "next-auth/react";
 import NextNProgress from "nextjs-progressbar";
 import { Toaster } from "react-hot-toast";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import useSocketStore from "../store/useSocketStore";
 import { UserSocketInitializer } from "../components/Misc";
 import { io } from "socket.io-client";
 import Script from "next/script";
+import { toast } from "react-hot-toast";
+import { WifiOff, Wifi } from "@carbon/icons-react";
+import { useRouter } from "next/router";
 
 const socket = io({
   reconnection: true,
@@ -33,7 +36,80 @@ export default function MyApp({
   Component,
   pageProps: { session, ...pageProps },
 }) {
+  const router = useRouter();
   const { setSocket } = useSocketStore();
+  const [offlineToastId, setOfflineToastId] = useState("");
+  useEffect(() => {
+    function handleOfflineStatus() {
+      toast.custom(
+        (t) => {
+          setOfflineToastId(t.id);
+          return (
+            <div
+              className={`${
+                t.visible ? "animate-enter" : "animate-leave"
+              } pointer-events-auto flex w-full max-w-md rounded-lg bg-gray-400 text-white shadow-lg ring-1 ring-black ring-opacity-5`}
+            >
+              <div className="w-0 flex-1 p-4">
+                <div className="flex items-start gap-4">
+                  <WifiOff size={24} className="text-danger-500" />
+                  <p>You have no internet connection</p>
+                </div>
+              </div>
+              <div className="flex border-l border-gray-200">
+                <button
+                  onClick={() => router.reload()}
+                  className="text-indigo-600 hover:text-indigo-500 focus:ring-indigo-500 flex w-full items-center justify-center rounded-none rounded-r-lg border border-transparent p-4 text-sm font-medium focus:outline-none focus:ring-2"
+                >
+                  Refresh
+                </button>
+              </div>
+            </div>
+          );
+        },
+        { duration: Infinity }
+      );
+    }
+
+    function handleOnlineStatus() {
+      toast.dismiss(offlineToastId);
+      toast.custom(
+        (t) => {
+          return (
+            <div
+              className={`${
+                t.visible ? "animate-enter" : "animate-leave"
+              } pointer-events-auto flex w-full max-w-md rounded-lg bg-gray-400 text-white shadow-lg ring-1 ring-black ring-opacity-5`}
+            >
+              <div className="w-0 flex-1 p-4">
+                <div className="flex items-start gap-4">
+                  <Wifi size={24} className="text-success-500" />
+                  <p>Your internet connection was restored</p>
+                </div>
+              </div>
+              <div className="flex border-l border-gray-200">
+                <button
+                  onClick={() => toast.dismiss(t.id)}
+                  className="text-indigo-600 hover:text-indigo-500 focus:ring-indigo-500 flex w-full items-center justify-center rounded-none rounded-r-lg border border-transparent p-4 text-sm font-medium focus:outline-none focus:ring-2"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          );
+        },
+        { duration: Infinity }
+      );
+    }
+
+    window.addEventListener("offline", handleOfflineStatus);
+    window.addEventListener("online", handleOnlineStatus);
+
+    return () => {
+      window.removeEventListener("offline", handleOfflineStatus);
+      window.removeEventListener("online", handleOnlineStatus);
+    };
+  }, [offlineToastId]);
   useEffect(() => {
     async function handleSocket() {
       fetch("/api/socket").then(() => {

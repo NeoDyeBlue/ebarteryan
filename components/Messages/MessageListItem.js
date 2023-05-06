@@ -22,7 +22,7 @@ export default function MessageListItem({
 
   const isOnline = useUserOnlineCheck(
     session && session.user.id,
-    recipient.user._id
+    recipient?.user?._id
   );
 
   function handleClick() {

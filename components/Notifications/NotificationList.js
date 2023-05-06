@@ -53,16 +53,16 @@ export default function NotificationList({
     }
   }, [socket, setNotificationList, setUnreadCount, notificationList, session]);
 
-  const notificationItems =
-    notificationList.length &&
-    notificationList.map((notification) => (
-      <NotificationListItem
-        key={notification._id}
-        read={notification.read}
-        type={notification.type}
-        data={notification}
-      />
-    ));
+  const notificationItems = (
+    notificationList?.length ? notificationList : []
+  ).map((notification) => (
+    <NotificationListItem
+      key={notification?._id}
+      read={notification?.read}
+      type={notification?.type}
+      data={notification}
+    />
+  ));
 
   return (
     <ul className={`flex flex-col gap-2 py-4 px-2 ${forPage ? "-mx-2" : ""}`}>

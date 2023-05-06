@@ -44,11 +44,7 @@ export default function ItemCard({
     <a className="flex max-h-[400px] flex-col gap-2">
       <div className="relative aspect-square min-h-[150px] w-full overflow-hidden rounded-[10px]">
         <Image
-          src={
-            image
-              ? image
-              : "https://res.cloudinary.com/dppgyhery/image/upload/v1631456018/samples/ecommerce/leather-bag-gray.jpg"
-          }
+          src={image}
           layout="fill"
           objectFit="cover"
           placeholder="blur"
