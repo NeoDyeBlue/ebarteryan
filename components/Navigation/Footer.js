@@ -39,12 +39,21 @@ export default function Footer() {
                 <FooterLinkListItem to="/offers" name="Offers" />
                 <FooterLinkListItem to="/notifications" name="Notifications" />
                 <FooterLinkListItem to="/messages" name="Messages" />
+                <FooterLinkListItem
+                  to="/terms-and-conditions"
+                  name="Terms & Conditions"
+                />
               </>
             ) : (
               !session && (
                 <>
                   <FooterLinkListItem to="/login" name="Login" />
+
                   <FooterLinkListItem to="/signup" name="Sign Up" />
+                  <FooterLinkListItem
+                    to="/terms-and-conditions"
+                    name="Terms & Conditions"
+                  />
                 </>
               )
             )}
