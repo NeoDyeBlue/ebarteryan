@@ -38,7 +38,7 @@ export default function InputField({ label, infoMessage, ...props }) {
         : "border-gray-200 focus:ring-green-500"
     }`}
       />
-      {infoMessage && !meta.error && (
+      {infoMessage && (meta.touched ? !meta.error : !meta.touched) && (
         <p className="flex gap-1 text-sm text-gray-200">
           <span>
             <Information size={16} className="-mt-[2px]" />
