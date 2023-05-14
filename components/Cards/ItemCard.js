@@ -15,6 +15,7 @@ export default function ItemCard({
   offers,
   to,
   isRemoved = false,
+  violation = "",
   onAfterRemove = () => {},
 }) {
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
@@ -92,8 +93,11 @@ export default function ItemCard({
             <div className="text-center">
               <p className="font-display font-semibold">{name}</p>
               <p className="text-sm">
-                This item was not shown to other for its violations. Please
-                refrain from posting inappropriate items.
+                {violation && (
+                  <span className="font-semibold capitalize">{violation}.</span>
+                )}
+                This item was not shown to other for its violation. Please
+                refrain from posting such items.
               </p>
             </div>
           </div>

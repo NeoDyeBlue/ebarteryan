@@ -7,6 +7,7 @@ import usePaginate from "../lib/hooks/usePaginate";
 import useMapStore from "../store/useMapStore";
 import { FacePendingFilled } from "@carbon/icons-react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import Image from "next/image";
 
 export default function Home() {
   const { listingPosition, listingRadius, listingRegion } = useMapStore();
@@ -61,10 +62,16 @@ export default function Home() {
             <ItemCardSkeleton key={i} />
           ))}
         >
-          <div className="col-span-full flex justify-center gap-4">
-            <p className="min-h-[100px] text-sm uppercase text-gray-100">
-              advertisement
-            </p>
+          <div className="col-span-full flex flex-col items-center gap-4">
+            <p className="text-sm uppercase text-gray-100">advertisement</p>
+            <div className="relative h-full min-h-[150px] w-full">
+              <Image
+                src="/images/ad-sample.jpg"
+                alt="ad-sample"
+                layout="fill"
+                objectFit="contain"
+              />
+            </div>
           </div>
           {items.length ? (
             itemCards

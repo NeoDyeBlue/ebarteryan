@@ -202,8 +202,13 @@ export default function UserOfferListItem({ offer, mutate }) {
           <div className="text-center">
             <p className="font-display font-semibold">{offer.name}</p>
             <p className="text-sm">
-              This offer was removed for its violations. Please refrain from
-              offering inappropriate items.
+              {offer?.violation && (
+                <span className="font-semibold capitalize">
+                  {offer?.violation}.
+                </span>
+              )}
+              This offer was removed for its violation. Please refrain from
+              offering such items.
             </p>
           </div>
         </li>

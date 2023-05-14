@@ -84,6 +84,7 @@ export default function Profile({ userInfo }) {
       offers={item?.offersCount}
       createdAt={item?.createdAt}
       isRemoved={item?.isRemoved}
+      violation={item?.violation}
       onAfterRemove={mutateItems}
     />
   ));

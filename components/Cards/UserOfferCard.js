@@ -312,8 +312,13 @@ export default function UserOfferCard({
           <div className="flex items-center gap-2">
             <Warning size={32} className="text-danger-500" />
             <p className="text-sm">
-              Your offer was removed for its violations. Please refrain from
-              offering inappropriate items.
+              {offer?.violation && (
+                <span className="font-semibold capitalize">
+                  {offer?.violation}.
+                </span>
+              )}{" "}
+              Your offer was removed for its violation. Please refrain from
+              offering such items.
             </p>
           </div>
           <Button small autoWidth onClick={showDeleteConfirmation}>

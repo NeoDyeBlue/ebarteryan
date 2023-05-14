@@ -117,6 +117,14 @@ export default function SignUpForm() {
           text="Sign Up with Facebook"
         /> */}
       </div>
+      <p className="text-center text-sm">
+        By sucessfully signing up you agree to our{" "}
+        <Link href="/terms-and-conditions">
+          <a className="font-display font-medium text-green-500 hover:underline">
+            Terms & Conditions
+          </a>
+        </Link>
+      </p>
     </div>
   );
 }

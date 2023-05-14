@@ -232,7 +232,7 @@ export default function ItemPageTabs({
             <div className="flex w-full items-center gap-2 rounded-[10px] border border-gray-100 p-4">
               <Warning size={56} className="text-gray-200" />
               <p className="text-sm text-gray-200">
-                The offer you accepted has been removed for its violations. Your
+                The offer you accepted has been removed for its violation. Your
                 item is now made unavailable but you can toggle it back if you
                 want to accept more offers. Please be reminded to accept offers
                 more carefully!
