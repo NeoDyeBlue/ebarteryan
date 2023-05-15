@@ -62,7 +62,7 @@ export default function ItemCard({
           {exchangeFor}
         </p>
       </div>
-      <Link href={`${to}/#offers-questions`}>
+      <Link href={`${to}#offers-questions`}>
         <a className="flex w-fit items-center gap-1 self-end rounded-md p-1 text-black-light hover:bg-gray-100/50">
           <Need />
           <p className="font-display text-sm font-semibold">{offers}</p>
