@@ -5,7 +5,6 @@ import { useField } from "formik";
 export default function Textarea({ label, infoMessage, size, ...props }) {
   // const textBoxRef = useRef(null);
   const [field, meta] = useField(props);
-  console.log(infoMessage, meta.error);
   return (
     <div className="flex w-full flex-col gap-2">
       {label && <p className="font-display font-medium">{label}</p>}

@@ -4,11 +4,21 @@ import MapPinDrop from "./MapPinDrop";
 import RangeInput from "../Inputs/RangeInput";
 import useMapStore from "../../store/useMapStore";
 import MapLocate from "./MapLocate";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { Search } from "@carbon/icons-react";
+import { FormikProvider, Form, useFormik, Field } from "formik";
+import { toast } from "react-hot-toast";
 
 export default function Map({ withRadiusPicker, pinPosition }) {
-  const { setRadius, radius, position, listingRadius, listingPosition } =
-    useMapStore();
+  const {
+    setRadius,
+    radius,
+    position,
+    listingRadius,
+    listingPosition,
+    setPosition,
+    setRegion,
+  } = useMapStore();
 
   const defaultCenter = [12.8797, 121.774];
 
@@ -18,28 +28,79 @@ export default function Map({ withRadiusPicker, pinPosition }) {
     pinPosition ? true : false
   );
 
+  const [newPinPos, setNewPinPos] = useState(null);
+
+  const locationSearchFormik = useFormik({
+    initialValues: {
+      location: "",
+    },
+    onSubmit: handleLocationSearch,
+  });
+
+  async function handleLocationSearch(values) {
+    if (location) {
+      const result = await fetch(
+        `https://api.tomtom.com/search/2/search/${values.location
+          .split(" ")
+          .join(
+            "%20"
+          )}.json?entityTypeSet=Municipality&type=geography&key=awbTtEIZufAop7NYalmH11BPHSzr0QYv`
+      );
+      const data = await result.json();
+      if (data?.results?.length) {
+        setPosition({
+          lat: data?.results[0]?.position?.lat,
+          lng: data?.results[0]?.position?.lon,
+        });
+        setRegion(data?.results[0]?.address?.freeformAddress);
+      } else {
+        toast.error("Can't find location");
+      }
+    }
+  }
+
   function setNotInInitialLocation() {
     setInInitialLocation(false);
   }
 
-  const hasPosition = Boolean(position && Object.keys(position).length);
   const hasListingPosition = Boolean(
     listingPosition && Object.keys(listingPosition).length
   );
 
-  const newPinPos = useMemo(() => {
-    if (inInitialLocation) {
-      return pinPosition;
-    } else {
-      if (hasPosition) {
-        return position;
-      }
-      return null;
+  useEffect(() => {
+    const hasPosition = Boolean(position && Object.keys(position).length);
+
+    let pinPos = null;
+
+    if (inInitialLocation && !hasPosition) {
+      pinPos = pinPosition;
     }
-  }, [position, inInitialLocation, pinPosition, hasPosition]);
+    if (hasPosition) {
+      pinPos = position;
+    }
+    setNewPinPos(pinPos);
+  }, [position, inInitialLocation, pinPosition]);
 
   return (
     <div className="flex h-full w-full flex-col gap-4">
+      <FormikProvider value={locationSearchFormik}>
+        <Form className="flex min-h-[46px] w-full overflow-hidden rounded-full border border-gray-100 p-2 focus-within:shadow-md">
+          <Field
+            // value={searchQuery}
+            name="location"
+            // onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full border-none px-2 font-body text-[15px] placeholder-[#818181] outline-none focus:border-none focus:outline-none
+            lg:px-4"
+            placeholder="Search location"
+          ></Field>
+          <button
+            className="flex aspect-square h-full flex-shrink-0 items-center justify-center rounded-full bg-green-500 text-white"
+            type="submit"
+          >
+            <Search size={16} className="block" />
+          </button>
+        </Form>
+      </FormikProvider>
       {withRadiusPicker && (
         <RangeInput
           min={1}

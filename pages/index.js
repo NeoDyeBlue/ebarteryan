@@ -64,7 +64,7 @@ export default function Home() {
         >
           <div className="col-span-full flex flex-col items-center gap-4">
             <p className="text-sm uppercase text-gray-100">advertisement</p>
-            <div className="relative h-full min-h-[150px] w-full">
+            <div className="relative h-full min-h-[150px] w-full rounded-[10px] bg-gray-100/20">
               <Image
                 src="/images/ad-sample.jpg"
                 alt="ad-sample"
