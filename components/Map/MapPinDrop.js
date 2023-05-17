@@ -3,11 +3,10 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { LocationFilled } from "@carbon/icons-react";
 import { divIcon } from "leaflet";
 import useMapStore from "../../store/useMapStore";
-import { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo, useEffect, useCallback } from "react";
 import useSWR from "swr";
-import { useCallback } from "react";
 
-const tomtomFetcher = (url, args) =>
+const tomtomRevGeoCodeFetcher = (url, args) =>
   fetch(`${url}/${args.lat},${args.lng}.json?key=${args.token}`).then((r) =>
     r.json()
   );
@@ -23,7 +22,7 @@ export default function MapPinDrop({ pinPosition, onPositionChange }) {
         token: "awbTtEIZufAop7NYalmH11BPHSzr0QYv",
       },
     ],
-    tomtomFetcher
+    tomtomRevGeoCodeFetcher
   );
 
   const iconMarkup = renderToStaticMarkup(

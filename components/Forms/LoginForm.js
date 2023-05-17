@@ -18,10 +18,7 @@ export default function LoginForm() {
     });
     if (res.ok) {
       router.push("/");
-    } else if (
-      res.error &&
-      (res.error.name == "PasswordError" || res.error.name == "UserError")
-    ) {
+    } else if (res.error) {
       actions.setFieldError("email", res.error);
     }
   }
