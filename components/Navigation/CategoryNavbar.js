@@ -32,7 +32,7 @@ export default function CategoryNavbar() {
         return (
           <CategoryListItem
             key={index}
-            to={`/${category.name.split(" ").join("+")}`}
+            to={`/${category.name.split(" ").join("%20").toLowerCase()}`}
             name={category.name}
           />
         );
@@ -46,26 +46,17 @@ export default function CategoryNavbar() {
       className="sticky z-40 w-full bg-white shadow-md"
     >
       <div className="container mx-auto flex flex-col lg:flex-row lg:gap-4">
-        {router.pathname == "/search" ? (
-          <div className="flex min-h-[50px] w-full items-center overflow-hidden">
-            <p className="overflow-hidden overflow-ellipsis whitespace-nowrap font-display font-medium">
-              Search results for:{" "}
-              <span className="font-normal">&quot;{search_query}&quot;</span>
-            </p>
-          </div>
-        ) : (
-          <div
-            className="relative flex w-full overflow-hidden before:absolute before:left-0 before:z-50 before:block
+        <div
+          className="relative flex w-full overflow-hidden before:absolute before:left-0 before:z-50 before:block
            before:h-full before:w-4 before:bg-gradient-to-r before:from-white before:to-transparent after:absolute after:right-0 after:block 
            after:h-full after:w-4 after:bg-gradient-to-l after:from-white after:to-transparent"
-          >
-            <CategoryList>
-              <CategoryListItem to="/" name="All Items" aka={["/items"]} />
-              {categoryListItems}
-              <CategoryListItem to="/others" name="Others" />
-            </CategoryList>
-          </div>
-        )}
+        >
+          <CategoryList>
+            <CategoryListItem to="/" name="All Items" aka={["/items"]} />
+            {categoryListItems}
+            <CategoryListItem to="/others" name="Others" />
+          </CategoryList>
+        </div>
         <LocationBarterButtons className="hidden w-full flex-row-reverse gap-4 py-4 lg:flex lg:max-w-[380px]" />
       </div>
     </div>

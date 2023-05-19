@@ -9,6 +9,7 @@ export default function DropdownSelect({
   label,
   infoMessage,
   name,
+  onChangeGetOriginal = () => {},
 }) {
   const [field, meta, helpers] = useField(name);
   const [selectedItem, setSelectedItem] = useState(
@@ -41,7 +42,13 @@ export default function DropdownSelect({
   });
 
   useEffect(() => {
-    helpers.setValue(selectedItem?.value ? selectedItem.value : selectedItem);
+    const value = selectedItem?.value ? selectedItem.value : selectedItem;
+    helpers.setValue(value);
+    const original =
+      items.find((item) => item.value == value || item == value)?.original ||
+      value;
+
+    onChangeGetOriginal(original);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedItem]);
 

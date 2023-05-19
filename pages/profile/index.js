@@ -39,7 +39,7 @@ export async function getServerSideProps(context) {
 }
 
 export default function Profile({ userInfo }) {
-  const tabs = ["listings", "drafts", "unavailable", "ended"];
+  const tabs = ["listings", "drafts", "offered", "unavailable", "ended"];
   const router = useRouter();
   const [activeTab, setActiveTab] = useState(tabs[0]);
   const { data: session, status } = useSession();
@@ -184,6 +184,10 @@ export default function Profile({ userInfo }) {
                 </Tab>
                 <Tab className="tab-box" selectedClassName="tab-box-active">
                   {/* <LicenseDraft itemsSize={24} /> */}
+                  <p>Offered</p>
+                </Tab>
+                <Tab className="tab-box" selectedClassName="tab-box-active">
+                  {/* <LicenseDraft itemsSize={24} /> */}
                   <p>Unavailable</p>
                 </Tab>
                 <Tab className="tab-box" selectedClassName="tab-box-active">
@@ -193,138 +197,41 @@ export default function Profile({ userInfo }) {
               </TabList>
             </div>
             <div>
-              <TabPanel>
-                <div
-                  className={`grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
+              {[...Array(tabs.length)].map((_, i) => (
+                <TabPanel key={i}>
+                  <div
+                    className={`grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
            lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:pb-6 ${
              !items.length && itemsEndReached
                ? "min-h-[80vh] grid-cols-1 lg:grid-cols-1"
                : ""
            }`}
-                >
-                  {items?.length ? (
-                    itemCards
-                  ) : !itemsEndReached || itemsLoading ? (
-                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
-                  ) : (
-                    <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
-                      <FacePendingFilled size={100} />
-                      Nothing to show
-                    </p>
-                  )}
-                  {/* {itemsLoading &&
+                  >
+                    {items?.length ? (
+                      itemCards
+                    ) : !itemsEndReached || itemsLoading ? (
+                      [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
+                    ) : (
+                      <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
+                        <FacePendingFilled size={100} />
+                        Nothing to show
+                      </p>
+                    )}
+                    {/* {itemsLoading &&
                     [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)} */}
-                </div>
-                {!itemsEndReached && !itemsLoading ? (
-                  <div className="mx-auto mb-8 w-full max-w-[300px]">
-                    <Button
-                      secondary={true}
-                      onClick={() => setItemsSize(itemsSize + 1)}
-                    >
-                      Load More
-                    </Button>
                   </div>
-                ) : null}
-              </TabPanel>
-              <TabPanel>
-                <div
-                  className={`grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
-           lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:pb-6 ${
-             !items.length && itemsEndReached
-               ? "min-h-[80vh] grid-cols-1 lg:grid-cols-1"
-               : ""
-           }`}
-                >
-                  {items?.length ? (
-                    itemCards
-                  ) : !itemsEndReached || itemsLoading ? (
-                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
-                  ) : (
-                    <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
-                      <FacePendingFilled size={100} />
-                      Nothing to show
-                    </p>
-                  )}
-                  {/* {itemsLoading &&
-                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)} */}
-                </div>
-                {!itemsEndReached && !itemsLoading ? (
-                  <div className="mx-auto mb-8 w-full max-w-[300px]">
-                    <Button
-                      secondary={true}
-                      onClick={() => setItemsSize(itemsSize + 1)}
-                    >
-                      Load More
-                    </Button>
-                  </div>
-                ) : null}
-              </TabPanel>
-              <TabPanel>
-                <div
-                  className={`grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
-           lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:pb-6 ${
-             !items.length && itemsEndReached
-               ? "min-h-[80vh] grid-cols-1 lg:grid-cols-1"
-               : ""
-           }`}
-                >
-                  {items?.length ? (
-                    itemCards
-                  ) : !itemsEndReached || itemsLoading ? (
-                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
-                  ) : (
-                    <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
-                      <FacePendingFilled size={100} />
-                      Nothing to show
-                    </p>
-                  )}
-                  {/* {itemsLoading &&
-                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)} */}
-                </div>
-                {!itemsEndReached && !itemsLoading ? (
-                  <div className="mx-auto mb-8 w-full max-w-[300px]">
-                    <Button
-                      secondary={true}
-                      onClick={() => setItemsSize(itemsSize + 1)}
-                    >
-                      Load More
-                    </Button>
-                  </div>
-                ) : null}
-              </TabPanel>
-              <TabPanel>
-                <div
-                  className={`grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
-           lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:pb-6 ${
-             !items.length && itemsEndReached
-               ? "min-h-[80vh] grid-cols-1 lg:grid-cols-1"
-               : ""
-           }`}
-                >
-                  {items?.length ? (
-                    itemCards
-                  ) : !itemsEndReached || itemsLoading ? (
-                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
-                  ) : (
-                    <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
-                      <FacePendingFilled size={100} />
-                      Nothing to show
-                    </p>
-                  )}
-                  {/* {itemsLoading &&
-                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)} */}
-                </div>
-                {!itemsEndReached && !itemsLoading ? (
-                  <div className="mx-auto mb-8 w-full max-w-[300px]">
-                    <Button
-                      secondary={true}
-                      onClick={() => setItemsSize(itemsSize + 1)}
-                    >
-                      Load More
-                    </Button>
-                  </div>
-                ) : null}
-              </TabPanel>
+                  {!itemsEndReached && !itemsLoading ? (
+                    <div className="mx-auto mb-8 w-full max-w-[300px]">
+                      <Button
+                        secondary={true}
+                        onClick={() => setItemsSize(itemsSize + 1)}
+                      >
+                        Load More
+                      </Button>
+                    </div>
+                  ) : null}
+                </TabPanel>
+              ))}
             </div>
           </Tabs>
         </div>

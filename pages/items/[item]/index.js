@@ -23,7 +23,12 @@ import {
   AnchorLinkButton,
 } from "../../../components/Buttons";
 import { IconLabel } from "../../../components/Icons";
-import { OfferModal, ConfirmationModal } from "../../../components/Modals";
+import {
+  OfferModal,
+  ConfirmationModal,
+  Modal,
+  ListingModal,
+} from "../../../components/Modals";
 import { useState, useEffect, useCallback, memo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getItem } from "../../../lib/data-access/item";
@@ -59,17 +64,16 @@ export async function getServerSideProps(context) {
     let userOffer = null;
     let acceptedOffer = null;
     let fromUser = false;
-
-    if (!item || item.isRemoved) {
-      return { notFound: true };
-    }
-
-    acceptedOffer = await getAcceptedOffer(item._id);
-
     if (session && session?.user?.verified) {
       userOffer = await getUserOffer(item._id, session?.user?.id);
       fromUser = item?.user?._id == session?.user?.id;
     }
+
+    if (!item || item.isRemoved || (!fromUser && item.asOffer)) {
+      return { notFound: true };
+    }
+
+    acceptedOffer = await getAcceptedOffer(item._id);
     return {
       props: {
         itemData: JSON.parse(JSON.stringify(item)),
@@ -99,6 +103,8 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
   const [currentImage, setCurrentImage] = useState(0);
   const [isViewerOpen, setIsViewerOpen] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isListingOpen, setIsListingOpen] = useState(false);
+  const [isOfferOptionsOpen, setIsOfferOptionsOpen] = useState(false);
   const [saved, setSaved] = useState(itemData?.requester?.isSaved);
 
   //others
@@ -329,6 +335,35 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
         />
       )}
       {/* Modal */}
+      <Modal
+        isOpen={isOfferOptionsOpen}
+        onClose={() => setIsOfferOptionsOpen(false)}
+        label={"Offer an item"}
+      >
+        <div className="flex flex-col gap-2">
+          <Button
+            onClick={() => {
+              openOfferModal();
+              setIsOfferOptionsOpen(false);
+            }}
+          >
+            Create New Offer
+          </Button>
+          <Button
+            onClick={() => {
+              setIsListingOpen(true);
+              setIsOfferOptionsOpen(false);
+            }}
+            secondary={true}
+          >
+            Select from Listing
+          </Button>
+        </div>
+      </Modal>
+      <ListingModal
+        isOpen={isListingOpen}
+        onClose={() => setIsListingOpen(false)}
+      />
       <PopupLoader isOpen={isUpdating} message="Changing availability" />
       <PopupLoader isOpen={isDeleting} message="Deleting item..." />
       <ConfirmationModal
@@ -420,7 +455,9 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                       See Your Offer
                     </AnchorLinkButton>
                   ) : !itemData.ended || itemData.available ? (
-                    <Button onClick={openOfferModal}>Offer Now</Button>
+                    <Button onClick={() => setIsOfferOptionsOpen(true)}>
+                      Offer Now
+                    </Button>
                   ) : null}
                   <div className="hidden md:block">
                     <Button onClick={handleSaveClick} secondary={true}>
@@ -499,16 +536,33 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                 </span>
               </div>
             </div>
-            <div className="flex flex-col gap-3 pb-4">
+            <div className="flex flex-col gap-3 border-b border-gray-100 pb-4">
               <h2 className="text-xl font-medium">Exchange for</h2>
               <p>{itemData.exchangeFor}</p>
             </div>
+            {itemData?.categoryFields?.length ? (
+              <ul className="flex flex-col gap-3">
+                {itemData?.categoryFields
+                  ?.filter((f) => f.name && f.value)
+                  .map((field, index) => (
+                    <li
+                      className="flex items-center justify-between gap-4"
+                      key={index}
+                    >
+                      <p className="font-display font-medium capitalize">
+                        {field.name}
+                      </p>
+                      <p className="capitalize">{field.value}</p>
+                    </li>
+                  ))}
+              </ul>
+            ) : null}
             <div className="flex flex-col gap-4 pb-6">
               <div className="flex min-h-[65px] items-center justify-between rounded-[10px] border border-gray-100 p-4">
                 <p className="font-display font-medium">Availability</p>
                 {itemData?.draft ? (
                   <p>Draft</p>
-                ) : fromUser && !ended ? (
+                ) : fromUser && !ended && !itemData.asOffer ? (
                   <MemoizedInlineDropdownSelect
                     name="availability"
                     items={[
@@ -521,7 +575,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                       setAvailable(value);
                     }}
                   />
-                ) : (
+                ) : !itemData.asOffer ? (
                   <div
                     className={`flex items-center gap-2 rounded-[5px] py-[0.2rem] px-3`}
                   >
@@ -538,7 +592,15 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                         : "available"}
                     </p>
                   </div>
+                ) : (
+                  <p>Offered</p>
                 )}
+              </div>
+              <div className="flex min-h-[65px] flex-col gap-3 rounded-[10px] border border-gray-100 p-4 md:flex-row md:items-center md:justify-between">
+                <p className="w-fit font-display font-medium">Price Value</p>
+                <div className="flex flex-wrap justify-end gap-3">
+                  ₱{itemData?.priceValue || 0}
+                </div>
               </div>
               <div className="flex min-h-[65px] flex-col gap-3 rounded-[10px] border border-gray-100 p-4 md:flex-row md:items-center md:justify-between">
                 <p className="w-fit font-display font-medium">
@@ -557,7 +619,9 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
                       See Your Offer
                     </AnchorLinkButton>
                   ) : !itemData.ended || itemData.available ? (
-                    <Button onClick={openOfferModal}>Offer Now</Button>
+                    <Button onClick={() => setIsOfferOptionsOpen(true)}>
+                      Offer Now
+                    </Button>
                   ) : null}
                   <Button onClick={handleSaveClick} secondary={true}>
                     {saved ? (
@@ -661,7 +725,7 @@ export default function Item({ itemData, userOffer, fromUser, acceptedOffer }) {
             questionsPaginated={questions}
             showUserControls={fromUser}
             hasUserOffer={userOffer ? true : false}
-            available={available && !ended}
+            available={available && !ended && !itemData.asOffer}
             onUserOfferEdit={openOfferModal}
             onOfferAcceptChange={(value) => handleOfferAcceptChange(value)}
           />

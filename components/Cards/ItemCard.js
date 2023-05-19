@@ -15,10 +15,13 @@ export default function ItemCard({
   offers,
   to,
   isRemoved = false,
+  isForListingSelection = false,
   violation = "",
   onAfterRemove = () => {},
+  onConfirmOffer = () => {},
 }) {
   const [isConfirmDeleteOpen, setIsConfirmDeleteOpen] = useState(false);
+  const [isConfirmOfferOpen, setIsConfirmOfferOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   async function handleDeleteConfirmlick() {
@@ -71,8 +74,49 @@ export default function ItemCard({
     </a>
   );
 
-  if (!isRemoved) {
+  if (!isRemoved && !isForListingSelection) {
     return <Link href={to}>{children}</Link>;
+  } else if (isForListingSelection && !isRemoved) {
+    return (
+      <div
+        onClick={() => setIsConfirmOfferOpen(true)}
+        className="flex max-h-[400px] flex-col gap-2 hover:cursor-pointer"
+      >
+        <ConfirmationModal
+          isOpen={isConfirmOfferOpen}
+          label="Offer Item?"
+          message={`"${name}" will be removed from your listing and won't receive any offers`}
+          onClose={() => setIsConfirmOfferOpen(false)}
+          onConfirm={() => {
+            onConfirmOffer();
+            setIsConfirmOfferOpen(false);
+          }}
+        />
+        <div className="relative aspect-square min-h-[150px] w-full overflow-hidden rounded-[10px]">
+          <Image
+            src={image}
+            layout="fill"
+            objectFit="cover"
+            placeholder="blur"
+            blurDataURL="/images/placeholder.png"
+            alt="item image"
+          />
+        </div>
+        <div className="flex flex-col gap-1 text-gray-400">
+          <p className="max-h-full overflow-hidden text-ellipsis whitespace-nowrap font-display font-semibold text-black-light">
+            {name}
+          </p>
+          <p className="text-[15px] font-medium">Exchange for:</p>
+          <p className="overflow-hidden text-ellipsis whitespace-nowrap text-[15px]">
+            {exchangeFor}
+          </p>
+        </div>
+        <div className="flex w-fit items-center gap-1 self-end rounded-md p-1 text-black-light hover:bg-gray-100/50">
+          <Need />
+          <p className="font-display text-sm font-semibold">{offers}</p>
+        </div>
+      </div>
+    );
   } else {
     return (
       <>

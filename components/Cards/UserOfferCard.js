@@ -224,6 +224,11 @@ export default function UserOfferCard({
                   {offer?.createdAt && format(new Date(offer?.createdAt), "PP")}{" "}
                 </span>
                 <ConditionBadge condition={offer?.condition} />
+                {offer?.fromListing && (
+                  <span className="flex items-center justify-center rounded-full bg-info-100 px-2 text-xs font-medium leading-none text-info-500">
+                    From Listing
+                  </span>
+                )}
               </p>
             </div>
             {/* <CircleButton icon={<OverflowMenuVertical size={24} />} /> */}
@@ -296,7 +301,103 @@ export default function UserOfferCard({
         </div>
       </li>
     );
-  } else {
+  }
+  // else if (!offer.isRemoved && offer.fromListing) {
+  //   return (
+  //     <li className={`relative mb-1 flex flex-col gap-3 md:gap-6`}>
+  //       <ConfirmationModal
+  //         onClose={hideDeleteConfirmationOpen}
+  //         isOpen={isDeleteConfirmationOpen}
+  //         label="Delete Offer"
+  //         message="Deleting your offer will be gone forever!"
+  //         onConfirm={handleDeletelick}
+  //       />
+  //       <div className="flex w-full flex-col gap-3">
+  //         <div className="flex w-full items-center justify-between">
+  //           <div className="flex flex-col">
+  //             <p className="font-display font-medium">
+  //               {offer?.name || "Item Name"}
+  //             </p>
+  //             <p className="mt-[0.05rem] flex flex-col gap-2 text-sm text-gray-300 sm:flex-row">
+  //               <span>
+  //                 {offer?.region || offer?.location?.region} •{" "}
+  //                 {offer?.createdAt && format(new Date(offer?.createdAt), "PP")}{" "}
+  //               </span>
+  //               <ConditionBadge condition={offer?.condition} />
+  //             </p>
+  //           </div>
+  //           {/* <CircleButton icon={<OverflowMenuVertical size={24} />} /> */}
+  //           {!isAccepted && (
+  //             <KebabMenu>
+  //               <KebabMenuItem onClick={handleEditClick}>
+  //                 <Edit size={24} /> Edit Offer
+  //               </KebabMenuItem>
+  //               <KebabMenuItem onClick={showDeleteConfirmation}>
+  //                 <TrashCan size={24} /> Delete Offer
+  //               </KebabMenuItem>
+  //             </KebabMenu>
+  //           )}
+  //         </div>
+  //         <p>{offer?.description || "Description"}</p>
+  //         <div className="grid max-w-[calc((0.25rem*2+300px))] grid-cols-[repeat(auto-fill,_minmax(100px,_100px))] gap-1 overflow-hidden">
+  //           {itemImages}
+  //         </div>
+  //       </div>
+  //       <div className="flex w-full flex-col items-start gap-2 self-start md:flex-row md:items-center">
+  //         <div className="flex w-full items-center gap-4">
+  //           <div className="relative h-[48px] w-[48px] flex-shrink-0 overflow-hidden rounded-full">
+  //             <Image
+  //               src={offer?.user?.image?.url || session?.user?.image}
+  //               layout="fill"
+  //               alt="user image"
+  //               // objectFit="cover"
+  //             />
+  //           </div>
+  //           <div className="flex w-full items-center justify-between">
+  //             <div className="flex flex-col">
+  //               <p className="min-w-[150px] font-display">
+  //                 {offer?.user?.fullName ||
+  //                   `${session?.user?.firstName} ${session?.user?.lastName}`}
+  //               </p>
+  //               {/* <div className="flex gap-1">
+  //                 <span className="flex w-full items-center justify-start gap-1">
+  //                   <StarFilled size={18} />
+  //                   <span>5</span>
+  //                   <span className="text-gray-200">{"(10)"}</span>
+  //                 </span>
+  //               </div> */}
+  //             </div>
+  //           </div>
+  //         </div>
+  //         {isAccepted && (
+  //           <div className="flex w-full justify-end gap-2">
+  //             <Button underlined autoWidth small onClick={openChat}>
+  //               <div className="relative mr-1 h-[20px] w-[20px] overflow-hidden rounded-full">
+  //                 <Image
+  //                   src={itemLister?.image?.url}
+  //                   alt="item lister image"
+  //                   layout="fill"
+  //                 />
+  //               </div>
+  //               {/* <Chat size={20} /> */}
+  //               {isConvoLoading ? (
+  //                 <DotLoader size={20} color="#85CB33" />
+  //               ) : (
+  //                 <>
+  //                   <Chat size={20} />
+  //                   <p className="hidden lg:block">
+  //                     Chat {itemLister?.firstName}
+  //                   </p>
+  //                 </>
+  //               )}
+  //             </Button>
+  //           </div>
+  //         )}
+  //       </div>
+  //     </li>
+  //   );
+  // }
+  else {
     return (
       <li
         className={`relative mb-1 flex flex-col gap-3 rounded-[10px] border border-gray-100 p-4 md:gap-6`}

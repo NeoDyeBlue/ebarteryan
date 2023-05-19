@@ -1,6 +1,13 @@
 import { NavLayout, CategoryLayout } from "../../components/Layouts";
-import { LocationBarterButtons, Button } from "../../components/Buttons";
-import { getAllCategories } from "../../lib/data-access/category";
+import {
+  LocationBarterButtons,
+  Button,
+  FilterButton,
+} from "../../components/Buttons";
+import {
+  getAllCategories,
+  getCategoryData,
+} from "../../lib/data-access/category";
 // import { getSession } from "next-auth/react";
 // import { getItems } from "../../../lib/controllers/item-controller";
 import useMapStore from "../../store/useMapStore";
@@ -11,17 +18,20 @@ import { ItemCard } from "../../components/Cards";
 import { ItemCardSkeleton } from "../../components/Loaders";
 import { FacePendingFilled } from "@carbon/icons-react";
 import InfiniteScroll from "react-infinite-scroll-component";
+import { useState } from "react";
+import { FilterModal } from "../../components/Modals";
 
 export async function getServerSideProps(context) {
   const { params } = context;
   // const { listingRadius, listingPosition } = useMapStore.getState();
   // const session = await getSession(context);
   const categories = await getAllCategories();
+  const categoryData = await getCategoryData(params.category);
   const categoryNames = categories.map((category) =>
-    category.name.split(" ").join("+").toLowerCase()
+    category.name.toLowerCase()
   );
 
-  if (!categoryNames.includes(params.category)) {
+  if (!categoryNames.includes(params.category.toLowerCase())) {
     return { notFound: true };
   }
 
@@ -40,13 +50,14 @@ export async function getServerSideProps(context) {
   // );
   return {
     props: {
-      // data: JSON.parse(JSON.stringify(data)),
-      data: true,
+      data: JSON.parse(JSON.stringify(categoryData)),
     },
   };
 }
 
 export default function Category({ data }) {
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [filters, setFilters] = useState({});
   const { listingRadius, listingPosition, listingRegion } = useMapStore();
   const router = useRouter();
   const { category } = router.query || null;
@@ -63,7 +74,7 @@ export default function Category({ data }) {
     8,
     {
       ...(listingPosition && Object.keys(listingPosition).length
-        ? { ...listingPosition, radius: listingRadius }
+        ? { ...listingPosition, radius: listingRadius, ...filters }
         : {}),
     }
     // { initalData: data && data.length ? data : null }
@@ -84,6 +95,13 @@ export default function Category({ data }) {
 
   return (
     <div className="flex w-full flex-col gap-4">
+      <FilterModal
+        isOpen={isFilterOpen}
+        onClose={() => setIsFilterOpen(false)}
+        onApply={(value) => setFilters(value)}
+        initialValues={filters}
+        options={data.filterFields}
+      />
       <Head>
         <title className="capitalize">
           {category
@@ -99,7 +117,7 @@ export default function Category({ data }) {
       </Head>
       <LocationBarterButtons />
       <div className="container relative mx-auto">
-        <InfiniteScroll
+        {/* <InfiniteScroll
           dataLength={items.length}
           next={() => setSize(size + 1)}
           hasMore={!isEndReached}
@@ -124,8 +142,8 @@ export default function Category({ data }) {
               </span>
             </p>
           ) : null}
-        </InfiniteScroll>
-        {/* <div
+        </InfiniteScroll> */}
+        <div
           className={`grid grid-cols-[repeat(auto-fill,_minmax(150px,_1fr))] gap-4 pb-4 
            lg:grid-cols-[repeat(auto-fill,_minmax(250px,_1fr))] lg:gap-6 lg:py-6 ${
              !items.length && isEndReached
@@ -133,21 +151,24 @@ export default function Category({ data }) {
                : ""
            }`}
         >
+          <div className="col-span-full flex h-fit justify-end border-b border-b-gray-100 pb-4">
+            <FilterButton
+              onClick={() => setIsFilterOpen(true)}
+              isActive={Object.keys(filters).length}
+            />
+          </div>
           {items?.length ? (
             itemCards
-          ) : !isEndReached ? (
+          ) : !isEndReached || isLoading ? (
             [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)
           ) : (
             <p className="m-auto flex max-w-[60%] flex-col items-center justify-center gap-2 text-center font-display text-xl text-gray-200/70">
               <FacePendingFilled size={100} />
-              Nothing to show{" "}
-              <span className="font-semibold">
-                {listingRegion ? `${listingRegion} - ${listingRadius}km` : ""}
-              </span>
+              Nothing to show
             </p>
           )}
-          {isLoading &&
-            [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)}
+          {/* {isLoading &&
+                    [...Array(8)].map((_, i) => <ItemCardSkeleton key={i} />)} */}
         </div>
         {!isEndReached && !isLoading ? (
           <div className="mx-auto mb-8 w-full max-w-[300px]">
@@ -155,7 +176,7 @@ export default function Category({ data }) {
               Load More
             </Button>
           </div>
-        ) : null} */}
+        ) : null}
       </div>
     </div>
   );

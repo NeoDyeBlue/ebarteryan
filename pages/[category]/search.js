@@ -1,51 +1,102 @@
+import { NavLayout, CategoryLayout } from "../../components/Layouts";
+import {
+  LocationBarterButtons,
+  Button,
+  FilterButton,
+} from "../../components/Buttons";
+import {
+  getAllCategories,
+  getCategoryData,
+} from "../../lib/data-access/category";
+// import { getSession } from "next-auth/react";
+// import { getItems } from "../../../lib/controllers/item-controller";
+import useMapStore from "../../store/useMapStore";
 import Head from "next/head";
-import { LocationBarterButtons, FilterButton } from "../components/Buttons";
-import { ItemCard } from "../components/Cards";
-import { NavLayout, CategoryLayout } from "../components/Layouts";
-import { ItemCardSkeleton } from "../components/Loaders";
-import usePaginate from "../lib/hooks/usePaginate";
-import useMapStore from "../store/useMapStore";
-import { Button } from "../components/Buttons";
 import { useRouter } from "next/router";
+import usePaginate from "../../lib/hooks/usePaginate";
+import { ItemCard } from "../../components/Cards";
+import { ItemCardSkeleton } from "../../components/Loaders";
 import { FacePendingFilled } from "@carbon/icons-react";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { FilterModal } from "../components/Modals";
 import { useState } from "react";
+import { FilterModal } from "../../components/Modals";
 
-export default function Search() {
-  const { listingPosition, listingRadius, listingRegion } = useMapStore();
-  const router = useRouter();
-  const { search_query } = router.query;
+export async function getServerSideProps(context) {
+  const { params } = context;
+  // const { listingRadius, listingPosition } = useMapStore.getState();
+  // const session = await getSession(context);
+  const categories = await getAllCategories();
+  const categoryData = await getCategoryData(params.category);
+  const categoryNames = categories.map((category) =>
+    category.name.toLowerCase()
+  );
+
+  if (!categoryNames.includes(params.category.toLowerCase())) {
+    return { notFound: true };
+  }
+
+  // console.log(categoryNames);
+
+  // const data = await getItems(
+  //   session && session.user ? session.user.id : null,
+  //   params.category,
+  //   {
+  //     page: 1,
+  //     limit: 8,
+  //     ...(listingPosition && Object.keys(listingPosition).length
+  //       ? { ...listingPosition, radius: listingRadius }
+  //       : {}),
+  //   }
+  // );
+  return {
+    props: {
+      data: JSON.parse(JSON.stringify(categoryData)),
+    },
+  };
+}
+
+export default function CategorySearch({ data }) {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({});
-
+  const { listingRadius, listingPosition, listingRegion } = useMapStore();
+  const router = useRouter();
+  const { category, search_query } = router.query;
   const {
     data: items,
     isEndReached,
     isLoading,
     size,
     setSize,
-  } = usePaginate("/api/items/search", 8, {
-    search_query,
-    ...(listingPosition && Object.keys(listingPosition).length
-      ? { ...listingPosition, radius: listingRadius, ...filters }
-      : {}),
-  });
+    error,
+    mutate,
+  } = usePaginate(
+    `/api/categories/${category}`,
+    8,
+    {
+      ...(listingPosition && Object.keys(listingPosition).length
+        ? {
+            ...listingPosition,
+            radius: listingRadius,
+            ...filters,
+            search_query,
+          }
+        : {}),
+    }
+    // { initalData: data && data.length ? data : null }
+  );
 
-  const itemCards =
-    items.length &&
-    items.map((item) => (
-      <ItemCard
-        key={item._id || item.id}
-        name={item.name}
-        exchangeFor={item.exchangeFor}
-        image={item.image.url}
-        to={`/items/${item._id || item.id}`}
-        duration={item.duration}
-        offers={item.offersCount}
-        createdAt={item.createdAt}
-      />
-    ));
+  const itemCards = (items.length ? items : []).map((item) => (
+    <ItemCard
+      key={item?._id || item?.id}
+      name={item?.name}
+      exchangeFor={item?.exchangeFor}
+      image={item?.image?.url}
+      to={`/items/${item?._id || item?.id}`}
+      duration={item?.duration}
+      offers={item?.offersCount}
+      createdAt={item?.createdAt}
+    />
+  ));
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -54,9 +105,18 @@ export default function Search() {
         onClose={() => setIsFilterOpen(false)}
         onApply={(value) => setFilters(value)}
         initialValues={filters}
+        options={data.filterFields}
       />
       <Head>
-        <title>eBarterYan | Barter Items at your Town</title>
+        <title className="capitalize">
+          {category
+            ? `${category
+                .split("+")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")}`
+            : "Loading..."}{" "}
+          | Barter Items at your Town
+        </title>
         <meta name="description" content="Generated by create next app" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
@@ -96,8 +156,8 @@ export default function Search() {
                : ""
            }`}
         >
-          <div className="col-span-full flex h-fit justify-between gap-4 border-b border-b-gray-100 pb-4">
-            {router.pathname == "/search" ? (
+          <div className="col-span-full flex h-fit items-center justify-between gap-4 border-b border-b-gray-100 pb-4">
+            {router.pathname == "/[category]/search" ? (
               <div className="flex min-h-[50px] w-full items-center overflow-hidden">
                 <p className="overflow-hidden overflow-ellipsis whitespace-nowrap font-display font-medium">
                   Search results for:{" "}
@@ -139,7 +199,7 @@ export default function Search() {
   );
 }
 
-Search.getLayout = function getLayout(page) {
+CategorySearch.getLayout = function getLayout(page) {
   return (
     <NavLayout>
       <CategoryLayout />

@@ -11,7 +11,14 @@ export default function SearchBox({ className, onClose }) {
     event.preventDefault();
 
     router.push(
-      `/search?${new URLSearchParams({
+      `${
+        router.pathname == "/[category]/search" ||
+        router.pathname == "/[category]"
+          ? router.pathname == "/[category]/search"
+            ? `${router.asPath.split("?")[0]}`
+            : `${router.asPath.split("?")[0]}/search`
+          : "/search"
+      }?${new URLSearchParams({
         search_query: searchQuery,
       }).toString()}`
     );
@@ -32,7 +39,12 @@ export default function SearchBox({ className, onClose }) {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full border-none px-2 text-[15px] placeholder-[#818181] outline-none focus:border-none focus:outline-none
             lg:px-4"
-            placeholder="Search in eBarterYan"
+            placeholder={`Search in ${
+              router.pathname == "/[category]/search" ||
+              router.pathname == "/[category]"
+                ? router.query.category
+                : "eBarterYan"
+            }`}
           ></input>
           <button
             className="flex-shrink-0 rounded-full bg-green-500 p-1 text-white lg:p-2"

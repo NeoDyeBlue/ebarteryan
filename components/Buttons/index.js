@@ -5,3 +5,4 @@ export { default as AnchorLinkButton } from "./AnchorLinkButton";
 export { default as LocationBarterButtons } from "./LocationBarterButtons";
 export { default as ThirdPartyButton } from "./ThirdPartyButton";
 export { default as EditDeleteButtons } from "./EditDeleteButtons";
+export { default as FilterButton } from "./FilterButton";
