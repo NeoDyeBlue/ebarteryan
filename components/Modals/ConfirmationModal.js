@@ -43,7 +43,7 @@ export default function ConfirmationModal({
       preventScroll={true}
       closeTimeoutMS={150}
       onRequestClose={() => {
-        onCancel && onCancel();
+        onCancel();
         onClose();
       }}
       // htmlOpenClassName="overflow-y-scroll fixed w-full"

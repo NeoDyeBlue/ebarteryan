@@ -87,6 +87,7 @@ export default function ItemCard({
           label="Offer Item?"
           message={`"${name}" will be removed from your listing and won't receive any offers`}
           onClose={() => setIsConfirmOfferOpen(false)}
+          onCancel={() => setIsConfirmOfferOpen(false)}
           onConfirm={() => {
             onConfirmOffer();
             setIsConfirmOfferOpen(false);
